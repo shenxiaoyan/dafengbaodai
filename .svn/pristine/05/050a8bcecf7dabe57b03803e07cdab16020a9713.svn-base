@@ -1,0 +1,538 @@
+<script >
+    app.controller("insureCompanyListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            function ($rootScope, $scope, $http, $stateParams) {
+
+                //状态栏
+                $scope.states = [];
+                $scope.byState = 'all';
+
+                $scope.getStates = function () {
+                    $http.get("/rest/insureCompanyStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.insureCompanyStates;
+                        });
+                };
+
+                $scope.getStates();
+
+                //单数 例user
+                $scope.state_code = $stateParams.state_code;
+
+                //公司列表
+                $scope.list = [];
+                $scope.insureCompanyId = "";
+
+                if ($stateParams.entity_key === "insureCompany") {
+                    $scope.entity_key = "insureCompanies";
+                } else {
+                    $scope.entity_key = $stateParams.entity_key;
+                }
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+
+                    if($scope.byState==='ALL' || $scope.byState === 'all'){
+                        $scope.link='/dafeng/searchInsureCompany?size=15&page='+page;
+
+                        $scope.searchInfo = {
+                            stateCode : ""
+                        };
+                    }
+                    else if($scope.byState==='state'){
+
+                        $scope.searchInfo = {
+                            stateCode : $scope.state_code
+                        };
+
+                        $scope.link = "/dafeng/searchInsureCompany?size=15&page=" + page;
+                    }
+                    $http({method: "POST", url: $scope.link , data: $scope.searchInfo}).success(function (resResult) {
+                        $scope.list = resResult.data.insureCompanies;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+                };
+
+                $scope.getList(0);
+
+                //获取全部
+                $scope.getAll = function(){
+                    $scope.state_code = "";
+                    $scope.byState='all';
+                    $scope.insureCompanyId = "";
+                    $scope.searchInfo = {
+                        stateCode : ""
+					};
+                    $scope.getList(0);
+
+                };
+
+                /*
+                * 启用保险公司
+                * */
+                $scope.enabledCompany = function(id){
+
+                    var enabled = function () {
+                        $http({
+                            method: "PATCH",
+                            url: "/dafeng/insurerCompany/changeState?id=" + id
+                        }).success(function () {
+                            $rootScope.toasterSuccess("成功！", "启用成功！");
+                            $scope.getList(0);
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "启用失败！");
+                            $scope.getList(0);
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认启用此保险公司吗？", enabled);
+                };
+
+                /*
+                * 禁用保险公司
+                * */
+                $scope.disabledCompany = function (id) {
+
+                    var disabled = function () {
+                        $http({
+                            method: "PATCH",
+                            url: "/dafeng/insurerCompany/changeState?id=" + id
+                        }).success(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "禁用成功！");
+                        }).error(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterError("失败！", "禁用失败！");
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认禁用此保险公司吗？", disabled);
+                };
+
+                //根据搜索框搜索
+                $scope.search = function(page){
+
+                    if($scope.searchInfo){
+                        $http({
+                            method:"POST",
+                            url:"/dafeng/searchInsureCompany?size=15&page=" +page,
+                            data: $scope.searchInfo
+
+                        }).then(function(resResult){
+
+                            $scope.list = resResult.data.data.insureCompanies;
+
+                            $scope.pageList = {
+                                size: resResult.data.data.page.size,
+                                total_elements: resResult.data.data.page.totalElements,
+                                current_page: resResult.data.data.page.number === 0 ? 0 : resResult.data.data.page.number,
+                                num_page: resResult.data.data.page.totalPages,
+                                total_page: resResult.data.data.page.totalPages
+                            };
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.search);
+                            }
+                        });
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写搜索信息！");
+                    }
+
+
+                };
+
+
+                /*
+                * 清空按钮
+                * */
+                $scope.clearSearch = function () {
+                    $scope.insureCompanyId = "";
+                    $scope.getList(0);
+                    if($scope.state_code){
+                        $scope.searchInfo = {
+                            stateCode : $scope.state_code
+						};
+
+					}else{
+                        $scope.searchInfo = {
+                            stateCode : ""
+						};
+
+                    }
+                };
+
+                //状态栏搜索
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.byState = 'state';
+                        $scope.state_code = stateCode;
+                        $scope.insureCompanyId = "";
+                        $scope.searchInfo = {};
+                        $scope.getList(0);
+
+                    }
+                };
+
+                //列表中编辑保险公司    传的id是点击的本条数据的id
+                $scope.editCompany = function (id) {
+                    $http.get("/rest/insureCompanies/search/findById?id=" + id).success(function (resResult) {
+                        $scope.incomInfo = resResult;
+                        $scope.insurerCompanyId = resResult.insurerCompanyId;
+                        $scope.insureCompanyNAME = resResult.name;
+                        $scope.editListIconURL = resResult.listIcon;
+                        $scope.editDetailIconURL = resResult.detailIcon;
+                    });
+
+                    $scope.editListTip = "选择文件后请先点击上传";
+                    //修改图片
+                    $scope.updateListIcon = function () {
+                        $scope.editListTip = "正在上传，请稍后";
+                        var fd = new FormData();
+
+                        //图片上传
+                        var listIcon = $('#update_list_icon')[0].files[0];
+
+                        fd.append("file", listIcon);
+
+                        $http({
+                            method: "POST",
+                            url: "dafeng/fileUpload",
+                            headers: {
+                                "Content-Type": undefined
+                            },
+                            timeout: 0,
+                            transformRequest: angular.identity,
+                            data: fd
+                        }).success(function (resResult) {
+                            $scope.editListTip = "上传成功";
+                            $rootScope.toasterSuccess("成功！", "上传图片成功！");
+                            $scope.editListIconURL = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "上传图片失败！");
+                        });
+                    };
+
+                    $scope.editDetailTip = "选择文件后请先点击上传";
+                    $scope.updateDetailIcon = function () {
+                        $scope.editDetailTip = "正在上传，请稍后";
+                        var fd = new FormData();
+
+                        //图片上传
+                        var detailIcon = $('#update_detail_icon')[0].files[0];
+
+                        fd.append("file", detailIcon);
+
+                        $http({
+                            method: "POST",
+                            url: "dafeng/fileUpload",
+                            headers: {
+                                "Content-Type": undefined
+//                            "connection":open
+                            },
+                            timeout: 0,
+                            transformRequest: angular.identity,
+                            data: fd
+                        }).success(function (resResult) {
+                            $scope.editDetailTip = "上传成功";
+                            $rootScope.toasterSuccess("成功！", "上传图片成功！");
+
+                            $scope.editDetailIconURL = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "上传图片失败！");
+                        });
+                    };
+                    //弹出框的确认按钮
+                    $scope.editCom = function () {
+                        var newObj = {
+                            id: id,
+                            insurerCompanyId: $scope.insurerCompanyId,
+                            detailIcon: $scope.editDetailIconURL,
+                            listIcon: $scope.editListIconURL,
+                            name: $scope.insureCompanyNAME
+                        };
+                        //发请求修改
+						if(!$scope.insurerCompanyId){
+                            $rootScope.toasterWarning("失败！", "请输入保险公司ID！");
+                        }else if(!$scope.insureCompanyNAME){
+                            $rootScope.toasterWarning("失败！", "请输入保险公司名称！");
+                        }else if($scope.insurerCompanyId && !(/^[1-9]\d*$/).test($scope.insurerCompanyId)){
+                            $rootScope.toasterWarning("失败！", "保险公司ID必须是开头不为0的正整数！");
+                        }else if($scope.incomInfo.insurerCompanyId == $scope.insurerCompanyId && $scope.incomInfo.detailIcon === $scope.editDetailIconURL && $scope.incomInfo.listIcon === $scope.editListIconURL && $scope.incomInfo.name === $scope.insureCompanyNAME){
+                            $rootScope.toasterWarning("失败！", "请修改信息后提交！");
+                        }else{
+                            $http({
+                                method: 'PATCH',
+                                url: '/dafeng/insurerCompany/update',
+                                data: newObj
+                            }).success(function (resResult) {
+                                if(resResult.ErrorCode){
+                                    $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                                }else{
+                                    $rootScope.toasterSuccess("成功！", "编辑成功！");
+
+                                    $("#insure_company_modal_edit").modal("hide");
+                                }
+
+                                $scope.getList(0);
+                            }).error(function () {
+                                $rootScope.toasterError("失败！", "编辑失败！");
+                            })
+						}
+                    };
+                };
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+//                        console.log(tds[index].offsetWidth)
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="insureCompanyListCtrl">
+	<!-- column -->
+	<div class="col w-md lter b-l">
+		<div class="vbox">
+			<div class="wrapper b-b b-light clearfix">
+				<div class="inline pull-left">
+					<!--<span translate="createEnquiries.self.label"></span>-->
+					状态：
+				</div>
+				<div class="inline pull-left m-r">
+					<label class="i-checks pull-left m-n">
+						<input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+					</label>
+				</div>
+				<div class="inline pull-left m-r" ng-repeat="state in states">
+					<label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+						<input type="radio" name="state"><i></i> {{ state.label }}
+					</label>
+				</div>
+				<div class="pull-right m-r inline">
+					<button type="button" class="btn m-b-xs btn-sm btn-danger btn-addon" ui-sref="workflowEntity.home.profile.info({id:list.id})">
+						<i class="fa fa-plus"></i>新增
+					</button>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell">
+					<div class="cell-inner">
+						<div class="wrapper">
+							<div class="panel panel-default">
+								<div class="panel-heading" ng-if="list.length > 0">
+									查询结果
+								</div>
+								<div class="panel-heading" ng-if="list.length < 1">
+									暂无数据！
+								</div>
+								<div class="wrapper">
+									<div class="w inline m-r">
+										<input type="text" class="form-control"
+											   placeholder="请输入保险公司ID"
+											   ng-model="searchInfo.insurerCompanyId"
+											   autocomplete="off">
+									</div>
+									<div class="w inline m-r">
+										<input type="text" class="form-control"
+											   placeholder="请输入保险公司名称"
+											   ng-model="searchInfo.name"
+											   autocomplete="off">
+									</div>
+									<div class="inline">
+										<button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+											<span>查询</span>
+										</button>
+										<button type="button" class="btn btn-default" ng-click="clearSearch()">
+											<span>清除</span>
+										</button>
+									</div>
+								</div>
+								<div class="table-responsive" ng-if="list.length > 0">
+									<table class="table table-hover b-t b-light">
+										<thead>
+										<tr>
+											<th style="width: 120px">保险公司编号</th>
+											<th style="width: 150px">保险公司ID(小马)</th>
+											<th>保险公司名称</th>
+											<th>列表icon</th>
+											<th>详情icon</th>
+											<th>创建时间</th>
+											<th>更新时间</th>
+											<th>操作</th>
+										</tr>
+										</thead>
+									</table>
+									<div class="table-responsive" ng-if="list.length > 0" style="max-height: 570px;overflow: auto">
+										<table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+										<tbody>
+										<tr ng-repeat="item in list" ng-if="!insureCompanyId">
+											<td class="v-middle" style="width: 120px">
+												{{ item.id }}
+											</td>
+											<td class="v-middle" style="width: 150px">
+												{{ item.insurerCompanyId }}
+											</td>
+											<td class="v-middle">
+												{{ item.name }}
+											</td>
+											<td class="v-middle">
+												<img style="height: 60px;width:150px;" class="img-responsive" ng-src="{{ item.listIcon?item.listIcon:'img/userHead.png' }}">
+											</td>
+											<td class="v-middle">
+												<img style="height: 30px;width:150px;" class="img-responsive" ng-src="{{ item.detailIcon?item.detailIcon:'img/userHead.png' }}">
+											</td>
+											<td class="v-middle">
+												{{ item.createdAt/1000 | datetime}}
+											</td>
+											<td class="v-middle">
+												{{ item.lastModifiedAt/1000 | datetime}}
+											</td>
+											<td class="v-middle">
+												<button class="btn btn-xs btn-danger"
+														ng-if="item.status === 1"
+														ng-click="disabledCompany(item.id)">禁用</button>
+												<button class="btn btn-xs btn-success"
+														ng-if="item.status === 2"
+														ng-click="enabledCompany(item.id)">启用</button>
+												<button class="btn btn-xs btn-info"
+														data-target="#insure_company_modal_edit"
+														data-toggle="modal"
+														ng-click="editCompany(item.id)">
+														编辑
+												</button>
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+						<div class="wrapper b-t b-light clearfix">
+							<ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+							<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+						</div>
+				</div>
+			</div>
+
+
+			<div class="modal fade" id="insure_company_modal_edit" aria-hidden="true" aria-labelledby="myDepartModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">
+								<span>&times;</span>
+							</button>
+							<h4 class="modal-title" id="myDepartModal">编辑保险公司</h4>
+						</div>
+						<div class="modal-body">
+							<form>
+								<input type="hidden" ng-model="template.id">
+								<div class="form-group">
+									<label for="insure_company_ID">保险公司ID</label>
+									<input type="text" class="form-control"
+										   ng-model="insurerCompanyId"
+										   id="insure_company_ID"
+										   placeholder="保险公司ID"
+										   autocomplete="off">
+								</div>
+								<div class="form-group">
+									<label for="insure_company_name">保险公司名称</label>
+									<input type="text" class="form-control"
+										   ng-model="insureCompanyNAME"
+										   id="insure_company_name"
+										   placeholder="保险公司名称"
+										   autocomplete="off">
+								</div>
+								<div class="form-group" style="height: 150px;display: flex;flex-direction: column">
+									<img style="height: 60px;width:150px;" class="img-responsive" ng-src="{{ editListIconURL }}">
+									<span>列表icon</span>
+									<div class="col-sm-10" style="padding-left: 0px">
+										<input type="file" id="update_list_icon" class="inline" style="margin: 5px 0px">
+										<div>
+											<button type="button" class="btn btn-default btn-rounded"
+													ng-click="updateListIcon()">
+												<i class="fa fa-arrow-circle-o-up"></i> 上传列表图片
+											</button>
+											<span class="text-danger text-xs" ng-model="editListTip">
+											  {{editListTip}}
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="form-group" style="height: 150px;display: flex;flex-direction: column">
+									<img style="height: 60px;width:150px;" class="img-responsive" ng-src="{{ editDetailIconURL }}">
+									<span>详情icon</span>
+									<div class="col-sm-10" style="padding-left: 0px">
+										<input type="file" id="update_detail_icon" class="inline" style="margin: 5px 0px">
+										<div>
+											<button type="button" class="btn btn-default btn-rounded" ng-click="updateDetailIcon()">
+												<i class="fa fa-arrow-circle-o-up"></i> 上传详情图片
+											</button>
+											<span class="text-danger text-xs" ng-model="editDetailTip">
+												{{editDetailTip}}
+											</span>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+							<button type="button" class="btn btn-primary" ng-click="editCom()">确认</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- /column -->
+</div>
+<!-- /hbox layout -->
+</div>

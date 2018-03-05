@@ -1,0 +1,149 @@
+<script>
+	/*
+	 * @author  金杭
+	 * @date    2017/07/19
+	 * */
+	 "use strict";
+	 app.controller("configWorkflowsCtrl",
+		[
+			"$rootScope",
+			"$scope",
+            "$http",
+            "$resource",
+            "$location",
+            "$state",
+            "routeCase",
+            "getListResource",
+            "getDetailResource",
+            "editableOptions",
+            "editableThemes",
+            function ($rootScope, $scope, $http, $resource, $location, $state, routeCase, getListResource, getDetailResource, editableOptions, editableThemes) {
+				//设置可编辑表格的默认参数
+                editableThemes.bs3.inputClass   = "input-sm";
+                editableThemes.bs3.buttonsClass = "btn-sm";
+                editableOptions.theme           = "bs3";
+                
+                //动态获取请求路由
+                $scope.route = routeCase($location.$$path);
+                
+                //获取资源化的工作流，getListResource 方法在自定义服务中查看
+                getListResource($scope.route).then(function(resResult){
+                	$scope.workflows = resResult._embedded[$scope.route];
+                });
+                
+                /* 
+                 * 新增工作流按钮函数，此函数仅仅是将一个空的对象压入已获得的工作流中
+                 * @author  金杭
+                 * */
+                $scope.addWorkflow = function () {
+                    $scope.inserted = {
+	                    label: "",
+	                    createdAt:"",
+	                    lastModifiedAt:""
+                    };
+                    $scope.workflows.push($scope.inserted);
+                };
+                
+                /*
+                 * 保存工作流的函数
+                 * @author  金杭
+                 * @param   {object}  workflow 需要修改或者新增的工作流对象
+                 * @return  无
+                 * */
+                $scope.saveWorkflow = function (workflow) {
+                	//使用_links来判断是否是新增或修改
+                	if(workflow._links){
+                		//修改需要获取资源化的对象，getDetailResource 方法在自定义服务中查看
+                		var promise = getDetailResource(workflow);
+                    	
+                    	promise.then(function(resResult){
+                    		resResult.$patch(function(){
+                    			$state.reload();
+                        		$rootScope.toasterSuccess("成功！","修改成功！");
+                    		},function(){
+                    			$rootScope.toasterError("失败！","修改失败！，请联系管理员");
+                    		});
+                    	});
+                    	
+                	}else{
+                		//新增直接post
+                		$http.post("/rest/" + $scope.route,workflow).success(function(resResult){
+                			$state.reload();
+                			$rootScope.toasterSuccess("成功！","新增成功！");
+                		});
+                		
+                	}
+                };
+
+                /*
+                 * 删除工作流的函数
+                 * @author  金杭
+                 * @param   {number}  index    剔除时的工作流的索引（仅新增时用）
+                 * @param   {object}  workflow 需要修改或者新增的工作流对象
+                 * @return  无
+                 * */
+                $scope.removeWorkflow = function (index,workflow) {
+                	//使用_links来判断是否是新增还是已有的
+                	if(workflow._links){
+                		$rootScope.sweetConfirm({
+                			title: "确定删除这条数据嘛？",
+              			  	text: "删除后此条数据将不可恢复！",
+              			  	type: "warning",
+              			  	callback:function(){
+              			  		//删除需要获取资源化的对象，getDetailResource 方法在自定义服务中查看
+                				var promise = getDetailResource(workflow);
+                				
+                            	promise.then(function(resResult){
+                            		resResult.$delete(function(){
+                            			$state.reload();
+                                		$rootScope.toasterSuccess("成功！","删除成功！");
+                            		},function(){
+                            			$rootScope.toasterError("失败！","删除失败！，请联系管理员");
+                            		});
+                            	});	
+              			  	}
+                		});
+                	}else{
+                		//新增时取消就直接根据索引来删除
+                		$scope.workflows.splice(index, 1);
+                	}
+                };
+                
+			}
+		]		 
+	 );
+</script>
+<div class="wrapper-md" ng-controller="configWorkflowsCtrl">
+	<button class="btn btn-default m-b-md" ng-click="addWorkflow()">新增工作流</button>
+	<table class="table table-bordered table-hover table-condensed bg-white-only">
+        <tr style="font-weight: bold;">
+            <td>名称</td>
+            <td>操作</td>
+        </tr>
+        <tr ng-repeat="workflow in workflows">
+            <td class="v-middle">
+                <span editable-text="workflow.label" e-name="label" e-form="rowform"
+                      e-required>
+                  {{ workflow.label || "未填写" }}
+                </span>
+            </td>
+            <td style="white-space: nowrap;">
+                <!-- form -->
+                <form editable-form name="rowform" onbeforesave="saveWorkflow(workflow)" ng-show="rowform.$visible"
+                      class="form-buttons form-inline" shown="inserted == workflow">
+                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-sm btn-info">
+                    	保存
+                    </button>
+                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()"
+                            class="btn btn-sm btn-default">
+                       	取消
+                    </button>
+                </form>
+                <div class="buttons" ng-show="!rowform.$visible">
+                    <button class="btn btn-sm btn-info" ng-click="rowform.$show()">修改</button>
+                    <button class="btn btn-sm btn-danger" ng-click="removeWorkflow($index,workflow)">删除</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

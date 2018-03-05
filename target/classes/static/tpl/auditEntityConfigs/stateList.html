@@ -1,0 +1,48 @@
+<div class="vbox">
+    <div class="wrapper b-b clearfix">
+        <div class="pull-left m-t-xs">
+            {{entity_key}} / states
+        </div>
+        <div class="pull-right">
+            <a class="btn btn-sm btn-danger" ui-sref="auditEntityConfig.stateCreate({})">
+                <i class="fa fa-cog"></i> 新增
+            </a>
+        </div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>唯一标识</th>
+                            <th>状态分组</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="item in states">
+                            <td class="v-middle">{{item.label}}</td>
+                            <td class="v-middle">{{item.stateCode}}</td>
+                            <td class="v-middle">{{item.stateGroup}}</td>
+                            <td class="v-middle clearfix">
+                                <button type="button" class="pull-left m-r-sm btn btn-info btn-xs"
+                                        ng-click="stateEdit(item.id)">
+                                    <i class="fa fa-edit"></i> 编辑
+                                </button>
+                                <button type="button" class="pull-left btn btn-info btn-xs"
+                                        ng-click="stateAct(item.id)">
+                                    <i class="fa fa-coffee"></i> 行为
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

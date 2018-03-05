@@ -1,0 +1,2 @@
+<div ng-controller="workflowEntityModuleController" class="h-full" ui-view></div>
+

@@ -1,0 +1,155 @@
+package com.liyang.controller;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.LicenseService;
+
+/**
+ * 行驶证识别
+ * 
+ * @author huanghengkun
+ * @create 2017年11月6日
+ */
+@RestController
+@RequestMapping("/dafeng/license")
+public class LicenseController {
+
+	@Autowired
+	private LicenseService licenseService;
+
+	@Value("${xmcxapi.apikey}")
+	private String xmcxApiKey;
+
+	/**
+	 * 行驶证识别--小马
+	 * 
+	 * @param imgFile
+	 * @return
+	 */
+	@RequestMapping(value = "/distinguishForMobile", method = RequestMethod.POST)
+	public ResponseBody mobileDistinguish(@RequestParam(value = "file") MultipartFile imgFile) {
+		return licenseService.doDistinguish(imgFile, xmcxApiKey);
+	}
+
+	/**
+	 * 行驶证识别--百度
+	 * 
+	 * @param file
+	 * @return
+	 */
+	@PostMapping("baidu-vehicle-license")
+	public ResponseBody mobileBaiduVehicleLicense(@RequestParam(value = "file") MultipartFile file) {
+		// return licenseService.baiduDistinguish(file);
+		JSONObject wordsResult = licenseService.baiduDistinguish(file).getJSONObject("words_result");
+		String owner = wordsResult.getJSONObject("所有人").getString("words");
+		String engine_num = wordsResult.getJSONObject("发动机号码").getString("words");
+		String issue_date = wordsResult.getJSONObject("发证日期").getString("words");
+		String plate_num = wordsResult.getJSONObject("号牌号码").getString("words");
+		String Model = wordsResult.getJSONObject("品牌型号").getString("words");
+		String vehicle_type = wordsResult.getJSONObject("车辆类型").getString("words");
+		String vin = wordsResult.getJSONObject("车辆识别代号").getString("words");
+		String register_date = wordsResult.getJSONObject("注册日期").getString("words");
+		VehicleLicense vehicleLicense = new VehicleLicense(owner, engine_num, issue_date, plate_num, Model,
+				vehicle_type, vin, register_date);
+		return new ResponseBody(vehicleLicense);
+	}
+
+}
+
+class VehicleLicense {
+
+	private String owner;
+	private String engine_num;
+	private String issue_date;
+	private String plate_num;
+	private String Model;
+	private String vehicle_type;
+	private String vin;
+	private String register_date;
+
+	public VehicleLicense(String owner, String engine_num, String issue_date, String plate_num, String model,
+			String vehicle_type, String vin, String register_date) {
+		this.owner = owner;
+		this.engine_num = engine_num;
+		this.issue_date = issue_date;
+		this.plate_num = plate_num;
+		this.Model = model;
+		this.vehicle_type = vehicle_type;
+		this.vin = vin;
+		this.register_date = register_date;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public String getEngine_num() {
+		return engine_num;
+	}
+
+	public void setEngine_num(String engine_num) {
+		this.engine_num = engine_num;
+	}
+
+	public String getIssue_date() {
+		return issue_date;
+	}
+
+	public void setIssue_date(String issue_date) {
+		this.issue_date = issue_date;
+	}
+
+	public String getPlate_num() {
+		return plate_num;
+	}
+
+	public void setPlate_num(String plate_num) {
+		this.plate_num = plate_num;
+	}
+
+	public String getModel() {
+		return Model;
+	}
+
+	public void setModel(String model) {
+		Model = model;
+	}
+
+	public String getVehicle_type() {
+		return vehicle_type;
+	}
+
+	public void setVehicle_type(String vehicle_type) {
+		this.vehicle_type = vehicle_type;
+	}
+
+	public String getVin() {
+		return vin;
+	}
+
+	public void setVin(String vin) {
+		this.vin = vin;
+	}
+
+	public String getRegister_date() {
+		return register_date;
+	}
+
+	public void setRegister_date(String register_date) {
+		this.register_date = register_date;
+	}
+
+}

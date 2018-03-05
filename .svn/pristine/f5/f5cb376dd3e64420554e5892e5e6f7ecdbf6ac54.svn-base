@@ -1,0 +1,10 @@
+<div class="vbox bg-white" ng-controller="workflowEntityProfileController">
+    
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

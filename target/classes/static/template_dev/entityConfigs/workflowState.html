@@ -1,0 +1,39 @@
+<div class="vbox">
+    <div class="wrapper-md b-b">
+        {{entity_key}} /  workflow / states
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            workflow / states
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped b-t b-light">
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px;">
+                                           选
+                                        </th>
+                                        <th>label</th>
+                                        <th>code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="state in allStates">
+                                        <td><label class="i-checks m-b-none"><input type="checkbox" ng-model="state.isSelected" ng-change="changeWorkflowState(state);"><i></i></label></td>
+                                        <td><span class="text-ellipsis">{{state.label}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

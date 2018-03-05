@@ -1,0 +1,115 @@
+连接密码
+root
+Dafeng@1403
+
+解析域名 test.dafengbaoxian.com 指向特定ip地址
+添加a记录:主机记录 @,记录：118.31.239.203
+
+ubuntu16.04下安装jdk
+下载jdk linux压缩包
+wget http://jihaojie.com.cn/uploads/jdk-8u151-linux-x64.tar.gz
+
+创建文件夹
+mkdir /java
+
+将下载的jdk压缩包放入该文件夹
+mv jdk-8u151-linux-x64.tar.gz /java
+
+解压缩文件
+tar -zxvf jdk-8u151-linux-x64.tar.gz
+
+配置环境变量
+vi /etc/environment
+在末尾添加或修改以下几行
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$JAVA_HOME/bin"
+export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
+export JAVA_HOME=/java/jdk1.8.0_151
+保存后使环境变量立即生效
+source /etc/environment
+
+查看java是否安装成功
+java -version
+显示JDK版本说明恭喜你，环境变量配置正确
+
+
+配置所有用户的环境变量
+sudo vi /etc/profile
+文件末尾添加以下内容
+#set Java environment
+export JAVA_HOME=/java/jdk1.8.0_151
+export JRE_HOME=$JAVA_HOME/jre
+export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH
+export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+使环境变量立即生效
+source /etc/profile
+
+重启电脑验证java -version是否有效
+
+
+安装redis服务 3.0.6
+apt-get update
+apt-get remove redis-server
+apt-get install redis-server
+查看是否安装成功
+redis-server --version
+启动redis服务
+systemctl start redis-server
+systemctl status redis-server.service
+使用客户端连接
+redis-cli
+> set test "HugeServer"
+> get test
+
+7）启动Redis服务：
+systemctl daemon-reload
+systemctl start redis
+systemctl enable redis
+Ubuntu 16.04安装Redis
+重启服务：
+systemctl restart redis
+ 
+8）测试：
+使用命令行客户端连接Redis服务：
+redis-cli
+测试连通状态：
+ping
+设置key – value：
+set name "jack"
+get name
+exit
+
+查看redis服务器版本
+redis-cli -h 127.0.0.1 info | grep 'redis_version'
+
+
+
+
+
+
+
+ Ubuntu 16.04 安装MySQL
+
+apt update 
+
+安装MySQL
+
+apt install mysql-server
+设置密码为 root
+apt install mysql-client
+mysql_secure_installation
+
+测试数据库连接是否正常
+ssh通道，输入ip和root及密码
+数据库连接处使用localhost，帐号root，密码Dafeng@1403
+
+
+启动web项目
+创建文件夹用于部署 
+mkdir /var/www/html
+nohup java -jar xxxxxxxxxx-0.0.1-SNAPSHOT.jar &
+如果有错误可以查看目录下 nohup.out
+tail -n 300 nohup.out
+
+
+
+

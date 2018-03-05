@@ -1,0 +1,7 @@
+[
+{"id":1,"label":"新建","state_code":"NEW"},
+{"id":2,"label":"申请","state_code":"APPLY"},
+{"id":3,"label":"有效","state_code":"ENABLE"},
+{"id":4,"label":"无效","state_code":"DISABLE"},
+{"id":5,"label":"删除","state_code":"DELETE"}
+]

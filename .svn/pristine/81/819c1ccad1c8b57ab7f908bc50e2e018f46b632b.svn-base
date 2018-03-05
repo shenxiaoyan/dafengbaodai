@@ -1,0 +1,122 @@
+<script>
+    app.controller("exceptionListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$state",
+            "$http",
+            function ($rootScope, $scope, $state, $http) {
+
+                $scope.pageList = {
+                    size:0,
+                    total_elements:0,
+                    current_page:0,
+                    num_page:1,
+                    total_page:1
+                };
+
+                $scope.exceptions = [];
+
+                $scope.getExceptions = function (page) {
+                    $http.get("rest/exceptions?size=20&page=" + page + "&sort=lastModifiedAt,desc").success(function (resResult) {
+                        $scope.exceptions    = resResult._embedded["exceptions"];
+
+                        $scope.pageList = {
+                            size:resResult.page.size,
+                            total_elements:resResult.page.totalElements,
+                            current_page:resResult.page.number,
+                            num_page:resResult.page.totalPages,
+                            total_page:resResult.page.totalPages
+                        };
+
+                        angular.forEach($scope.exceptions,function (value,index) {
+                            $http.get(value._links.createdBy.href).success(function (resResult) {
+                                value.createdBy = resResult.nickname;
+                            });
+                        });
+
+                        if(resResult.page.totalElements > 0) {
+                            $rootScope.setPaginator("#exception_list_paginator", $scope.pageList, $scope.getExceptions);
+                        }
+                    });
+                };
+
+                $scope.getExceptions(0);
+
+                $scope.jumpToInfo = function (exception) {
+                    $scope.exception = exception;
+                    $("#exception_modal").modal("show");
+                };
+
+            }
+        ]
+    )
+</script>
+<div class="hbox hbox-auto-xs bg-light" ng-controller="exceptionListCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <div ng-if="exceptions.length < 1">
+                                没有更多记录！
+                            </div>
+                            <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs" ng-if="exceptions.length > 0">
+                                <a ng-repeat="exception in exceptions" ng-click="jumpToInfo(exception)"
+                                    class="list-group-item b-l-success clearfix b-l-3x">
+                                    <div class="pull-right text-sm text-muted">
+                                        <div class="hidden-xs">{{ exception.lastModifiedAt | datetime }}</div>
+                                    </div>
+                                    <div class="clear">
+                                        <div class="clearfix">
+                                            <span class="pull-left m-r text-md">{{exception.ActionStatus}}</span>
+                                            <span class="pull-left text-md">{{ exception.createdBy }}</span>
+                                        </div>
+                                        <div class="text-ellipsis m-t-xs">{{exception.ErrorInfo | limitTo:100}}</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="m-l-md">
+                            <ul id="exception_list_paginator"></ul>
+                        </div>
+                        <div class="modal fade" id="exception_modal">
+                            <div class="modal-dialog" style="width: 1200px;">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span>&times;</span>
+                                        </button>
+                                        <h4 class="modal-title">异常详情</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="clearfix">
+                                            <span class="pull-left">创建人：</span>
+                                            <span class="pull-left">{{ exception.createdBy }}</span>
+                                        </div>
+                                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                                        <div class="clearfix">
+                                            <span class="pull-left">时间：</span>
+                                            <span class="pull-left">{{ exception.lastModifiedAt | datetime }}</span>
+                                        </div>
+                                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                                        <div>
+                                            ErrorInfo：
+                                        </div>
+                                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                                        <div>
+                                            {{ exception.ErrorInfo }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>

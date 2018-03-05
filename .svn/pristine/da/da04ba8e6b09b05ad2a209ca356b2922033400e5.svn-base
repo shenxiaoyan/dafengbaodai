@@ -1,0 +1,180 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *企业裁判文书详情
+     * */
+    app.controller('businessDocumentCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            {
+                code: "18860469551",
+                time: "2011-1-1"
+            };
+        //数据初始化
+        $scope.info =
+            {
+                code: "18860469551"
+            };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.code = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //提交空表单时提示格式错误
+            if (myForm.code) {
+                myForm.code.$dirty = true;
+
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = false;
+
+            if($scope.info.code === $scope.mockData.code){
+                console.log('ddd');
+                $scope.resultSwitch = true;
+            }
+
+
+        };
+
+        $scope.test=[
+            {
+                sheanType:"aa",
+                sheanCla:"ee",
+                sheanClass:"qq"
+            },
+            {
+                sheanType:"11",
+                sheanCla:"66",
+                sheanClass:"88"
+            }
+        ]
+
+    }]);
+</script>
+
+
+<div class="vbox" ng-controller="businessDocumentCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">企业裁判文书详情</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal newfenye">
+                                <input type="hidden" class="url" value="/transaction/baseInfo">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>裁判文书编号:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.code" name="code"  class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.code.$dirty && myForm.code.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.code.$error.required">编码不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>审结时间</td><td>2013年12月05日</td></tr>
+                                <tr><td>案件类型</td><td>裁判文书</td></tr>
+                                <tr><td>内容</td><td>..上诉人（原审原告）浙江浙大网新集团有限公司...</td></tr>
+                                <tr><td>法院名称</td><td>浙江省杭州市中级人民法院</td></tr>
+                                <tr><td>案由编码</td><td>A08</td></tr>
+                                <tr><td>标题</td><td>浙江浙大网新集团有限公司与永城财产保险股份有限公 司浙江分公司保险合同纠纷二审民事判决书</td></tr>
+                                <tr><td>审判员</td><td>审 判 长:俞建明,审 判 员:韩 昱,代理审判员:余江中,书 记 员:朱 江</td></tr>
+                                <tr><td>案号</td><td>（2013）浙杭民终字第 3200 号</td></tr>
+                                <tr><td>判决结果</td><td>驳回上诉，维持原判。二审案件受理费 218 元，由上诉人 浙江浙大网新集团有限公司负担。本判决为终审判决。</td></tr>
+                                <tr><td>审理程序</td><td>二审</td></tr>
+                                <tr><td>案由</td><td>与公司、证券、保险、票据等有关的民事纠纷</td></tr>
+                                <tr><td>案由编码类型</td><td>4</td></tr>
+                                <tr><td>依据</td><td>双方当事人签订的商业险合同中</td></tr>
+                                <tr><td>法院等级</td><td>高级</td></tr>
+                                <tr><td>司法类型</td><td>裁判文书</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">当事人信息1</th></tr>
+                                <tr><td>当事人生日</td><td>1991-12-12</td></tr>
+                                <tr><td>当事人称号</td><td>上诉人（原审原告）</td></tr>
+                                <tr><td>当事人类型</td><td>公司</td></tr>
+                                <tr><td>律师事务所</td><td>望京</td></tr>
+                                <tr><td>地址</td><td>望京</td></tr>
+                                <tr><td>当事人名称</td><td>浙江浙大网新集团有限公司</td></tr>
+                                <tr><td>当事人身份证号码</td><td>355548511545</td></tr>
+                                <tr><td>委托辩护人</td><td>张三</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td width="50%">审结时间</td><td width="50%">{{mockData.time}}</td></tr>
+                                <tr><td>案件类型</td><td>裁判文书</td></tr>
+                                <tr><td>内容</td><td>..上诉人（原审原告）浙江浙大网新集团有限公司...</td></tr>
+                                <tr><td>法院名称</td><td>浙江省杭州市中级人民法院</td></tr>
+                                <tr><td>案由编码</td><td>A08</td></tr>
+                                <tr><td>标题</td><td>浙江浙大网新集团有限公司与永城财产保险股份有限公 司浙江分公司保险合同纠纷二审民事判决书</td></tr>
+                                <tr><td>审判员</td><td>审 判 长:俞建明,审 判 员:韩 昱,代理审判员:余江中,书 记 员:朱 江</td></tr>
+                                <tr><td>案号</td><td>（2013）浙杭民终字第 3200 号</td></tr>
+                                <tr><td>判决结果</td><td>驳回上诉，维持原判。二审案件受理费 218 元，由上诉人 浙江浙大网新集团有限公司负担。本判决为终审判决。</td></tr>
+                                <tr><td>审理程序</td><td>二审</td></tr>
+                                <tr><td>案由编码类型</td><td>4</td></tr>
+                                <tr><td>法院等级</td><td>高级</td></tr>
+                                <tbody ng-repeat="(index,value) in test">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td>当事人生日</td><td>{{value.sheanType}}</td></tr>
+                                <tr><td>当事人称号</td><td>{{value.sheanClass}}</td></tr>
+                                <tr><td>当事人类型</td><td>{{value.sheanCla}}</td></tr>
+                                <tr><td>律师事务所</td><td>望京</td></tr>
+                                <tr><td>地址</td><td>望京</td></tr>
+                                <tr><td>当事人名称</td><td>浙江浙大网新集团有限公司</td></tr>
+                                <tr><td>当事人身份证号码</td><td>355548511545</td></tr>
+                                <tr><td>委托辩护人</td><td>张三</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

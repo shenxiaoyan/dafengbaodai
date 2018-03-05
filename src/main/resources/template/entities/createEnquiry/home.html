@@ -1,0 +1,71 @@
+<script>
+    app.controller("orderWdxydHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state) {
+
+                $scope.id         = $stateParams.id;
+
+                $scope.profile = {};
+                $scope.canActs = [];
+                $scope.links   = [];
+
+                $scope.getProfile = function () {
+//
+//                    $http.get("/rest/offerResults/"+ $scope.id).success(function (resResult) {
+//
+//                        console.log(resResult);
+//                        $scope.profile = resResult;
+//
+////                        $scope.canActs = [];
+////                        $scope.canFileActs = [];
+////                        angular.forEach($scope.profile.currentUserCanActList,function (val,key) {
+////                            if(val.actGroup == "UPDATE" || val.actGroup == "OPERATE"){
+////                                $scope.canActs.push(val) ;
+////                            }else if(val.actGroup == "FILE_OPERATE"){
+////                                $scope.canFileActs.push(val)
+////                            }
+////                        });
+////
+////                        $scope.links = $scope.profile._links;
+//                    });
+                };
+
+                $scope.getProfile();
+
+            }
+        ]
+    );
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="orderWdxydHomeController">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <!--<div class="b-b clearfix" style="padding: 18px 20px 0 20px;">-->
+                <!--<div class="pull-right">-->
+                    <!--<ul class="nav nav-tabs" style="margin-bottom: -1px;">-->
+                        <!--<li ui-sref-active="active">-->
+                            <!--<a ui-sref="workflowEntity.home.profile.info({})">主页</a>-->
+                        <!--</li>-->
+                        <!--&lt;!&ndash;<li ui-sref-active="active">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a ui-sref="workflowEntity.home.page({entity_key:'orderWdxyd',view_type:'list'})">关联列表</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</li>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<li ui-sref-active="active">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a ui-sref="workflowEntity.home.page({entity_key:'orderWdxyd',view_type:'file'})">申请文件</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</li>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<li ui-sref-active="active">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<a ui-sref="workflowEntity.home.page({entity_key:'orderWdxyd',view_type:'info'})">关联消息</a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</li>&ndash;&gt;-->
+                    <!--</ul>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="row-row bg-white" ui-view></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,155 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *企业法院失信简项
+     * */
+    app.controller('businessSimpleCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            {
+                code: "18860469551",
+                time: "2011-1-1"
+            };
+        //数据初始化
+        $scope.info =
+            {
+                code: "18860469551"
+            };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.code = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //提交空表单时提示格式错误
+            if (myForm.code) {
+                myForm.code.$dirty = true;
+
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = false;
+
+            if($scope.info.code === $scope.mockData.code){
+                console.log('ddd');
+                $scope.resultSwitch = true;
+            }
+
+
+        };
+
+        $scope.test=[
+            {
+                sheanType:"aa",
+                sheanCla:"ee",
+                sheanClass:"qq"
+            },
+            {
+                sheanType:"11",
+                sheanCla:"66",
+                sheanClass:"88"
+            }
+        ]
+
+    }]);
+</script>
+
+
+<div class="vbox" ng-controller="businessSimpleCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">企业法院失信简项</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <input type="hidden" class="url" value="/transaction/baseInfo">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label label1"><span style="color: #ff0000">*</span>企业名/注册号/统一社会信用代码:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.code" name="code"  class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.code.$dirty && myForm.code.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.code.$error.required">编码不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-3 col-md-offset-3 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>失信公告数据条数</td><td>2</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>裁判文书编号</td><td>	c2013zhehangminzhong3200_d33_fhangzhou@AVuPYiHYz6pKxOU13ktH</td></tr>
+                                <tr><td>审结时间</td><td>2013年12月05日</td></tr>
+                                <tr><td>标题</td><td>浙江浙大网新集团有限公司与永城财产保险股份有限公 司浙江分公司保险合同纠纷二审民事判决书</td></tr>
+                                <tr><td>内容</td><td>..上诉人（原审原告）浙江浙大网新集团有限公司...</td></tr>
+                                <tr><td>数据类型</td><td>裁判文书</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息2</th></tr>
+                                <tr><td>裁判文书编号</td><td>	c2013zhehangminzhong3200_d33_fhangzhou@AVuPYiHYz6pKxOU13ktH</td></tr>
+                                <tr><td>审结时间</td><td>2013年12月05日</td></tr>
+                                <tr><td>标题</td><td>浙江浙大网新集团有限公司与永城财产保险股份有限公 司浙江分公司保险合同纠纷二审民事判决书</td></tr>
+                                <tr><td>内容</td><td>..上诉人（原审原告）浙江浙大网新集团有限公司...</td></tr>
+                                <tr><td>数据类型</td><td>裁判文书</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>失信公告数据条数</td><td>{{test.length}}</td></tr>
+                                <tbody ng-repeat="(index,value) in test">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td>裁判文书编号</td><td>	{{value.sheanType}}</td></tr>
+                                <tr><td>审结时间</td><td>{{value.sheanClass}}</td></tr>
+                                <tr><td>标题</td><td>{{value.sheanCla}}</td></tr>
+                                <tr><td>内容</td><td>..上诉人（原审原告）浙江浙大网新集团有限公司...</td></tr>
+                                <tr><td>数据类型</td><td>裁判文书</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

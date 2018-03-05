@@ -1,0 +1,443 @@
+<script>
+
+    "use strict";
+    app.controller("rolesListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                //状态栏
+                $scope.states    = [];
+                $scope.link = "";
+//                $scope.eduitBtn = false;
+                $scope.list = [];
+                $scope.role = {};
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+
+                $scope.getStates = function () {
+                    $http.get("/rest/roleStates")
+                        .success(function (resResult) {
+
+                            $scope.states = resResult._embedded.roleStates;
+
+                        });
+                };
+
+                $scope.getStates();
+
+                //获取当前状态
+//                $scope.state_code = "ENABLED";
+
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url :  "/dafeng/role/getByStateCode?size=15&page=" + page + "&sort=lastModifiedAt,desc",
+                        data: {
+                            stateCode : $scope.state_code
+                        }
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.roleContent;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+
+                //修改角色状态
+                $scope.patchRoleState = function(state,id){
+
+                    switch(state){
+                        case "ENABLED":
+                            $scope.stateName = "启用";
+                            $scope.url = "/dafeng/role/disabled";
+                            $scope.method = "POST";
+                            $scope.sta = id;
+                            break;
+                        case "DISABLED":
+                            $scope.stateName = "禁用";
+                            $scope.url = "/dafeng/role/disabled";
+                            $scope.method = "POST";
+                            $scope.sta = id;
+                            break;
+                        case "DELETE":
+                            $scope.stateName = "删除";
+                            $scope.method = "DELETE";
+                            $scope.url = "/dafeng/role/" + id;
+                            $scope.sta = "";
+                            break;
+                    }
+
+                    var delId = function(){
+                        $http({
+                            method : $scope.method,
+                            url : $scope.url,
+                            data : {
+                                id : $scope.sta
+                            }
+                        }).success(function(resResult){
+                            if(resResult.ErrorCode){
+                                $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                            }else{
+                                $rootScope.toasterSuccess("成功！",  $scope.stateName + "成功！");
+                                $scope.getList(0);
+                            }
+                        }).error(function(){
+                            $rootScope.toasterError("失败！",  $scope.stateName + "失败！");
+                        });
+                    };
+
+                    $rootScope.sweetConfirm("确认"+  $scope.stateName +"此角色吗？",delId);
+                };
+
+                /*
+                 * 角色的修改
+                 * */
+
+                $scope.editRoles = function(id){
+
+                    $http.get("/rest/roles/" + id).success(function(resReuslt){
+                        $scope.eduitrole = resReuslt;
+                        $scope.oldLabel = resReuslt.label;
+                        $scope.oldRoleCode = resReuslt.roleCode;
+                    });
+
+                    $scope.editRoleInfo = function(){
+
+                        if($scope.oldLabel === $scope.eduitrole.label && $scope.oldRoleCode === $scope.eduitrole.roleCode){
+                            $rootScope.toasterWarning("失败！", "请修改角色信息后再提交！");
+                        }else if(!$scope.eduitrole.label || !$scope.eduitrole.roleCode){
+                            $rootScope.toasterWarning("失败！", "角色名称和英文名称为必填！");
+                        }else if(!(/^[A-Z_]{1,}$/.test($scope.eduitrole.roleCode))&&$scope.eduitrole.roleCode){
+                            $rootScope.toasterWarning("失败！", "请填写大写的英文字母或下划线！");
+                        }else{
+                            $http({
+                                method : "PATCH",
+                                url :  "/dafeng/role/" + id,
+                                data : {
+                                    label : $scope.eduitrole.label,
+                                    roleCode : $scope.eduitrole.roleCode
+                                }
+                            }).success(function () {
+
+                                $rootScope.toasterSuccess("成功！", "修改成功！");
+
+                                $("#role_modal").modal("hide");
+
+                                $scope.getList();
+
+                                $scope.eduitrole = {};
+
+                            }).error(function(){
+
+                                $rootScope.toasterError("失败！", "修改失败！");
+
+                                $scope.eduitrole = {};
+                            });
+                        }
+
+                    }
+
+
+                };
+
+                /*
+                * 角色的保存
+                * */
+                $scope.saveRoleInfo = function() {
+
+                    if ($scope.role.label && $scope.role.roleCode) {
+                        if((/^[A-Z_]{1,}$/.test($scope.role.roleCode))&&$scope.role.roleCode) {
+
+                            $http.post("/dafeng/role/saveRole", $scope.role).success(function (resResult) {
+
+                                if(resResult.ErrorCode){
+                                    $rootScope.toasterError("失败！", resResult.ErrorInfo);
+
+                                }else{
+                                    $rootScope.toasterSuccess("成功！", "新建成功！");
+                                    $scope.getList(0);
+                                    $("#role_modal_edit").modal("hide");
+                                    $scope.role = {};
+                                }
+
+                            }).error(function () {
+                                $rootScope.toasterError("失败！", "新建失败！");
+                                $scope.role = {};
+                            });
+                        }else{
+                            $rootScope.toasterWarning("失败！", "请填写大写的英文字母或下划线！");
+                        }
+                    } else {
+                        $rootScope.toasterWarning("失败！", "信息填写不完整！");
+                    }
+
+                };
+
+                /*
+                * 清空信息
+                * */
+                $scope.clearRoleInfo = function(){
+                    $scope.role = {};
+                    $scope.getList(0);
+                };
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+                $scope.getAll = function(){
+                    $scope.state_code = "";
+                    $scope.getList(0);
+                }
+
+//                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+//                    //下面是在table render完成后执行的js
+//                    var ths = $('th');
+//                    var tds = $('td');
+//                    angular.forEach(ths, function(data,index){
+//                        data.setAttribute('width', tds[index].offsetWidth);
+//                    });
+//                });
+            }
+        ]
+    );
+    //    app.directive('onFinishRender', function ($timeout) {
+    //        return {
+    //            restrict: 'A',
+    //            link: function(scope, element, attr) {
+    ////			    scope.$last(判断条件，这里直接跳过);
+    //                if (true) {
+    //                    $timeout(function() {
+    //                        scope.$emit(attr.onFinishRender);
+    //                    });
+    //                }
+    //            }
+    //        };
+    //    });
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="rolesListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <!--<span translate="createEnquiries.self.label"></span>-->
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n" ng-click="getAll()">
+                        <input type="radio" name="state" checked="checked"/><i></i>全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state" value="{{state.stateCode}}" ng-model="state_code"><i></i> {{ state.label }}
+                    </label>
+                </div>
+                <div class="pull-right">
+                    <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                            data-target="#role_modal_edit"
+                            data-toggle="modal">
+                        <i class="fa fa-plus"></i>
+                        新增角色
+                    </button>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 320px">机构名称</th>
+                                            <th style="width: 150px">角色名称</th>
+                                            <th style="width: 300px">角色英文简称</th>
+                                            <th style="width: 300px">创建时间</th>
+                                            <th style="width: 300px">最后更新时间</th>
+                                            <th  ng-if="state_code !=='DELETED'">操作</th>
+                                            <!--<th  ng-if="state_code==='ENABLED' || state_code==='CREATED'">权限设置</th>-->
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle" style="width: 320px">
+                                                杭州大蜂保险有限公司
+                                            </td>
+                                            <td class="v-middle" style="width: 150px">
+                                                {{ item.roleCode }}
+                                            </td>
+                                            <td class="v-middle" style="width: 300px">
+                                                {{ item.label }}
+                                            </td>
+                                            <td class="v-middle" style="width: 300px">
+                                                {{ item.createdAt ? (item.createdAt | dateSecondTime) : "暂无" }}
+                                            </td>
+                                            <td class="v-middle" style="width: 300px">
+                                                {{ item.lastModifiedAt ? (item.lastModifiedAt | dateSecondTime) : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                <div class="inline"
+                                                     data-target="#role_modal"
+                                                     data-toggle="modal"
+                                                     ng-click="editRoles(item.id)"
+                                                     ng-if="item.stateCode ==='ENABLED' || item.stateCode==='DISABLED'">
+                                                    <button class="btn btn-xs btn-info">编辑</button>
+                                                </div>
+                                                <div class="inline"
+                                                     data-target="#role_template_modal"
+                                                     data-toggle="modal"
+                                                     ng-click="patchRoleState('DELETE',item.id)"
+                                                     ng-if="item.stateCode==='ENABLED' || item.stateCode==='DISABLED'">
+                                                    <button class=" btn-xs btn btn-danger">删除</button>
+                                                </div>
+                                                <div class="inline"
+                                                     ng-click="patchRoleState('ENABLED',item.id)"
+                                                     ng-if="item.stateCode==='DISABLED'">
+                                                    <button class="btn btn-xs btn-success">启用</button>
+                                                </div>
+                                                <div class="inline"
+                                                     ng-click="patchRoleState('DISABLED',item.id)"
+                                                     ng-if="item.stateCode==='ENABLED'">
+                                                    <button class="btn btn-xs btn-danger">禁用</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="role_modal_edit" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"  data-dismiss="modal" ng-click="clearRoleInfo()">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="createDepartModal">新增角色</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span>角色名称</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           required
+                                           autocomplete="off"
+                                           id="role_name"
+                                           ng-model="role.label"
+                                           placeholder="请填写角色名称">
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span>角色大写英文</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           required
+                                           autocomplete="off"
+                                           id="role_name_en"
+                                           ng-model="role.roleCode"
+                                           placeholder="请填写大写英文角色名称">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearRoleInfo()">取消</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveRoleInfo()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="role_modal" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"  data-dismiss="modal" ng-click="clearRoleInfo()">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="createRole">修改角色</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span>角色名称</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="eduitrole.label"
+                                           placeholder="请填写角色名称">
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="text-danger">*</span>角色大写英文</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="eduitrole.roleCode"
+                                           placeholder="请填写角色大写英文">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearRoleInfo()">取消</button>
+                            <button type="button" class="btn btn-primary" ng-click="editRoleInfo()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+</div>
+<!-- /hbox layout -->

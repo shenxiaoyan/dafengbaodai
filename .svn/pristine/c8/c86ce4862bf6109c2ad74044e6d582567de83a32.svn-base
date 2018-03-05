@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Insert title here</title>
+</head>
+<body>
+
+	<form action="dafeng/fileUpload" method="post" enctype="multipart/form-data" > 
+	<p>
+			
+            文件：<input type="file" name="file" />  
+            <select name="fileType">
+            	<option>选择文件类型</option>
+            	<option value="image">图像</option>
+            	<option value="file">文件</option>
+            </select>    
+        </p>
+        <p>  
+            <input type="submit" value="上传" />  
+        </p>  
+    </form> 
+</body>
+</html>

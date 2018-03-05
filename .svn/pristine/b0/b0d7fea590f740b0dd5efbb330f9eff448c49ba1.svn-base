@@ -1,0 +1,2153 @@
+{
+    "_embedded": {
+        "roles": [
+            {
+                "label": "DEVELOPER",
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "DEVELOPER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/1"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/1"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/1/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/1/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/1/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/1/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/1/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/1/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/1/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/1/createdBy"
+                    }
+                }
+            },
+            {
+                "label": "ANONYMOUS",
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "ANONYMOUS",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/2"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/2"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/2/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/2/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/2/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/2/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/2/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/2/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/2/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/2/createdBy"
+                    }
+                }
+            },
+            {
+                "label": "USER",
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "USER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/3"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/3"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/3/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/3/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/3/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/3/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/3/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/3/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/3/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/3/createdBy"
+                    }
+                }
+            },
+            {
+                "label":"BROKER",
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "BROKER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/4"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/4"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/4/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/4/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/4/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/4/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/4/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/4/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/4/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/4/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "GROUP_OWNER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/5"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/5"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/5/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/5/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/5/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/5/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/5/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/5/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/5/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/5/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "GROUP_MANAGER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/6"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/6"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/6/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/6/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/6/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/6/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/6/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/6/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/6/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/6/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "GROUP_FINANCE",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/7"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/7"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/7/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/7/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/7/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/7/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/7/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/7/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/7/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/7/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "GROUP_ANALYST",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/8"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/8"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/8/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/8/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/8/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/8/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/8/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/8/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/8/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/8/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "GROUP_ARCHIVIST",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/9"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/9"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/9/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/9/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/9/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/9/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/9/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/9/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/9/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/9/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_OWNER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/10"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/10"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/10/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/10/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/10/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/10/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/10/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/10/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/10/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/10/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_MANAGER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/11"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/11"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/11/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/11/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/11/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/11/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/11/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/11/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/11/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/11/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_SERVICE_DIRECTOR",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/12"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/12"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/12/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/12/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/12/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/12/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/12/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/12/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/12/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/12/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_SERVICE",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/13"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/13"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/13/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/13/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/13/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/13/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/13/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/13/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/13/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/13/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_FINANCE_DIRECTOR",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/14"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/14"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/14/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/14/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/14/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/14/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/14/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/14/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/14/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/14/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_FINANCE",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/15"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/15"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/15/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/15/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/15/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/15/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/15/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/15/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/15/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/15/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_RISK_DIRECTOR",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/16"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/16"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/16/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/16/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/16/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/16/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/16/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/16/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/16/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/16/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "COMPANY_RISK",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/17"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/17"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/17/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/17/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/17/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/17/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/17/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/17/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/17/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/17/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "STORE_OWNER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/18"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/18"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/18/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/18/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/18/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/18/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/18/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/18/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/18/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/18/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "STORE_MANAGER",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/19"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/19"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/19/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/19/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/19/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/19/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/19/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/19/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/19/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/19/createdBy"
+                    }
+                }
+            },
+            {
+                "label": null,
+                "createdAt": "2017-08-04T06:01:13.000+0000",
+                "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                "act": null,
+                "notice": null,
+                "roleCode": "STORE_SALESMAN",
+                "visibleMenuTree": [],
+                "currentUserCanActList": [
+                    {
+                        "label": "创建",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "create",
+                        "sort": 10,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    },
+                    {
+                        "label": "读取",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "read",
+                        "sort": 20,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "READ"
+                    },
+                    {
+                        "label": "更新",
+                        "createdAt": "2017-08-04T06:01:13.000+0000",
+                        "lastModifiedAt": "2017-08-04T06:01:13.000+0000",
+                        "noticeSelfTemplate": null,
+                        "noticeShowTemplate": null,
+                        "handNotice": false,
+                        "noticeOtherTemplate": null,
+                        "iconClass": null,
+                        "btnClass": null,
+                        "alias": null,
+                        "comment": null,
+                        "help": null,
+                        "description": null,
+                        "actCode": "update",
+                        "sort": 30,
+                        "view": false,
+                        "importance": false,
+                        "messageType": null,
+                        "actGroup": "UPDATE"
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/rest/roles/20"
+                    },
+                    "role": {
+                        "href": "http://localhost/rest/roles/20"
+                    },
+                    "logs": {
+                        "href": "http://localhost/rest/roles/20/logs"
+                    },
+                    "state": {
+                        "href": "http://localhost/rest/roles/20/state"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/rest/roles/20/createdByDepartment"
+                    },
+                    "visibleMenus": {
+                        "href": "http://localhost/rest/roles/20/visibleMenus"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/rest/roles/20/lastModifiedBy"
+                    },
+                    "usedByDepartments": {
+                        "href": "http://localhost/rest/roles/20/usedByDepartments"
+                    },
+                    "lastAct": {
+                        "href": "http://localhost/rest/roles/20/lastAct"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/rest/roles/20/createdBy"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "first": {
+            "href": "http://localhost/rest/roles?page=0&size=20"
+        },
+        "self": {
+            "href": "http://localhost/rest/roles{?page,size,sort}",
+            "templated": true
+        },
+        "next": {
+            "href": "http://localhost/rest/roles?page=1&size=20"
+        },
+        "last": {
+            "href": "http://localhost/rest/roles?page=1&size=20"
+        },
+        "profile": {
+            "href": "http://localhost/rest/profile/roles"
+        },
+        "search": {
+            "href": "http://localhost/rest/roles/search"
+        }
+    },
+    "page": {
+        "size": 20,
+        "totalElements": 37,
+        "totalPages": 2,
+        "number": 0
+    }
+}

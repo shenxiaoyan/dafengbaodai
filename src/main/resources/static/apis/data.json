@@ -1,0 +1,120 @@
+{
+    "_embedded": {
+        "users": [{
+                "createdAt": "2017-07-14T13:05:07.000+0000",
+                "lastModifiedAt": "2017-07-14T13:05:07.000+0000",
+                "label": null,
+                "act": null,
+                "nickname": "杨为乾",
+                "sex": 1,
+                "province": "Zhejiang",
+                "city": "Hangzhou",
+                "country": "CN",
+                "headimgurl": "http://wx.qlogo.cn/mmhead/Q3auHgzwzM6j9o3h0ID2M9IrGciaNlibDwzwPxVetbKiaZCicgEX5mXLfA/0",
+                "openid": "oQrgpwQkB1ymk9Tp3jshcWOiYwwM",
+                "unionid": "oQJrzvvgsfNo1xkIE4two9qXzPFI",
+                "sig": "eJxFkMtugzAQRf*FbarW4FiQSl1ARVRQHqQhFcoGWdgQK43t2IYAVf*9BBF1M4tzZjRz58dKV-tnLCUjOTY5VMR6tYD1NGLaSqZojktD1YBthJADwMM2VGkm*CAcYCPbgQD8S0YoN6xk46DYxapvmkqXG2G35yicm5tYXLM*WUZTv2bV0LgOD**Rr7dhckhmXjZLik2cHT8DKbodL1ccO3FAjrruiUe76wn6LPRRuVa3uo1B*g1l87HYVjr7wvtUuS*npRc0LDGRzbTLL*DtsYyc8zHyPdR8OBoOBU7SsAsdw965i4A7cVwUouYmN52k449*-wA-fGCW",
+                "visibleMenuTree": [{
+                        "id": 1,
+                        "label": "工作台",
+                        "href": "",
+                        "sort": null,
+                        "parent": null,
+                        "children": [{
+                                "id": 3,
+                                "label": "消息",
+                                "href": "messages",
+                                "sort": null,
+                                "parent": null,
+                                "children": null,
+                                "parentId": 1
+                            }, {
+                                "id": 2,
+                                "label": "概览",
+                                "href": "dashboard",
+                                "sort": null,
+                                "parent": null,
+                                "children": null,
+                                "parentId": 1
+                            }],
+                        "parentId": 0
+                    }],
+                "currentUserCanActList": [],
+                "stateActList": [{
+                        "createdAt": "2017-07-14T12:21:01.000+0000",
+                        "lastModifiedAt": "2017-07-14T12:21:01.000+0000",
+                        "label": "新建",
+                        "sort": 0,
+                        "stateCode": "NEW",
+                        "done": false
+                    }, {
+                        "createdAt": "2017-07-14T12:21:01.000+0000",
+                        "lastModifiedAt": "2017-07-14T12:21:01.000+0000",
+                        "label": "申请",
+                        "sort": 10,
+                        "stateCode": "APPLY",
+                        "done": true
+                    }, {
+                        "createdAt": "2017-07-14T12:21:01.000+0000",
+                        "lastModifiedAt": "2017-07-14T12:21:01.000+0000",
+                        "label": "有效",
+                        "sort": 20,
+                        "stateCode": "ENABLE",
+                        "done": false
+                    }],
+                "_links": {
+                    "self": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1"
+                    },
+                    "user": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1"
+                    },
+                    "role": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/role"
+                    },
+                    "state": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/state"
+                    },
+                    "createdBy": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/createdBy"
+                    },
+                    "lastAct": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/lastAct"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/createdByDepartment"
+                    },
+                    "department": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/department"
+                    },
+                    "workflow": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/workflow"
+                    },
+                    "logs": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/logs"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://dev.wuliuweiwang.com/rest/users/1/lastModifiedBy"
+                    }
+                }
+            }]
+    },
+    "_links": {
+        "self": {
+            "href": "http://dev.wuliuweiwang.com/rest/users{?page,size,sort}",
+            "templated": true
+        },
+        "profile": {
+            "href": "http://dev.wuliuweiwang.com/rest/profile/users"
+        },
+        "search": {
+            "href": "http://dev.wuliuweiwang.com/rest/users/search"
+        }
+    },
+    "page": {
+        "size": 20,
+        "totalElements": 1,
+        "totalPages": 1,
+        "number": 0
+    }
+}

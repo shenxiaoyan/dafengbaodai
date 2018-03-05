@@ -1,0 +1,112 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 19px 15px 0px 15px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'acts'})">行为</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'act_roles'})">行为：角色</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'states'})" >状态</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'state_acts'})" >状态：行为</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'workflows'})" >工作流</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'workflow_states'})" >工作流：状态</a></li>
+                    </ul>
+                </div>
+                <h4 class="pull-left  m-t-none">用户配置</h4>
+            </div>
+            
+            <div class="panel b-a">
+            <div class="panel-heading bg-info dk no-border wrapper-lg">
+              <button class="btn btn-sm btn-icon btn-rounded btn-info pull-right m-r"><i class="fa fa-phone"></i></button>
+              <button class="btn btn-sm btn-icon btn-rounded btn-info m-l"><i class="fa fa-heart"></i></button>
+            </div>
+            <div class="text-center m-b clearfix">
+              <div class="thumb-lg avatar m-t-n-xxl">
+                <img src="img/a5.jpg" alt="..." class="b b-3x b-white">
+                <div class="h4 font-thin m-t-sm">Jacobs Simon</div>
+              </div>
+            </div>
+            <div class="padder-v b-t b-light bg-light lter row text-center no-gutter">
+              <div class="col-xs-4">
+                <div>Facebook</div>
+                <div class="inline m-t-sm">
+                  <div ui-jq="easyPieChart" ui-options="{
+                      percent: 30,
+                      lineWidth: 3,
+                      trackColor: '{{app.color.light}}',
+                      barColor: '{{app.color.primary}}',
+                      scaleColor: false,
+                      color: '#fff',
+                      size: 65,
+                      lineCap: 'butt',
+                      rotate: 45,
+                      animate: 1000
+                    }">
+                    <div>
+                      <span class="step">30</span>%
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-4">
+                <div>Twitter</div>
+                <div class="inline m-t-sm">
+                  <div ui-jq="easyPieChart" ui-options="{
+                      percent: 50,
+                      lineWidth: 3,
+                      trackColor: '{{app.color.light}}',
+                      barColor: '{{app.color.info}}',
+                      scaleColor: false,
+                      color: '#fff',
+                      size: 65,
+                      lineCap: 'butt',
+                      rotate: 90,
+                      animate: 1000
+                    }">
+                    <div>
+                      <span class="step">50</span>%
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-4">
+                <div>Linkin</div>
+                <div class="inline m-t-sm">
+                  <div ui-jq="easyPieChart" ui-options="{
+                      percent: 20,
+                      lineWidth: 3,
+                      trackColor: '{{app.color.light}}',
+                      barColor: '{{app.color.warning}}',
+                      scaleColor: false,
+                      color: '#fff',
+                      size: 65,
+                      lineCap: 'butt',
+                      rotate: 180,
+                      animate: 1000
+                    }">
+                    <div>
+                      <span class="step">20</span>%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hbox text-center b-t b-light">          
+              <a href class="col padder-v text-muted b-r b-light">
+                <div class="h4">5032</div>
+                <span>Posts</span>
+              </a>
+              <a href class="col padder-v text-muted">
+                <div class="h4">689</div>
+                <span>Photos</span>
+              </a>
+            </div>
+          </div>
+            <div class="row-row bg-white"  ui-view>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

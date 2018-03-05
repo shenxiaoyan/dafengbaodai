@@ -1,0 +1,82 @@
+package com.liyang.service;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.liyang.client.AipOcrSingleton;
+import com.liyang.client.IClient;
+import com.liyang.client.IServiceObserve;
+import com.liyang.client.strategy.SecurityInfoXiaoma;
+import com.liyang.client.xiaoma.ClientXiaoma;
+import com.liyang.client.xiaoma.MessageLicenseOcr;
+import com.liyang.client.xiaoma.ResultLicenseOcr;
+import com.liyang.client.xiaoma.ServiceLicenseOcr;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.helper.ResponseBody;
+import com.liyang.util.FailReturnObject;
+
+/**
+ * @author Administrator
+ *
+ */
+@Service
+public class LicenseService {
+
+	private final static Logger logger = LoggerFactory.getLogger(LicenseService.class);
+
+	/**
+	 * 百度行驶证识别
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public JSONObject baiduDistinguish(MultipartFile file) {
+		HashMap<String, String> options = new HashMap<>();
+		options.put("detect_direction", "true");
+		options.put("accuracy", "normal");
+		byte[] bytes = null;
+		try {
+			bytes = file.getBytes();
+		} catch (IOException e) {
+			logger.error("【上传文件转换为二进制数组异常！】：");
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = AipOcrSingleton.getInstance().getClient().vehicleLicense(bytes, options);
+		return jsonObject;
+
+	}
+
+	/**
+	 * 小马行驶证识别
+	 * 
+	 * @param imgFile
+	 * @param xmcxApiKey
+	 * @return
+	 */
+	public ResponseBody doDistinguish(MultipartFile imgFile, String xmcxApiKey) {
+		MessageLicenseOcr message = new MessageLicenseOcr(imgFile, logger);
+		IClient client = new ClientXiaoma();
+		IServiceObserve serviceObserve = null;
+		SecurityInfoXiaoma securityInfo = new SecurityInfoXiaoma(xmcxApiKey);
+		ServiceLicenseOcr service = new ServiceLicenseOcr(securityInfo, client, serviceObserve);
+		ResultLicenseOcr result = null;
+		try {
+			result = (ResultLicenseOcr) service.callService(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+			message.getLogger().warn("小马行驶证识别接口异常");
+			throw new FailReturnObject(ExceptionResultEnum.LICENSE_INTFC_ERROR);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			throw new FailReturnObject(ExceptionResultEnum.LICENSE_INTFC_ERROR);
+		}
+
+		return new ResponseBody(result.getDataString());
+	}
+}

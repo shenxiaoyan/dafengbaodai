@@ -1,0 +1,30 @@
+<script>
+    app.controller("roleProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state,$filter) {
+
+                $scope.profile = {};
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="roleProfileCtrl">
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+
+            </div>
+        </div>
+    </div>
+</div>

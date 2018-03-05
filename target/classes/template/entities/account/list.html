@@ -1,0 +1,50 @@
+<div class="vbox">
+    <div class="wrapper-md b-b clearfix">
+        <div class="font-thin h4">
+            {{entity_key + "s"}}
+        </div>
+
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div ng-if="list.length < 1">
+                        暂无数据！
+                    </div>
+                    <table class="table" ng-if="list.length > 0">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ui-sref="workflowEntity.home.profile.info({id:item.id})" ng-repeat="item in list">
+                            <td class="v-middle">
+                                <span class="pull-left thumb avatar m-r">
+                                    <img ng-src="{{ item.headimgurl }}">
+                                </span>
+                            </td>
+                            <td class="v-middle">
+                                {{item.nickname}}
+                            </td>
+                            <td class="v-middle">
+                                {{item.createdAt}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="m-l-md">
+                    <ul id="account_list_paginator"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

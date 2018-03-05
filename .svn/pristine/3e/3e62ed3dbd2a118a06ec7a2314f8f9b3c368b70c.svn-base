@@ -1,0 +1,31 @@
+<div ng-controller="workflowEntityModuleController" class="h-full w-full" ui-view></div>
+
+<!--&lt;!&ndash; hbox layout &ndash;&gt;-->
+<!--<div class="hbox hbox-auto-xs bg-light h-full" ng-controller="workflowEntityModuleController">-->
+    <!--<div class="col w-md b-r " ng-controller='workflowEntityStatesController'>-->
+        <!--<div class="vbox">-->
+            <!--<div class="b-b clearfix" style="padding:27.5px 30px;">-->
+                <!--<div class="font-thin h4 pull-left">-->
+                  <!--出单管理-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="row-row">-->
+                <!--<div class="cell scrollable">-->
+                    <!--<div class="cell-inner">-->
+                        <!--<div class="wrapper-md">-->
+                            <!--<ul class="nav nav-pills nav-stacked nav-sm">-->
+                                <!--<li ui-sref-active="active" ng-repeat="state in states">-->
+                                    <!--<a ui-sref="workflowEntity.list({state_code:state.stateCode})">-->
+                                        <!--{{ state.label }}-->
+                                    <!--</a>-->
+                                <!--</li>-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col lter" ui-view></div>-->
+<!--</div>-->
+<!--&lt;!&ndash; /hbox layout &ndash;&gt;-->

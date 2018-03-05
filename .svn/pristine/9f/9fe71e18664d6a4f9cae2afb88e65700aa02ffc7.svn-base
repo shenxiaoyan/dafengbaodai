@@ -1,0 +1,52 @@
+<div class="vbox">
+    <div class="wrapper-md b-b">
+        {{entity_key}} /  actForm
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+
+                <div class="panel-body">
+
+                    <form class="form-horizontal" method="get">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">全名</label>
+                            <div class="col-sm-10">
+                                <input type="text" ng-model="label" class="form-control">
+                                <span class="help-block m-b-none">行为全名</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">别称</label>
+                            <div class="col-sm-10">
+                                <input type="text" ng-model="alias" class="form-control">
+                                <span class="help-block m-b-none">显示在按钮上的名称</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">小图标Class</label>
+                            <div class="col-sm-10">
+                                <input type="text" ng-model="iconClass" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">按钮class</label>
+                            <div class="col-sm-10">
+                                <input type="text" ng-model="buttonClass" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a type="submit" href="javascript:history.go(-1);" class="btn btn-default">取消</a>
+                                <button type="submit"  ng-click="save()" class="btn btn-primary">保存</button>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,268 @@
+<script>
+    "use strict";
+    app.controller("logsCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams,$filter) {
+
+                $scope.list = [];
+                $scope.menus = [];
+                $scope.menu = [];
+                $scope.searchInfo = {};
+                $scope.searchIf = true;
+
+                $http.get("/dafeng/log/menuList").success(function (response) {
+
+                    $scope.menu = response.data;
+                    console.log(response)
+                });
+
+//                //获取当前登录用户的角色
+//                $http.get('/rest/users/' + window.myid + "?projection=userProjection").success(function (response) {
+//
+//                    window.myinfo = $rootScope.myinfo = response;
+//
+//                    $scope.getMenuTree($rootScope.myinfo.role.id);
+//                });
+//
+//                //根据角色查询出他所能看到的菜单
+//                $scope.getMenuTree = function (myinfo) {
+//
+//                    $http.get("/rest/roles/" + myinfo).success(function (resResult) {
+//
+//                        $scope.menus = resResult.visibleMenuTree;
+//
+//                        angular.forEach( $scope.menus,function(val,index){
+//                            angular.forEach(val.children,function(value,index2){
+//                                $scope.menu.push(value);
+//                            });
+//                        });
+//
+//                    });
+//
+//                };
+
+//                console.log($scope.menu)
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+
+                    console.log($scope.searchInfo)
+
+                    $scope.searchIf = false;
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "GET",
+                        url : "/dafeng/log/search?size=15&page=" + page,
+                        params: $scope.searchInfo
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+
+                };
+
+                //数据过长是查看详情
+                $scope.logsDetail = function(detailName,info){
+                    $("#logs_detail").modal("show");
+                    $scope.detail = detailName;
+                    $scope.logInfo = info;
+                };
+
+                $scope.clearSearch = function(){
+                    $scope.searchInfo.actCode = "";
+                };
+
+            }
+        ]
+    )
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="logsCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="pull-left">
+                    <div class="w inline m-r">
+                        <select type="text"
+                                class="form-control"
+                                autocomplete="off"
+                                ng-model="searchInfo.entityName"
+                                ng-options="item.entityName as item.label for item in menu"
+                                ng-change="clearSearch()">
+                            <option value="">--请选择菜单--</option>
+                        </select>
+                    </div>
+                    <div class="w inline m-r" ng-if="searchInfo.entityName">
+                        <select type="text"
+                                class="form-control"
+                                autocomplete="off"
+                                ng-model="searchInfo.actCode">
+                            <option value="">--请选择操作类型--</option>
+                            <option value="create">创建</option>
+                            <option value="update">更新</option>
+                            <option value="delete">删除</option>
+                        </select>
+                    </div>
+                    <div class="inline">
+                        <button type="button" class="btn btn-primary" ng-click="getList(0)">
+                            <span>查询</span>
+                        </button>
+                        <!--<button type="button" class="btn btn-default m-r" ng-click="clearInfo()">-->
+                            <!--<span>清除</span>-->
+                        <!--</button>-->
+                    </div>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="searchIf">
+                                    请选择菜单查询操作记录！
+                                </div>
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="!searchIf && list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div>
+                                    <div class="table-responsive" ng-if="list.length > 0">
+                                        <table class="table table-hover b-t b-light scroll-x">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 30px;">编辑</th>
+                                                <th style="width: 65px;">序号</th>
+                                                <th style="width: 130px;" class="center">操作人</th>
+                                                <th style="width: 180px;" class="center">操作时间</th>
+                                                <th style="width: 100px;" class="center">操作种类</th>
+                                                <th style="width: 110px;">操作字段</th>
+                                                <th style="width: auto; text-align: center">操作前</th>
+                                                <th style="width: auto; text-align: center">操作后</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="item in list">
+                                                <td class="v-middle">
+                                                    <button id="unclaimedBtn"
+                                                            class="btn btn-xs btn-info"
+                                                            ui-sref="workflowEntity.home.profile.info({entityId:item.entityId,entityName:searchInfo.entityName})">
+                                                        详情
+                                                    </button>
+                                                </td>
+                                                <td class="v-middle center">
+                                                    {{ item.id?item.id:"暂无"}}
+                                                </td>
+                                                <td class="v-middle" style="width: 130px;">
+                                                    {{ item.createdBy?item.createdBy:"暂无"}}
+                                                </td>
+                                                <td class="v-middle" style="width: 130px;">
+                                                    {{ item.createdAt? (item.createdAt | dateSecondTime): "暂无"}}
+                                                </td>
+                                                <td class="v-middle" style="width: 100px;">
+                                                    {{ item.label?item.label:"暂无" }}
+                                                </td>
+                                                <td colspan="3" ng-if="item.difference.length > 0">
+                                                    <table style="width:100%;margin-bottom:0;table-layout:fixed;">
+                                                        <tbody>
+                                                        <tr ng-repeat="info in item.difference">
+                                                            <td width="110">{{ info.column ? info.column : "--"}}</td>
+                                                            <td width="auto" style="text-align:center">
+                                                                <span ng-if="info.old.length <= 10">{{ info.old ? info.old : "--" }}</span>
+                                                                <span  ng-if="info.old.length > 10"
+                                                                      ng-click="logsDetail(item,info)"
+                                                                      class="text-info-dker">
+                                                                    查看详情
+                                                                </span>
+                                                            </td>
+                                                            <td width="auto" style="text-align:center">
+                                                                <span ng-if="info.new.length <= 10">{{ info.new ? info.new : "--"}}</span>
+                                                                <span  ng-if="info.new.length > 10"
+                                                                       ng-click="logsDetail(item,info)"
+                                                                       class="text-info-dker">
+                                                                    查看详情
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td class="v-middle" style="width: 110px;" ng-if="item.difference.length < 1">--</td>
+                                                <td class="v-middle" width="auto" style="text-align:center" ng-if="item.difference.length < 1">--</td>
+                                                <td class="v-middle" width="auto" style="text-align:center" ng-if="item.difference.length < 1">--</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+            </div>
+
+            <!--修改-->
+            <div class="modal fade" id="logs_detail" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="createRole">操作详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            {{ detail.createdBy }}&ensp;
+                            <span ng-if="logInfo.column">把</span>
+                            &ensp;{{ logInfo.column }}&ensp;
+                            从&ensp;{{ logInfo.old ? logInfo.old : "--" }}&ensp;改成了&ensp;{{ logInfo.new ? logInfo.new : "--" }}。
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">确认
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+
+
+

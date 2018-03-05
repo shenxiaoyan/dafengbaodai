@@ -1,0 +1,591 @@
+package com.liyang.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.base.AbstractWorkflowAct.ActType;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.customer.CustomerAct;
+import com.liyang.domain.customer.CustomerActRepository;
+import com.liyang.domain.customer.CustomerFile;
+import com.liyang.domain.customer.CustomerForSearch;
+import com.liyang.domain.customer.CustomerLog;
+import com.liyang.domain.customer.CustomerLogRepository;
+import com.liyang.domain.customer.CustomerRepository;
+import com.liyang.domain.customer.CustomerState;
+import com.liyang.domain.customer.CustomerStateRepository;
+import com.liyang.domain.customer.CustomerWorkflow;
+import com.liyang.domain.customer.CustomerWorkflowRepository;
+import com.liyang.domain.role.Role;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.team.Team;
+import com.liyang.domain.team.TeamRepository;
+import com.liyang.domain.upgradeapply.UpgradeApply;
+import com.liyang.domain.upgradeapply.UpgradeApplyRepository;
+import com.liyang.domain.user.User;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.helper.ResponseBody;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.InviteCodeUtil;
+
+/**
+ * @author Administrator
+ *
+ */
+@Service
+public class CustomerService extends
+		AbstractWorkflowService<Customer, CustomerWorkflow, CustomerAct, CustomerState, CustomerLog, CustomerFile> {
+
+	@Autowired
+	CustomerActRepository customerActRepository;
+	@Autowired
+	CustomerStateRepository customerStateRepository;
+	@Autowired
+	CustomerLogRepository customerLogRepository;
+	@Autowired
+	CustomerRepository customerRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	CustomerWorkflowRepository customerWorkflowRepository;
+	@Autowired
+	UpgradeApplyRepository upgradeApplyRepository;
+	@Autowired
+	TeamRepository teamRepository;
+	@Autowired
+	RegisterService registerService;
+
+	/**
+	 * 修改用户信息
+	 */
+	public ResponseBody update(Map<String, String> userInfoMap, HttpServletRequest request) {
+
+		Customer customer = customerRepository.findByToken(request.getHeader("token"));
+		if (customer == null) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOUSER_ERROR);
+			// throw new RuntimeException("用户不存在");
+		}
+		// 修改用户信息
+		// String
+		// responseResult=HttpUtil.patchBody("http://"+serverIpAddress+"/rest/customers/"+customer.getId(),JSONObject.fromObject(userInfoMap).toString());
+		if (null != userInfoMap.get("client")) {
+			customer.setClient(userInfoMap.get("client"));
+		}
+		if (null != userInfoMap.get("pushToken")) {
+			customer.setPushToken(userInfoMap.get("pushToken"));
+		}
+		if (null != userInfoMap.get("nickname")) {
+			customer.setNickname(userInfoMap.get("nickname"));
+		}
+		if (null != userInfoMap.get("headimgurl")) {
+			customer.setHeadimgurl(userInfoMap.get("headimgurl"));
+		}
+		customerRepository.save(customer);
+
+		ResponseBody responseBody = new ResponseBody();
+
+		responseBody.setErrorCode(0);
+		responseBody.setErrorInfo("修改成功");
+		responseBody.setData(null);
+
+		return responseBody;
+	}
+
+	public Customer updateState(Customer customer) {
+		if ("ENABLED".equals(customer.getState().getStateCode())) {
+			CustomerState disableState = customerStateRepository.findByStateCode("DISABLED");
+			customer.setState(disableState);
+		} else if ("DISABLED".equals(customer.getState().getStateCode())) {
+			CustomerState enableState = customerStateRepository.findByStateCode("ENABLED");
+			customer.setState(enableState);
+		} else {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_STATECODE_ERROR);
+		}
+		return customerRepository.save(customer);
+	}
+
+	/**
+	 * 根据用户的id获取用户的邀请码
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public String getMyInviteForCustomerById(Integer id) {
+		// TODO
+		Customer customer = customerRepository.getById(id);
+		String myInvite = customer.getMyInvite();
+
+		return myInvite;
+	}
+
+	/**
+	 * 查询所有粉丝申请
+	 */
+	public List<UpgradeApply> queryUpgrade() {
+		return upgradeApplyRepository.query();
+	}
+
+	@Override
+	public LogRepository<CustomerLog> getLogRepository() {
+		// TODO Auto-generated method stub
+		return customerLogRepository;
+	}
+
+	@Override
+	public AuditorEntityRepository<Customer> getAuditorEntityRepository() {
+
+		return customerRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new User().setLogRepository(customerLogRepository);
+	}
+
+	@Override
+	public CustomerLog getLogInstance() {
+		// TODO Auto-generated method stub
+		return new CustomerLog();
+	}
+
+	@Override
+	public ActRepository<CustomerAct> getActRepository() {
+		// TODO Auto-generated method stub
+		return customerActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new Customer().setService(this);
+	}
+
+	@Override
+	public CustomerFile getFileLogInstance() {
+		// TODO Auto-generated method stub
+		return new CustomerFile();
+	}
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+		System.out.println("CustomerService初始化");
+		// List<CustomerAct> findAll = customerActRepository.findAll();
+		// if(findAll == null || findAll.isEmpty()){
+		if (customerActRepository.count() <= 0) {
+
+			CustomerWorkflow customerApplyWorkflow = new CustomerWorkflow();
+			customerApplyWorkflow.setLabel("安卓与ios用户登陆流程");
+			customerApplyWorkflow = customerWorkflowRepository.save(customerApplyWorkflow);
+
+			CustomerAct save1 = customerActRepository.save(new CustomerAct("创建", "create", 10, ActGroup.UPDATE));
+			CustomerAct save2 = customerActRepository.save(new CustomerAct("读取", "read", 20, ActGroup.READ));
+			CustomerAct save3 = customerActRepository.save(new CustomerAct("更新", "update", 30, ActGroup.UPDATE));
+			CustomerAct save4 = customerActRepository.save(new CustomerAct("删除", "delete", 40, ActGroup.UPDATE));
+
+			CustomerState enableState = new CustomerState("有效", 0, "ENABLED");
+
+			enableState.setActs(Arrays.asList(save2, save3, save4).stream().collect(Collectors.toSet()));
+			customerStateRepository.save(enableState);
+			CustomerState noable = new CustomerState("无效", 100, "DISABLED");
+			customerStateRepository.save(noable);
+			CustomerState deleteable = new CustomerState("已删除", 200, "DELETED");
+			customerStateRepository.save(deleteable);
+
+			customerApplyWorkflow.setStates(new HashSet<CustomerState>(Arrays.asList(noable, deleteable, enableState)));
+			customerApplyWorkflow = customerWorkflowRepository.save(customerApplyWorkflow);
+
+			save1.setActType(ActType.START);
+			save1.setStartWorkflow(customerApplyWorkflow);
+			save1.setTargetState(enableState);
+
+			Role role = roleRepository.findByRoleCode("USER");
+			if (role != null) {
+				save1.setRoles(new HashSet<Role>(Arrays.asList(role)));
+			}
+			customerActRepository.save(save1);
+
+		}
+
+	}
+
+	/**
+	 * 粉丝管理多条件查询
+	 * 
+	 * @param customerForSearch
+	 * @param pageable
+	 * @return
+	 */
+	public Page<Customer> seniorMultiConditionSearch(CustomerForSearch customerForSearch, Pageable pageable) {
+
+		Page<Customer> customerPage = customerRepository.findAll(new Specification<Customer>() {
+
+			@Override
+			public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				List<Predicate> predicateList = new ArrayList<>();
+				if (null != customerForSearch) {
+
+					if (customerForSearch.getNickname() != null
+							&& !org.springframework.util.StringUtils.isEmpty(customerForSearch.getNickname())) {
+						Predicate nicknameEqual = cb.equal(root.get("nickname"), customerForSearch.getNickname());
+						predicateList.add(nicknameEqual);
+					}
+					if (customerForSearch.getGrade() != null
+							&& !StringUtils.isEmpty(customerForSearch.getGrade().toString())) {
+						Predicate gradeEqual = cb.equal(root.get("grade"), customerForSearch.getGrade());
+						predicateList.add(gradeEqual);
+					}
+					if (!StringUtils.isEmpty(customerForSearch.getPhone())) {
+						Predicate phoneEqual = cb.equal(root.get("phone"), customerForSearch.getPhone());
+						predicateList.add(phoneEqual);
+					}
+					if (!StringUtils.isEmpty(customerForSearch.getStateCode())) {
+						Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"),
+								customerForSearch.getStateCode());
+						predicateList.add(stateCodeEqual);
+					}
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+				}
+				return null;
+			}
+		}, pageable);
+		return customerPage;
+
+	}
+
+	/**
+	 * 前端用户多条件查询
+	 * 
+	 * @param customerForSearch
+	 * @param pageable
+	 * @return
+	 */
+	public Page<Customer> multiConditionSearch(CustomerForSearch customerForSearch, Pageable pageable) {
+
+		Page<Customer> customerPage = customerRepository.findAll(new Specification<Customer>() {
+
+			@Override
+			public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				List<Predicate> predicateList = new ArrayList<>();
+				if (null != customerForSearch) {
+
+					if (customerForSearch.getGrade() != null
+							&& !StringUtils.isEmpty(customerForSearch.getGrade().toString())) {
+						Predicate gradeEqual = cb.equal(root.get("grade"), customerForSearch.getGrade());
+						predicateList.add(gradeEqual);
+					}
+					if (!StringUtils.isEmpty(customerForSearch.getPhone())) {
+						Predicate phoneEqual = cb.equal(root.get("phone"), customerForSearch.getPhone());
+						predicateList.add(phoneEqual);
+					}
+					if (!StringUtils.isEmpty(customerForSearch.getStateCode())) {
+						Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"),
+								customerForSearch.getStateCode());
+						predicateList.add(stateCodeEqual);
+					}
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+				}
+				return null;
+			}
+		}, pageable);
+		return customerPage;
+
+	}
+
+	public Page<Customer> multiConditionSearchInviteForCustomer(Pageable pageable, String invite) {
+
+		Page<Customer> customerList = customerRepository.getByInvited(invite, pageable);
+
+		return customerList;
+
+	}
+
+	public ResponseBody mobileQueryInviteCustomers(String token) {
+		Customer customer = customerRepository.findByToken(token);
+		if (customer == null) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOUSER_ERROR);
+		}
+		List<Customer> customers = customerRepository.getInvitedList(customer.getMyInvite());
+		List<Map<String, Object>> responseData = new ArrayList<>();
+		for (Customer c : customers) {
+			Map<String, Object> projectionClass = parseForProjection(c);
+			responseData.add(projectionClass);
+		}
+		return new ResponseBody(responseData);
+	}
+
+	/**
+	 * 根据projection调整返回结果
+	 * 
+	 * @param customer
+	 * @return
+	 */
+	public Map<String, Object> parseForProjection(Customer customer) {
+		Map<String, Object> result = new HashMap<>();
+		result.put("id", customer.getId());
+		result.put("nickname", customer.getNickname());
+		result.put("createdAt", customer.getCreatedAt());
+		result.put("lastModifiedAt", customer.getLastModifiedAt());
+		result.put("headimgurl", customer.getHeadimgurl());
+		result.put("myInvite", customer.getMyInvite());
+		result.put("phone", customer.getPhone());
+		result.put("tag", customer.getTag());
+		Map<String, Object> state = new HashMap<>();
+		state.put("id", customer.getState().getId());
+		state.put("label", customer.getState().getLabel());
+		state.put("stateCode", customer.getState().getStateCode());
+		result.put("state", state);
+		result.put("sex", customer.getSex());
+		result.put("grade", customer.getGrade());
+		result.put("account", customer.getAccount());
+		return result;
+	}
+
+	public ResponseBody geMyInfoSer(String token) {
+		Customer customer = customerRepository.findByToken(token);
+
+		SimplePropertyPreFilter filter = new SimplePropertyPreFilter(Customer.class, "id", "client", "grade",
+				"headimgurl", "invite", "myInvite", "nickname", "phone", "sex", "tag", "token", "account");
+		String custJsonStr = JSON.toJSONString(customer, filter);
+		JSONObject custJsonObj = JSON.parseObject(custJsonStr);
+		return new ResponseBody(custJsonObj);
+	}
+
+	/**
+	 * 根据号码查询未加入团队且完成实名认证的有效用户
+	 * 
+	 * @param phone
+	 * @param pageable
+	 * @return
+	 */
+	public List<Map<String, Object>> findNoTeamByPhone(String phone) {
+		List<Customer> list = customerRepository
+				.findByTeamIsNullAndAccount_RealNameNotNullAndStateStateCodeAndPhoneLike("ENABLED", "%" + phone + "%");
+		if (null == list || list.isEmpty()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_INTEAM_NOEXIST_NOACCOUNT_ERROR);
+		}
+		List<Map<String, Object>> returnList = new ArrayList<>();
+		for (Customer customer : list) {
+			Map<String, Object> dataMap = new HashMap<>();
+			dataMap.put("id", customer.getId());
+			dataMap.put("realName", customer.getAccount().getRealName());
+			dataMap.put("phone", customer.getPhone());
+			dataMap.put("identity", customer.getAccount().getIdentity());
+			returnList.add(dataMap);
+		}
+		return returnList;
+	}
+
+	/**
+	 * 根据Id获取
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Customer findOne(Integer id) {
+		return customerRepository.findOne(id);
+	}
+
+	/**
+	 * 据Id查找，并判断是否可加入团队用户
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	public Customer findNewTeamQualifiedOne(Integer customerId) {
+		Customer customer = customerRepository.findByIdAndState_StateCode(customerId, "ENABLED");
+		validNewTeamCaptainQualification(customer);
+		return customer;
+	}
+
+	/**
+	 * 新建团队，团长资格验证
+	 */
+	public void validNewTeamCaptainQualification(Customer customer) {
+		if (null == customer) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOUSERORFORBIDDEN_ERROR);
+		} else if (null != customer.getTeam()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_ALREADYINTEAM_ERROR);
+		} else if (null == customer.getAccount()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOACCOUNT_ERROR);
+		}
+	}
+
+	/**
+	 * 修改团队团长，资格验证
+	 */
+	public void validTeamCaptainQualification(Customer customer) {
+		if (null == customer) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOUSERORFORBIDDEN_ERROR);
+		} else if (null == customer.getAccount()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOACCOUNT_ERROR);
+		}
+	}
+
+	/**
+	 * 移除用户团队属性
+	 * 
+	 * @param customer
+	 */
+	@Transactional
+	public Customer dropTeam(Customer customer) {
+		customer.setTeam(null);
+		return customerRepository.save(customer);
+	}
+
+	/**
+	 * 据token获取user
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public Customer findbyToken(String token) {
+		return customerRepository.findByToken(token);
+	}
+
+	/**
+	 * 据phone获取, 禁用时报错，无此phone时新创建
+	 * 
+	 * @param phone
+	 * @return
+	 */
+	@Transactional
+	public Customer findByPhoneOrCreateByInvite(String phone, String invite, String code) {
+		if(!registerService.validateCode(phone,code)){
+			throw new FailReturnObject(ExceptionResultEnum.LOGIN_IDENTIFY_ERROR);
+		}
+		Customer customer = customerRepository.findByPhone(phone);
+		if (null != customer) {
+			judgeState(customer);
+			return customer;
+		} else { 
+			customer = new Customer();
+			if (!StringUtils.isEmpty(invite)) {
+				customer.setInvite(invite);
+			}
+			customer.setToken(UUID.randomUUID().toString());
+			customer.setNickname(phone);
+			customer.setPhone(phone);
+			customer.setTag(0);
+			customer.setMyInvite(noRepeatSixNum());
+			customer.setState(customerStateRepository.findByStateCode("ENABLED"));
+			customer.setWorkflow(customerActRepository.findByActCode("create").getStartWorkflow());
+			return customerRepository.save(customer);
+		}
+	}
+
+	/**
+	 * 生成不重复邀请码
+	 * 
+	 * @return
+	 */
+	public String noRepeatSixNum() {
+		String myInvite = "";
+		List<Customer> exist = null;
+		do {
+			myInvite = InviteCodeUtil.genetateInviteCode();
+			exist = customerRepository.findByMyInvite(myInvite);
+		} while (null != exist && !exist.isEmpty());
+		return myInvite;
+	}
+
+	/**
+	 * 状态判断，禁用状态抛错
+	 * 
+	 * @param customer
+	 */
+	public void judgeState(Customer customer) {
+		if (customer == null) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_DATA_ERROR);
+		} else if ("DISABLED".equalsIgnoreCase(customer.getStateCode())) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_DISABLE_ERROR);
+		}
+	}
+
+//	/**
+//	 * 据teamId查找
+//	 * 
+//	 * @param teamId
+//	 * @return
+//	 */
+//	public List<Customer> findByTeamId(Integer teamId) {
+//		return customerRepository.findByTeam_Id(teamId);
+//	}
+	
+	/**
+	 * 据团队号及手机号模糊查询
+	 * @param teamId
+	 * @param phone
+	 * @return
+	 */
+	public List<Customer> findByTeamIdAndPhoneLike(Integer teamId, String phone){
+		if (null == phone) {
+			return customerRepository.findByTeam_Id(teamId);
+		}else {
+			return customerRepository.findByTeamIdAndPhoneLike(teamId, "%" + phone + "%");
+		}
+	}
+	
+	/**
+	 * 据手机号查找
+	 * @param phone
+	 * @return
+	 */
+	public Customer findByPhone(String phone) {
+		return customerRepository.findByPhone(phone);
+	}
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

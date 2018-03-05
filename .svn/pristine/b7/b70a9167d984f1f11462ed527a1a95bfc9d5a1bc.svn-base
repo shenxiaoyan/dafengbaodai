@@ -1,0 +1,233 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *企业借贷信息
+     *
+     * */
+    app.controller('businessLoanCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            $scope.mockData = {
+                enterpriseName:"商道科技",
+                creditRegister: [
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/02 17:20:20"
+                    },
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/08 12:20:20"
+                    }
+                ]
+            };
+        //select
+        $scope.enterprise=[
+            {
+                type:'按企业名称查'
+            },
+            {
+                type:'按企业工商注册号查'
+            }
+        ];
+        $scope.YourOption =$scope.enterprise[0];
+        $scope.$watch("YourOption", function(n){
+            $scope.type = n.type;
+        });
+
+
+        //数据初始化
+        $scope.info = {
+            enterpriseName: "商道科技"
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.enterpriseName = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            //数据信息格式错误时阻止表单提交
+            if (myForm.enterpriseName) {
+                myForm.enterpriseName.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+
+            if($scope.info.enterpriseName === $scope.mockData.enterpriseName){
+                $scope.resultSwitch = true;
+                console.log('aaa')
+            }else {
+                $scope.resultSwitch = false;
+                console.log('bbb')
+            }
+
+
+
+
+        };
+
+    }]);
+</script>
+
+<div class="vbox" ng-controller="businessLoanCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">企业借贷信息</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <input type="hidden" class="url" value="/transaction/baseInfo">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>{{type}}:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.enterpriseName" name="enterpriseName" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.enterpriseName.$dirty && myForm.enterpriseName.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.enterpriseName.$error.required">所填内容不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>查询方式:</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="YourOption" class="form-control" ng-options="enterpriseType.type for enterpriseType in enterprise">
+                                            <!--<option value="name">按企业名称查</option>-->
+                                            <!--<option value="regNo">按企业工商注册号查</option>-->
+                                        </select>
+                                        <input id="queryMidValue" type="hidden" class="type" value="regNo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业照面信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td  width="50%">法定代表人/负责人/执行事务合伙人</td><td width="50%">	卢XXX</td></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">股权出质历史信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>出质批准日期</td><td>2014-12-17</td></tr>
+                                <tr><td>出质截至日期</td><td></td></tr>
+                                <tr><td>出质金额(万元)</td><td>32</td></tr>
+                                <tr><td>质权人姓名</td><td>白**</td></tr>
+                                <tr><td>质权人类别</td><td>其他</td></tr>
+                                <tr><td>出质备案日期</td><td>2014-12-17</td></tr>
+                                <tr><td>出质审批部门</td><td>青海省**市工商行政管理局</td></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">动产抵押信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">信息1</th></tr><tr><td>抵押人</td><td>福建省**市**纺织厂</td></tr>
+                                <tr><td>状态标识</td><td></td></tr>
+                                <tr><td>抵押ID</td><td>3501821105030011</td></tr>
+                                <tr><td>履约起始日期</td><td>2011-03-12</td></tr>
+                                <tr><td>履约截止日期</td><td>2012-03-11</td></tr>
+                                <tr><td>出质备案日期</td><td></td></tr>
+                                <tr><td>登记日期</td><td>2011-04-06</td></tr>
+                                <tr><td>登记证号</td><td></td></tr>
+                                <tr><td>被担保主债权数额(万元)</td><td></td></tr>
+                                <tr><td>申请抵押原因</td><td></td></tr>
+                                <tr><td>被担保主债权种类</td><td></td></tr>
+                                <tr><td>注销日期</td><td></td></tr>
+                                <tr><td>抵押权人</td><td>招商银行股份有限公司**支行</td></tr>
+                                <tr><td>登记机关</td><td>福建省福州市**市工商行政管理局</td></tr>
+                                <tr><td>注册地址行政区编号</td><td>35**2</td></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">动产抵押物信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">信息1</th></tr>
+                                <tr><td>抵押物名称</td><td>清花设备</td></tr>
+                                <tr><td>数量</td><td>299</td></tr>
+                                <tr><td>价值(万元)</td><td></td></tr>
+                                <tr><td>抵押ID</td><td>3501821006010015</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业照面信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td  width="50%">法定代表人/负责人/执行事务合伙人</td><td width="50%">{{value.platformType}}</td></tr>
+                                </tbody>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">股权出质历史信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td>出质批准日期</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>出质截至日期</td><td></td></tr>
+                                <tr><td>出质金额(万元)</td><td>32</td></tr>
+                                <tr><td>质权人姓名</td><td>白**</td></tr>
+                                <tr><td>质权人类别</td><td>其他</td></tr>
+                                <tr><td>出质备案日期</td><td>2014-12-17</td></tr>
+                                <tr><td>出质审批部门</td><td>青海省**市工商行政管理局</td></tr>
+                                </tbody>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">动产抵押信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th style="background-color: #f6f8f8" colspan="2">信息{{index+1}}</th></tr>
+                                <tr><td>抵押人</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>状态标识</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>抵押ID</td><td>3501821105030011</td></tr>
+                                <tr><td>履约起始日期</td><td>2011-03-12</td></tr>
+                                <tr><td>履约截止日期</td><td>2012-03-11</td></tr>
+                                <tr><td>出质备案日期</td><td></td></tr>
+                                <tr><td>登记日期</td><td>2011-04-06</td></tr>
+                                <tr><td>登记证号</td><td></td></tr>
+                                <tr><td>被担保主债权数额(万元)</td><td></td></tr>
+                                <tr><td>申请抵押原因</td><td></td></tr>
+                                <tr><td>被担保主债权种类</td><td></td></tr>
+                                <tr><td>注销日期</td><td></td></tr>
+                                <tr><td>抵押权人</td><td>招商银行股份有限公司**支行</td></tr>
+                                <tr><td>登记机关</td><td>福建省福州市**市工商行政管理局</td></tr>
+                                <tr><td>注册地址行政区编号</td><td>35**2</td></tr>
+                                </tbody>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">动产抵押物信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th style="background-color: #f6f8f8" colspan="2">信息{{index+1}}</th></tr>
+                                <tr><td>抵押物名称</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>数量</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>价值(万元)</td><td></td></tr>
+                                <tr><td>抵押ID</td><td>3501821006010015</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

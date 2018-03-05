@@ -1,0 +1,25 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 19px 15px 0px 15px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                          <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'dashboard'})">概览</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'borrower'})" >主体</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'asset'})" >资产</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'repayments'})">还款</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'files'})" >文件</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'contracts'})" >合同</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'esigns'})" >E签保</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'workflow'})" >流转记录</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'finance'})" >财务</a></li>
+                            <li ui-sref-active="active"><a ui-sref="orders.order.page({view_type:'invoice'})" >发票</a></li>
+                    </ul>
+                </div>
+                <h4 class="pull-left  m-t-none">容儿 80万元</h4>
+            </div>
+            <div class="row-row bg-white"  ui-view>
+            </div>
+        </div>
+    </div>
+</div>

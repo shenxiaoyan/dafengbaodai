@@ -1,0 +1,243 @@
+<!-- list -->
+<ul class="nav">
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>工作台</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="dashboard">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">概览</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="messages">
+            <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+            <b class="badge bg-info pull-right">3</b>
+
+            <span class="font-bold">消息</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="users">
+            <i class="glyphicon glyphicon-envelope icon text-info-lter"></i>
+            <span class="font-bold">联系人</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="stores">
+            <i class="fa fa-sitemap icon text-success"></i>
+            <span class="font-bold">门店</span>
+        </a>
+    </li>    
+    <li ui-sref-active="active">
+        <a ui-sref="distributors">
+            <i class="fa fa-sitemap icon text-info-dker"></i>
+            <span class="font-bold">渠道</span>
+        </a>
+    </li>    
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>业务系统</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.create({product_id:'1'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">新建</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'all'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">标的</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="customers.list({status:'all'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">客户</span>
+        </a>
+    </li>
+
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>风控</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'auto_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">自动风控标的</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'manual_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">待审标的</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="risksperson">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">个人查询</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="risksasset">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">资产查询</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="risksentertprise">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">企业查询</span>
+        </a>
+    </li>
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>财务</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="widthdraws">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">提现</span>
+        </a>
+    </li>
+    <li  ui-sref-active="active">
+        <a ui-sref="repayments">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">还款</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="lendouts">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">放款</span>
+        </a>
+    </li>
+
+
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>逾期与坏账处置</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'outday'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">逾期</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'bad_debt'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">坏账</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'1bad_debt'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">外部催收</span>
+        </a>
+    </li>
+
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>数据与分析</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'auto_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">还款报表</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'auto_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">放款报表</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'auto_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">门店效能PK</span>
+        </a>
+    </li>
+
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>催收</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="orders.list({status:'auto_risk'})">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">列表</span>
+        </a>
+    </li>      
+
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>管理系统</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="investors">
+            <i class="fa fa-sitemap icon text-info-dker"></i>
+            <span class="font-bold">资方机构</span>
+        </a>
+    </li> 
+    <li ui-sref-active="active">
+        <a ui-sref="investors">
+            <i class="fa fa-sitemap icon text-info-dker"></i>
+            <span class="font-bold">增信机构</span>
+        </a>
+    </li> 
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>开发&配置</span>
+    </li>
+      <li ui-sref-active="active">
+        <a ui-sref="entities">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">实体配置</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="products">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">产品线</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="fees">
+            <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+            <span class="font-bold">费用配置</span>
+        </a>
+    </li>
+    <li class="line dk"></li>
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>哒哒报表</span>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="loanReports">
+            <i class="fa fa-bar-chart icon text-info-dker"></i>
+            <span class="font-bold">贷款总表</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="clients">
+            <i class="fa fa-users icon text-primary-dker"></i>
+            <span class="font-bold">客户报表</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="partners">
+            <i class="fa fa-cubes icon"></i>
+            <span class="font-bold">合作商</span>
+        </a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="powers">
+            <i class="fa fa-chain icon text-info-dker"></i>
+            <span class="font-bold">权限统计</span>
+        </a>
+    </li>
+</ul>
+<!-- / list -->

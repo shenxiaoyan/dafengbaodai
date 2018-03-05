@@ -1,0 +1,565 @@
+package com.liyang.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.customer.CustomerVO;
+import com.liyang.domain.team.Team;
+import com.liyang.domain.team.TeamBean;
+import com.liyang.domain.teamobjective.TeamObjective;
+import com.liyang.domain.teamobjective.TeamObjectiveTO;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.CustomerService;
+import com.liyang.service.JournalService;
+import com.liyang.service.TeamObjectiveService;
+import com.liyang.service.TeamService;
+import com.liyang.util.CommonUtil;
+import com.liyang.util.DateUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.PageUtil;
+import com.liyang.util.PatternUtil;
+
+/**
+ * 
+ * @author Adam
+ *
+ */
+@RestController
+@RequestMapping("/dafeng/team")
+public class TeamController {
+	
+	@Autowired
+	TeamService teamService;
+	@Autowired
+	TeamObjectiveService teamObjService;
+	@Autowired
+	CustomerService customerService;
+	@Autowired
+	JournalService journalService;
+	
+	
+	// -------------------Web Team Methods ----------------------------
+	
+	/**
+	 * 后台新增团队
+	 * @param teamBean
+	 * @return
+	 */
+	@PostMapping("/add")
+	public ResponseBody addTeam(@RequestBody(required = true) TeamBean teamBean){
+		if (StringUtils.isEmpty(teamBean.getCaptainId()) || StringUtils.isEmpty(teamBean.getLabel())) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_NAMEORCAPTAINID_BLANK_ERROR);
+		}
+		Team team = new Team();
+		BeanUtils.copyProperties(teamBean, team);
+		Customer captain = customerService.findOne(teamBean.getCaptainId());
+		if (null == captain || null == captain.getAccount() || null != captain.getTeam()) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_CAPTAIN_ERROR);
+		}
+		team.setCaptain(captain);
+		team = teamService.save(team, "ENABLED");
+		// 初始化当月业绩
+		TeamObjective teamObjective = new TeamObjective();
+		String period = DateUtil.format2YearMonthStr(new Date());
+		teamObjective.setPeriod(period);
+		teamObjective.setTeam(team);
+		teamObjService.save(teamObjective);
+		return new ResponseBody("新增成功");
+	}
+	
+	/**
+	 * 编辑团队基本信息
+	 * @param teamBean
+	 * @return
+	 */
+	@PostMapping("/update")
+	public ResponseBody updateTeam(@RequestBody(required = true) TeamBean teamBean) {
+		Team team = teamService.findOne(teamBean.getId());
+		teamService.update(team, teamBean);
+		return new ResponseBody("更新成功");
+	}
+	
+	/**
+	 * 后台审核
+	 * @param teamBean
+	 * @return
+	 */
+	@PostMapping("/verify")
+	public ResponseBody verifyTeam(@RequestBody(required = true) TeamBean teamBean) {
+		if (null == teamBean.getId() || null == teamBean.getStateCode()) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_VERIFY_ERROR);
+		}
+		Team team = teamService.findOne(teamBean.getId());
+		teamService.updateState(team, teamBean);
+		return new ResponseBody("审核完成");
+	}
+	
+	/**
+	 * 团队列表多条件查询
+	 * @param teamBean
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/query")
+	public ResponseBody query(@RequestBody(required = false) TeamBean teamBean, 
+			@PageableDefault(value = 15, sort = "lastModifiedAt", direction = Direction.DESC)Pageable pageable) {
+		Page<Team> teamPage = teamService.query(teamBean, pageable);
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("teams", copyTeamProperties(teamPage.getContent()));
+		returnMap.put("page", PageUtil.getPageData(teamPage));
+		return new ResponseBody(returnMap);
+	}
+	
+	/**
+	 * 获取团队详细信息，含成员信息
+	 * @param teamId
+	 * @return
+	 */
+	@GetMapping("/info")
+	public ResponseBody teamInfo(@RequestParam(required = true) Integer teamId,
+			@PageableDefault(value = 15, sort = "joinTime", direction = Direction.DESC)Pageable pageable) {
+		Map<String, Object> returnMap = teamService.getInfo(teamId, pageable);
+		return new ResponseBody(returnMap);
+	}
+	
+	/**
+	 * 团队全部成员筛选
+	 * @return
+	 */
+	@GetMapping("/mb")
+	public ResponseBody teamMemberInfo(@RequestParam(required = true) Integer teamId, @RequestParam(required = false) String phone) {
+		List<Customer> memberList = customerService.findByTeamIdAndPhoneLike(teamId, phone);
+		List<Map<String, Object>> returnList = new ArrayList<>();
+		for (Customer customer : memberList) {
+			Map<String, Object> dataMap = new HashMap<>();
+			dataMap.put("id", customer.getId());
+			if (null == customer.getAccount()) {
+				dataMap.put("realName", customer.getNickname());
+			}else {
+				dataMap.put("realName", customer.getAccount().getRealName());
+			}
+			dataMap.put("phone", customer.getPhone());
+			returnList.add(dataMap);
+		}
+		return new ResponseBody(returnList);
+		
+	}
+	
+	/**
+	 * 属性复制
+	 * @param teamList
+	 * @return
+	 */
+	public List<TeamBean> copyTeamProperties(List<Team> teamList){
+		List<TeamBean> teamBeanList = new ArrayList<>();
+		for (Team team : teamList) {
+			TeamBean teamBean = new TeamBean();
+			BeanUtils.copyProperties(team, teamBean);
+			teamBean.setStateCode(team.getState().getStateCode());
+			teamBean.setCaptainId(team.getCaptain().getId());
+			String period = DateUtil.format2YearMonthStr(new Date());
+			TeamObjective currentObjective = teamObjService.findByTeamAndPeriod(team, period);
+			// TODO 某团员中途退出团队时逻辑
+			if (null != currentObjective) {
+				teamBean.setCurrentAutoObjective(currentObjective.getAutoObjective());
+				teamBean.setCurrentLifeObjective(currentObjective.getLifeObjective());
+				teamBean.setCurrentAutoCompletion(currentObjective.getAutoCompletion());
+				teamBean.setCurrentLifeCompletion(currentObjective.getLifeCompletion());
+			}
+			teamBeanList.add(teamBean);
+		}
+		return teamBeanList;
+	}
+	
+	/**
+	 * 后台添加团队成员
+	 * @return
+	 */
+	@PostMapping("/addMember")
+	public ResponseBody addTeamMember(@RequestParam(required = true) Integer customerId,
+			@RequestParam(required = true) Integer teamId) {
+		Customer customer = customerService.findNewTeamQualifiedOne(customerId);
+		// TODO log切面中添加add相关切入点
+		Team team = teamService.findOne(teamId);
+		teamService.addTeamMember(team, customer);
+		return new ResponseBody("添加成功");
+	}
+	
+	/**
+	 * 获取团队成员人数
+	 * @return
+	 */
+	@GetMapping("/memberNum")
+	public ResponseBody getMemberNum(@RequestParam(required = true) Integer teamId){
+		Integer memberNum = teamService.getMemberNum(teamId);
+		return new ResponseBody(memberNum);
+	}
+	
+	/**
+	 * 清空团队成员&设置团队状态为删除&删除所有团队业绩
+	 * @param teamId
+	 * @return
+	 */
+	@GetMapping("/delete")
+	@Transactional
+	public ResponseBody deleteTeam(@RequestParam(required = true) Integer teamId){
+		Team team = teamService.findOne(teamId);
+		for (Customer customer : team.getMembers()) {
+			customerService.dropTeam(customer);
+		}
+		teamService.deleteTeam(team);
+		List<TeamObjective> objectives = teamObjService.findByTeam(team);
+		for (TeamObjective teamObj : objectives) {
+			teamObjService.deleteTeamObjective(teamObj);
+		}
+		return new ResponseBody("删除成功");
+	}
+	
+	/**
+	 * 移除用户团队属性
+	 * @return
+	 */
+	@GetMapping("/dropTeam")
+	public ResponseBody dropMember(@RequestParam(required = true) Integer customerId){
+		Customer customer = customerService.findOne(customerId);
+		if (null == customer.getTeam()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOTEAM_ERROR);
+		}
+		if (customer.getId() == customer.getTeam().getCaptain().getId()) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_DROP_CAPTAIN_ERROR);
+		}
+		customerService.dropTeam(customer);
+		return new ResponseBody("移除成功");
+	}
+	
+	/**
+	 * 邀请加入团队页面，基本数据
+	 * @param phone
+	 * @return
+	 */
+	@GetMapping("/invite/data")
+	public ResponseBody getShareInfo(@RequestParam(required = true) String phone) {
+		Customer customer = customerService.findByPhone(phone);
+		if (null == customer) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOUSER_ERROR);
+		}
+		Team team = customer.getTeam();
+		if (null == team) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_INVITE_CUSTOMER_ERROR);
+		}
+		Map<String, String> resultMap = new HashMap<>();
+		resultMap.put("realName", customer.getAccount().getRealName());
+		resultMap.put("headimgurl", customer.getHeadimgurl());
+		resultMap.put("myInvite", customer.getMyInvite());
+		resultMap.put("teamLabel", team.getLabel());
+		resultMap.put("contactPhone", team.getContactPhone());
+		resultMap.put("teamInviteCode", team.getTeamInviteCode());
+		if (customer.getId() == team.getCaptain().getId()) {
+			resultMap.put("role", "团长");
+		}else {
+			resultMap.put("role", "成员");
+		}
+		return new ResponseBody(resultMap);
+	}
+	
+	// -------------------Mobile Team Methods ----------------------------
+	/**
+	 * 移动端申请建立新团队
+	 * @return
+	 */
+	@PostMapping("/apply")
+	public ResponseBody mobileApply(@RequestBody(required = true) TeamBean teamBean, HttpServletRequest request){
+		Customer customer = customerService.findbyToken(request.getHeader("token"));
+		customerService.validNewTeamCaptainQualification(customer);
+		Team team = new Team();
+		team.setLabel(teamBean.getLabel());
+		team.setCityCode(teamBean.getCityCode());
+		team.setCaptain(customer);
+		team = teamService.save(team, "APPLIED");
+		// 初始化当月业绩 TODO 改为在审核时初始化业绩
+		TeamObjective teamObjective = new TeamObjective();
+		String period = DateUtil.format2YearMonthStr(new Date());
+		teamObjective.setPeriod(period);
+		teamObjective.setTeam(team);
+		teamObjService.save(teamObjective);
+		return new ResponseBody("申请成功，请等待审核");
+	}
+	
+	/**
+	 * 移动端用户申请加入团队
+	 * @return
+	 */
+	@GetMapping("/join")
+	public ResponseBody mobileJoin(@RequestParam(required = true) String teamInviteCode,
+			HttpServletRequest request){
+		Customer customer = customerService.findbyToken(request.getHeader("token"));
+		customerService.validNewTeamCaptainQualification(customer);
+		teamService.updateTeamJoin(customer, teamInviteCode);
+		return new ResponseBody("加入成功");
+	}
+	
+	/**
+	 * 通过分享页面加入团队
+	 * @param customerTO
+	 * @return
+	 */
+	@PostMapping("/invite/join")
+	public ResponseBody inviteJoin(@RequestBody(required = true) CustomerVO customerTO) {
+		if(!PatternUtil.validatePhone(customerTO.getPhone())){
+			throw new FailReturnObject(ExceptionResultEnum.REGIS_MOB_CELLFORMART_ERROR);
+		}		
+		Customer customer = customerService.findByPhoneOrCreateByInvite(customerTO.getPhone(), customerTO.getInvite(), customerTO.getCode());
+		if (null != customer.getTeam()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_ALREADYINTEAM_ERROR);
+		}
+		Team team = teamService.findByInviteCode(customerTO.getTeamInviteCode());
+		if (null == team) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_INVITECODE_ERROR);
+		}
+		teamService.addTeamMember(team, customer);
+		if (null != customer.getClient()) {
+			return new ResponseBody("加入团队成功");
+		}else {
+			return new ResponseBody("成功注册并加入团队");
+		}
+	}
+	
+	/**
+	 * 获取自身团队信息，含团队业绩（当月、下月），最新团队公告
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/own")
+	public ResponseBody mobileOwnTeamInfo(HttpServletRequest request){
+		Map<String, Object> returnMap = teamService.getOwnTeam(request.getHeader("token"));
+		return new ResponseBody(returnMap);
+	}
+	
+	/**
+	 * 获取团队成员列表
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/members")
+	public ResponseBody mobileOwnTeamMembers(HttpServletRequest request) {
+		Team team = customerService.findbyToken(request.getHeader("token")).getTeam();
+		if (null == team) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOTEAM_ERROR);
+		}
+		List<Customer> memberList = customerService.findByTeamIdAndPhoneLike(team.getId(), null);
+		List<CustomerVO> cusTOList = new ArrayList<>();
+		for (Customer customer : memberList) {
+			CustomerVO customerTO = new CustomerVO();
+			BeanUtils.copyProperties(customer, customerTO);
+			if (null != customer.getAccount()) {
+				customerTO.setRealName(customer.getAccount().getRealName());
+			}else {
+//				char c = (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
+//				customerTO.setRealName(String.valueOf(c));
+				customerTO.setRealName(customer.getNickname());
+			}
+			if (customer.getId() != team.getCaptain().getId()) {
+				cusTOList.add(customerTO);
+			}
+		}
+		return new ResponseBody(cusTOList);
+	}
+	
+	
+	// -------------------Web TeamObjective Methods ----------------------------
+	
+	/**
+	 * 手动新增团队业绩目标
+	 * @return
+	 */
+	@PostMapping("/objective/add")
+	public ResponseBody addTeamObjective(@RequestBody(required = true) TeamObjectiveTO teamObjTO) {
+		Team team = teamService.findOne(teamObjTO.getTeamId());
+		TeamObjective teamObjective = new TeamObjective();
+		BeanUtils.copyProperties(teamObjTO, teamObjective, CommonUtil.getNullPropertyNames(teamObjTO));
+		String period = DateUtil.format2YearMonthStr(teamObjTO.getPeriodTime());
+		TeamObjective exist = teamObjService.findByTeamAndPeriod(team, period);
+		if (null != exist) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_OBJECTIVE_EXIST_ERROR);
+		}
+		teamObjective.setPeriod(period);
+		teamObjective.setTeam(team);
+		teamObjService.save(teamObjective);
+		return new ResponseBody("业绩目标设置成功");
+	}
+	
+	/**
+	 * 更新团队业绩目标
+	 * @return
+	 */
+	@PostMapping("/objective/update")
+	public ResponseBody updateTeamObjective(@RequestBody(required = true) TeamObjectiveTO teamObjTO) {
+		TeamObjective teamObjective = teamObjService.findOne(teamObjTO.getId());
+		if (null == teamObjective) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_OBJECTIVE_ID_ERROR);
+		}
+		teamObjService.update(teamObjective, teamObjTO);
+		return new ResponseBody("团队业绩目标更新成功");
+	}
+	
+	/**
+	 * 团队总业绩列表
+	 * @param teamBeanArg
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/objective")
+	public ResponseBody teamObjectiveList(@RequestBody(required = true) TeamBean teamBeanArg, 
+			@PageableDefault(value = 15, sort = "lastModifiedAt", direction = Direction.DESC)Pageable pageable) {
+		Page<Team> teamPage = teamService.query(teamBeanArg, pageable);
+		List<TeamBean> teamBeanList = new ArrayList<>();
+		for (Team team : teamPage) {
+			TeamBean teamBean = new TeamBean();
+			BeanUtils.copyProperties(team, teamBean);
+			List<TeamObjective> objList = teamObjService.findByTeam(team);
+			double sumAutoObjective = 0;
+			double sumAutoCompletion = 0;
+			double sumLifeObjective = 0;
+			double sumLifeCompletion = 0;
+			for (TeamObjective teamObjective : objList) {
+				sumAutoObjective += teamObjective.getAutoObjective();
+				sumAutoCompletion += teamObjective.getAutoCompletion();
+				sumLifeObjective += teamObjective.getLifeObjective();
+				sumLifeCompletion += teamObjective.getLifeCompletion();
+			}
+			teamBean.setSumAutoObjective(sumAutoObjective);
+			teamBean.setSumAutoCompletion(sumAutoCompletion);
+			teamBean.setSumLifeObjective(sumLifeObjective);
+			teamBean.setSumLifeCompletion(sumLifeCompletion);
+			teamBeanList.add(teamBean);
+		}
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("teams", teamBeanList);
+		returnMap.put("page", PageUtil.getPageData(teamPage));
+		return new ResponseBody(returnMap);
+	}
+	
+	/**
+	 * 团队业绩列表、查询
+	 * @param teamObjTO
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/objective/query")
+	public ResponseBody queryObjective(@RequestBody(required = false) TeamObjectiveTO teamObjTO,
+			@PageableDefault(value = 15, sort = {"period","team_id"}, direction = Direction.DESC)Pageable pageable) {
+		Page<TeamObjective> teamObjPage = teamObjService.query(teamObjTO, pageable);
+		List<TeamObjectiveTO> teamObjTOList = new ArrayList<>(); 
+		for (TeamObjective teamObjective : teamObjPage) {
+			TeamObjectiveTO objectiveTO = new TeamObjectiveTO();
+			BeanUtils.copyProperties(teamObjective, objectiveTO);
+			objectiveTO.setTeamLabel(teamObjective.getTeam().getLabel());
+			teamObjTOList.add(objectiveTO);
+		}
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("teamObjectives", teamObjTOList);
+//		returnMap.put("teamObjectives", CommonUtil.copyListProperties(teamObjPage.getContent(), TeamObjectiveTO.class));
+		returnMap.put("page", PageUtil.getPageData(teamObjPage));
+		return new ResponseBody(returnMap);
+	}
+	
+	// -------------------Mobile TeamObjective Methods ----------------------------
+	
+	/**
+	 * 编辑（含新增）团队业绩目标
+	 * @param teamObjTO
+	 * @param request
+	 * @return
+	 */
+	@PostMapping("/editObjective")
+	public ResponseBody mobileUpdateObjective(@RequestBody(required = true) TeamObjectiveTO teamObjTO,
+			HttpServletRequest request) {
+		Customer customer = customerService.findbyToken(request.getHeader("token"));
+		validTeamEditQualification(customer);
+		Team team = customer.getTeam();
+		if (null == teamObjTO.getPeriodTime()) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_OBJECTIVE_PERIOD_MISS_ERROR);
+		}
+		String period = DateUtil.format2YearMonthStr(teamObjTO.getPeriodTime());
+		TeamObjective exist = teamObjService.findByTeamAndPeriod(team, period);
+		if (null != exist) {
+			teamObjService.update(exist, teamObjTO);
+		}else {
+			TeamObjective teamObjective = new TeamObjective();
+			BeanUtils.copyProperties(teamObjTO, teamObjective, CommonUtil.getNullPropertyNames(teamObjTO));
+			teamObjective.setPeriod(period);
+			teamObjective.setTeam(team);
+			teamObjService.save(teamObjective);
+		}
+		return new ResponseBody("业绩目标设置成功");
+	}
+	
+	/**
+	 * 编辑资格验证
+	 * @param customer
+	 */
+	public void validTeamEditQualification(Customer customer) {
+		if (null == customer.getTeam()) {
+			throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_NOTEAM_ERROR);
+		}
+		if (customer.getId() != customer.getTeam().getCaptain().getId()) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_EDIT_QUALIFICATION_ERROR);
+		}
+	}
+	
+	/**
+	 * 据月份获取团队业绩
+	 * @param request
+	 * @param period
+	 * @return
+	 */
+	@GetMapping("/objective/own")
+	public ResponseBody mobileTeamObjective(HttpServletRequest request, @RequestParam(required = true) String period) {
+		Team team = customerService.findbyToken(request.getHeader("token")).getTeam();
+		TeamObjective teamObj = teamObjService.findByTeamAndPeriod(team, period);
+		if (null == teamObj) {
+			return new ResponseBody("");
+		}
+		TeamObjectiveTO objectiveTO = new TeamObjectiveTO();
+		BeanUtils.copyProperties(teamObj, objectiveTO);
+		return new ResponseBody(objectiveTO);
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

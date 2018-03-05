@@ -1,0 +1,178 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/02
+     *学航旅信息核查信息
+     * */
+    app.controller('airInfoCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =[
+            {
+                name: '小艳',
+                idCard:'341623199405284821'
+            }
+        ];
+        //数据初始化
+        $scope.info = {
+            name: '小艳',
+            idCard:'341623199405284821'
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.name = '';
+            $scope.info.idCard = '';
+            $scope.resultSwitch = false;
+        };
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //数据信息格式错误时阻止表单提交
+            if (myForm.name) {
+                myForm.name.$dirty = true
+            }
+            if (myForm.idCard) {
+                myForm.idCard.$dirty = true
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+            angular.forEach($scope.mockData,function (obj) {
+                if($scope.info.name===obj.name && $scope.info.idCard===obj.idCard){
+                    $scope.resultSwitch = true;
+                    console.log('aaa')
+                }else{
+                    $scope.resultSwitch = false;
+                    console.log('ccc')
+                }
+
+            })
+        };
+
+        $scope.test =
+            {
+                sheanType:"aa",
+                sheanNum:"bb",
+                sheanLei:"yy",
+                sheanTime:"cc",
+                sheanOrg:"dd",
+                sheanCla:"ee"
+            }
+
+
+
+
+    }]);
+</script>
+<div class="vbox" ng-controller="airInfoCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading" style="font-size: 16px">航旅信息核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <div class="form-group validate validate-name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>姓名：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.name" name="name" class="form-control" ng-required="true" pattern="[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.name.$dirty&&myForm.name.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.pattern">姓名格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group validate validate-name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>身份证号：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.idCard" name="idCard" class="form-control" ng-required="true" pattern="(^\d{15}$)|(^\d{17}([0-9]|X)$)">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.idCard.$dirty && myForm.idCard.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.required">身份证号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.pattern">身份证号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>姓名</td><td>艾**</td></tr>
+                                <tr><td>身份证号</td><td>110***********7313</td></tr>
+                                <tr><td>出生日期</td><td>1982-11-05</td></tr>
+                                <tr><td>出生地</td><td>北京</td></tr>
+                                <tr><td>乘机次数</td><td>14</td></tr>
+                                <tr><td>国内次数</td><td>14</td></tr>
+                                <tr><td>平均国内票价</td><td>967</td></tr>
+                                <tr><td>平均国内折扣</td><td>72.57</td></tr>
+                                <tr><td>国际次数</td><td>0</td></tr>
+                                <tr><td>平均国际票价</td><td>0</td></tr>
+                                <tr><td>最爱司航</td><td>海南航</td></tr>
+                                <tr><td>最爱航司次数</td><td>6</td></tr>
+                                <tr><td>最爱目的地</td><td>北京</td></tr>
+                                <tr><td>最爱目的地次数</td><td>7</td></tr>
+                                <tr><td>国内头等次数</td><td>0</td></tr>
+                                <tr><td>国内商务次数</td><td>0</td></tr>
+                                <tr><td>国内经济次数</td><td>14</td></tr>
+                                <tr><td>国际头等次数</td><td>0</td></tr>
+                                <tr><td>国际商务次数</td><td>0</td></tr>
+                                <tr><td>国际经济次数</td><td>0</td></tr>
+                                <tr><td>商务出行次数</td><td>6</td></tr>
+                                <tr><td>旅游出行次数</td><td>8</td></tr>
+                                <tr><td>探亲出行次数</td><td>0</td></tr>
+                                <tr><td>平均延误分钟数</td><td>36</td></tr>
+                                <tr><td>延误次数（大于30分钟）</td><td>8</td></tr>
+                                <tr><td>大飞机次数</td><td>4</td></tr>
+                                <tr><td>小飞机次数</td><td>0</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>姓名</td><td>{{ test.sheanCla }}</td></tr>
+                                <tr><td>身份证号</td><td>{{ test.sheanType }}</td></tr>
+                                <tr><td>出生日期</td><td>{{ test.sheanCla }}</td></tr>
+                                <tr><td>出生地</td><td>{{ test.sheanNum }}</td></tr>
+                                <tr><td>乘机次数</td><td>{{ test.sheanOrg }}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

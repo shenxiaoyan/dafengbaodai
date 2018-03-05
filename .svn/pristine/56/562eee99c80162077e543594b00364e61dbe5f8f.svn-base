@@ -1,0 +1,389 @@
+<script >
+    app.controller("addressListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            function ($rootScope, $scope, $http, $stateParams) {
+
+                //状态栏
+                $scope.states = [];
+                $scope.byState = 'all';
+
+                $scope.getStates = function () {
+                    $http.get("/rest/addressStates/search/findForShow")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.addressStates;
+                        });
+                };
+
+                $scope.getStates();
+
+                $http.get("/rest/addressStates/search/findByStateCode?stateCode=ENABLED").success(function (resResult) {
+                    $scope.ENABLED = resResult;
+                });
+                $http.get("/rest/addressStates/search/findByStateCode?stateCode=DISABLED").success(function (resResult) {
+                    $scope.DISABLED = resResult;
+                });
+                //单数 例user
+                $scope.state_code = "";
+
+                //投保地址列表
+                $scope.list = [];
+                $scope.addressId = "";
+
+                if ($stateParams.entity_key === "address") {
+                    $scope.entity_key = "addresses";
+                } else {
+                    $scope.entity_key = $stateParams.entity_key;
+                }
+
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+                    if($scope.byState==='ALL' || $scope.byState === 'all'){
+                        $scope.link='/dafeng/address/search?size=15&page='+page;
+                    }
+                    else if($scope.byState==='state'){
+                        $scope.link = "/dafeng/address/search?stateCode=" + $scope.state_code +  "&size=15&page=" + page;
+                    }
+                    $http({method: "GET", url: $scope.link}).success(function (resResult) {
+                        $scope.list = resResult.data.content;
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+                };
+
+                $scope.getList(0);
+
+                $('#distPicker').distpicker();
+                $('#searchPicker').distpicker();
+
+                //获取全部
+                $scope.getAll=function(){
+                    $('#searchPicker').distpicker();
+                    $scope.state_code="";
+                    $scope.byState='all';
+                    $('#search_province').val("");
+                    $('#search_city').val("");
+                    $scope.getList(0);
+                }
+
+                //新增地址
+                $scope.addAddress=function(){
+
+                    //判断是否有地址
+                    if($('#province_select').val() && $('#city_select').val()){
+                        var city = $('#city_select').val();
+                        var code = $("option[value ="+ city+"]").attr("data-code");
+                        $http({
+                            method:'POST',
+                            url:'dafeng/address/save',
+                            data: {
+                                province:$('#province_select').val(),
+                                city:$('#city_select').val(),
+                                cityCode:code
+                            }
+                        }).success(function(response){
+                            if (response.ErrorCode == 0){
+                                $("#address_modal_add").hide();
+                                $rootScope.toasterSuccess("成功！", "新增成功！");
+                                $('#search_province').val("");
+                                $('#search_city').val("");
+                                $scope.getList(0);
+                            } else{
+                                $rootScope.toasterError("失败！", response.ErrorInfo);
+                            }
+                            $scope.address_province = "";
+                            $scope.address_city = "";
+                        }).error(function(){
+                            $rootScope.toasterError("失败！", "新增失败！");
+                        })
+                    }else{
+                        $rootScope.toasterWarning("失败！", "请完善投保地址信息！");
+                    }
+                };
+                /*
+                * 启用保险公司
+                * */
+                $scope.enabledAddress = function(id){
+
+                    var enabled = function () {
+                        $http({
+                            method: "PATCH",
+                            url: "/dafeng/address/changeState?id="+id
+                        }).success(function () {
+                            $rootScope.toasterSuccess("成功！", "启用成功！");
+                           $scope.getList(0);
+                            $('#search_province').val("");
+                            $('#search_city').val("");
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "启用失败！");
+                           $scope.getList(0);
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认启用此投保地址吗？", enabled);
+                };
+
+                /*
+                * 禁用保险公司
+                * */
+                $scope.disabledAddress = function (id) {
+
+                    var disabled = function () {
+                        $http({
+                            method: "PATCH",
+                            url: "/dafeng/address/changeState?id="+id
+                        }).success(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "禁用成功！");
+                            $('#search_province').val("");
+                            $('#search_city').val("");
+                        }).error(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterError("失败！", "禁用失败！");
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认禁用此投保地址吗？", disabled);
+                };
+
+                /*
+                * 根据省市区查询
+                * */
+                $scope.search = function () {
+                    if ($('#search_province').val()) {
+                        $http({
+                            method:"GET",
+                            url:"/dafeng/address/search?stateCode="+$scope.state_code+"&province="+$('#search_province').val()+"&city="+$('#search_city').val()
+                        }).success(function (resResult) {
+                            $scope.list = resResult.data.content;
+                            $scope.pageList = {
+                                size: resResult.data.size,
+                                total_elements: resResult.data.totalElements,
+                                current_page: resResult.data.number,
+                                num_page: resResult.data.totalPages,
+                                total_page: resResult.data.totalPages
+                            };
+                        })
+                    } else {
+                        $rootScope.toasterWarning("请选择查询条件！");
+                    }
+                };
+
+
+                //状态栏搜索
+                $scope.stateSelect = function ($event, stateCode) {
+                    $('#searchPicker').distpicker('reset');
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.byState = 'state';
+                        $scope.state_code = stateCode;
+                        $('#search_province').val("");
+                        $('#search_city').val("");
+                        $scope.getList(0);
+
+                    }
+                };
+                $scope.clearSearch = function () {
+                    $('#searchPicker').distpicker('reset');
+                    $scope.getList(0);
+                };
+
+                $('#address_modal_add').on('show.bs.modal', function () {
+                    $('#distPicker').distpicker('reset');
+                });
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="addressListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <!--<span translate="createEnquiries.self.label"></span>-->
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n">
+                        <input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state"><i></i> {{ state.label }}
+                    </label>
+                </div>
+                <div class="pull-right">
+                    <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                            data-target="#address_modal_add"
+                            data-toggle="modal">
+                        <i class="fa fa-plus"></i>
+                        新增投保地址
+                    </button>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div id="searchPicker" data-toggle="distpicker">
+                                        <div class="w inline m-r">
+                                            <select data-province="请选择省份" class="form-control" id="search_province"></select>
+                                        </div>
+                                        <div class="w inline m-r">
+                                            <select data-city="请选择城市" class="form-control" id="search_city"></select>
+                                        </div>
+                                        <div class="inline">
+                                            <button type="button" class="btn btn-primary m-r" ng-click="search()">
+                                                <span>查询</span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                                <span>清除</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>省份</th>
+                                            <th>市</th>
+                                            <th>新建时间</th>
+                                            <th>更新时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                    <div class="table-responsive" ng-if="list.length > 0" style="max-height: 570px;overflow: auto">
+                                        <table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+                                        <tbody>
+                                        <tr ng-repeat="item in list" ng-if="!addressId">
+                                            <td class="v-middle">
+                                                {{ item.province }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.city }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.lastModifiedAt | datetime}}
+                                            </td>
+                                            <td class="v-middle">
+                                                <button ng-if="item.stateCode==='ENABLED'" class="btn btn-xs btn-info" ng-click="disabledAddress(item.id)">禁用</button>
+                                                <button ng-if="item.stateCode==='DISABLED'" class="btn btn-xs btn-info" ng-click="enabledAddress(item.id)">启用</button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="address_modal_add" aria-hidden="true">
+                <div class="modal-dialog"  role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="createDepartModal">新增投保地址</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div id="distPicker" data-toggle="distpicker">
+                                    <div class="form-group">
+                                        <label for="province_select">投保省份</label>
+                                        <select type="text" class="form-control"
+                                                id="province_select"
+                                                ng-model="address_province"
+                                                data-province="请选择省份">
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="city_select">投保市</label>
+                                        <select type="text" class="form-control"
+                                                id="city_select"
+                                                ng-model="address_city"
+                                                data-city="请选择城市">
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="addAddress()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+

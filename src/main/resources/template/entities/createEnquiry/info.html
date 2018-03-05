@@ -1,0 +1,353 @@
+<div class="wrapper-md" ng-controller="workflowEntityInfoController">
+    <div class="panel panel-info" draggable="flase">
+        <div class="panel-heading">
+            车主信息:
+        </div>
+        <div class="panel-body">
+            <ul class="col-xs-6" style="list-style: none">
+                <li>
+                    <label class="w-xs text-info-color">
+                        车主姓名：
+                    </label>
+                    <span>
+                        {{ createList.ownerName }}
+                    </span>
+                </li>
+                <li>
+                    <label class="w-xs text-info-color">
+                        车牌：
+                    </label>
+                    <span>
+                        {{ createList.licenseNumber }}
+                    </span>
+                </li>
+                <!--<li>-->
+                    <!--<label class="w-xs text-info-color">-->
+                        <!--初登日期：-->
+                    <!--</label>-->
+                    <!--<span>-->
+                        <!--&lt;!&ndash;要在offer里找&ndash;&gt;-->
+                        <!--{{ createList.createdAt|datetime }}-->
+                    <!--</span>-->
+                <!--</li>-->
+            </ul>
+            <ul class="col-xs-6" style="list-style: none">
+                <!--<li>-->
+                    <!--<label class="w-xs text-info-color">-->
+                        <!--车架号：-->
+                    <!--</label>-->
+                    <!--<span>-->
+                        <!--{{ profile.notice?profile.notice:"暂无"}}-->
+                    <!--</span>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<label class="w-xs text-info-color">-->
+                        <!--发动机号：-->
+                    <!--</label>-->
+                    <!--<span>-->
+                        <!--{{ profile.createdAt?profile.createdAt:"暂无" }}-->
+                    <!--</span>-->
+                <!--</li>-->
+                <li>
+                    <label class="w-xs text-info-color">
+                        车辆种类：
+                    </label>
+                    <span>
+                        {{ createList.applyIdentityNo?createList.applyIdentityNo:"02" | carTypeCode}}
+                    </span>
+                </li>
+                <!--<li>-->
+                    <!--<label class="w-xs text-info-color">-->
+                        <!--厂牌型号：-->
+                    <!--</label>-->
+                    <!--<span>-->
+                        <!--{{ profile.data.result.offerDetail.modelJson.modelName ? profile.data.result.offerDetail.modelJson.modelName:"暂无" }}-->
+                    <!--</span>-->
+                <!--</li>-->
+                <li>
+                    <label class="w-xs text-info-color">
+                        使用性质：
+                    </label>
+                    <span>
+                        {{ profile.account?profile.account:"非运营" }}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-success" draggable="flase">
+        <div class="panel-heading">
+            询价详情：
+        </div>
+        <div class="panel-body">
+            <ul class="col-xs-6" style="list-style: none">
+                <li>
+                    <label class="w-xs text-info-color">
+                        询价人：
+                    </label>
+                    <span>
+                        {{ createList.ownerName }}
+                    </span>
+                </li>
+                <li>
+                    <label class="w-xs text-info-color">
+                        联系方式：
+                    </label>
+                    <span>
+                        {{ createList.mobilePhone }}
+                    </span>
+                </li>
+                <li>
+                    <label class="w-xs text-info-color">
+                        询价人类型：
+                    </label>
+                    <span>
+                        机构人员
+                        <!--{{ profile.applyIdentityNo?profile.applyIdentityNo:"暂无" }}-->
+                    </span>
+                </li>
+                <li>
+                    <label class="w-xs text-info-color">
+                        询价状态：
+                    </label>
+                    <span>
+                        {{ createList.label?createList.label:"暂无" }}
+                    </span>
+                </li>
+            </ul>
+            <ul class="col-xs-6" style="list-style: none">
+                <li>
+                    <label class="w-xs text-info-color">
+                        询价单号：
+                    </label>
+                    <span>
+                         {{ createList.offerUnique }}
+                    </span>
+                </li>
+                <li>
+                    <label class="w-xs text-info-color">
+                        询价时间：
+                    </label>
+                    <span>
+                        {{createList.createdAt / 1000|datetime }}
+                    </span>
+                </li>
+                <li>
+                    <label class="text-info-color">
+                        商业险起保日期：
+                    </label>
+                    <span>
+                        {{ createList.insuranceStartTime|datetime }}
+                    </span>
+                </li>
+                <li>
+                    <label class="text-info-color">
+                        交强险起保日期：
+                    </label>
+                    <span>
+                        {{ createList.forceInsuranceStartTime|datetime }}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="panel panel-danger" draggable="flase"  ng-if="createList.resultList.length > 0">
+        <div class="panel-heading">
+            报价管理：
+        </div>
+        <div class="panel-body">
+            <div ng-repeat="profile in createList.resultList">
+                <div class="panel b-a" ng-if="profile.id && !profile.errorMsg">
+
+                    <div>
+                        <div class="panel-heading b-b b-light">
+                            <div>
+                                <span>报价公司：</span>
+                                <button class="btn btn-info">{{ profile.insuranceCompanyName }}</button>
+                                <span ng-if="$scope.errorInfo" class="text-danger">{{ profile.errorMsg.message }},{{ profile.errorMsg.description }}</span>
+                            </div>
+                        </div>
+                        <ul class="list-group list-group-lg no-bg auto">
+                            <li class="list-group-item clearfix">
+                                <span>投保城市：</span>
+                                <span>{{ createList.createEnquiryParams.cityName ? createList.createEnquiryParams.cityName : (createList.cityName ? createList.cityName : "暂无") }}&ensp;</span>
+                                <span>商业险起期：</span>
+                                <span>{{ profile.insuranceStartTime ? (profile.insuranceStartTime|datetime) : "暂无" }}&ensp;</span>
+                                <span>交强险起期：</span>
+                                <span>{{ profile.forceInsuranceStartTime ? (profile.forceInsuranceStartTime|datetime) : "暂无" }}&ensp;</span>
+                                <span>厂牌型号：</span>
+                                <span>{{ profile.modelJson.modelName ? profile.modelJson.modelName : (createList.createEnquiryParams.carInfoDto.brandName ? createList.createEnquiryParams.carInfoDto.brandName : "暂无") }}&ensp;</span>
+                                <span>(新车预估价：{{ profile.modelJson.modelPrice ? profile.modelJson.modelPrice : (createList.createEnquiryParams.carInfoDto.purchasePrice ? createList.createEnquiryParams.carInfoDto.purchasePrice : "暂无") }})&ensp;</span>
+                            </li>
+                        </ul>
+                        <div class="clearfix">
+                            <ul class="col-xs-12 col-sm-6 col-md-6 wrapper-md" style="list-style: none">
+                                <li>
+                                    <label class="w text-info-dker">
+                                        商业险名称
+                                    </label>
+                                    <label class="w text-info-dker">
+                                        保费总额度(元)
+                                    </label>
+                                    <label class="w text-info-dker">
+                                        险种保费(元)
+                                    </label>
+                                </li>
+                                <li ng-repeat="list in profile.offerDetail.insurances">
+                                    <label class="w text-info-color">
+                                        {{ list.insuranceName? list.insuranceName:"" }}：
+                                    </label>
+                                    <label class="w">
+                                        {{ list.amountStr }}
+                                    </label>
+                                    <label class="w">
+                                        {{ list.quotesPrice ? list.quotesPrice : "不可投保"}}
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="w text-info-color">
+                                        不计免赔附加：
+                                    </label>
+                                    <span class="w"  ng-repeat="list in profile.offerDetail.insurances">
+                                        <span ng-if="list.compensation">{{list.englishName}}</span>
+                                    </span>
+                                    <label class="w" style="margin-left: 5%">
+                                        {{ profile.offerDetail.additionalPrice }}
+                                    </label>
+                                </li>
+                            </ul>
+                            <ul class="col-xs-12 col-sm-6 col-md-6 wrapper-md" style="list-style: none">
+                                <li>
+                                    <label class="w text-info-dker">
+                                        交强险名称
+                                    </label>
+                                    <label class="w text-info-dker">
+                                        险种保费(元)
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="w text-info-color">
+                                        交强险：
+                                    </label>
+                                    <label class="w">
+                                        {{ profile.offerDetail.forcePremium.quotesPrice ? profile.offerDetail.forcePremium.quotesPrice : "0" }}
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="w text-info-color">
+                                        车船税：
+                                    </label>
+                                    <label class="w">
+                                        {{ profile.offerDetail.taxPrice.quotesPrice ? profile.offerDetail.taxPrice.quotesPrice : "0" }}
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix panel-footer">
+                            <div>
+                                <ul class="col-xs-3" style="list-style: none">
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            商业险出单价：
+                                        </label>
+                                        <span class="w-sm">
+                                        {{ profile.offerDetail.currentPrice ?  (profile.offerDetail.currentPrice | number : 2) : ((profile.currentPrice / 100) | number : 2) }}
+                                    </span>
+                                    </li>
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            商业险底价：
+                                        </label>
+                                        <span class="w-sm">
+                                        {{ profile.offerDetail.originalPrice }}
+                                    </span>
+                                    </li>
+                                </ul>
+                                <ul class="col-xs-3" style="list-style: none">
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            强制险出单价：
+                                        </label>
+                                        <span class="w-sm">
+                                        {{ profile.offerDetail.ciBasePrice }}
+                                    </span>
+                                    </li>
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            强制险底价：
+                                        </label>
+                                        <span class="w-sm">
+                                        {{ profile.offerDetail.ciBasePrice }}
+                                    </span>
+                                    </li>
+                                </ul>
+                                <ul class="col-xs-3" style="list-style: none">
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            出单价合计：
+                                        </label>
+                                        <span class="w-sm text-danger">
+                                        {{ profile.offerDetail.currentPrice ?  ((profile.offerDetail.currentPrice + profile.offerDetail.ciBasePrice) | number : 2) : (((profile.currentPrice / 100) + profile.offerDetail.ciBasePrice) | number : 2) }}
+                                    </span>
+                                    </li>
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            底价合计：
+                                        </label>
+                                        <span class="w-sm text-danger">
+                                        {{ (profile.offerDetail.originalPrice + profile.offerDetail.ciBasePrice) | myParseFloat }}
+                                    </span>
+                                    </li>
+                                    <li>
+                                        <label class="w-sm text-info-color">
+                                            折扣：
+                                        </label>
+                                        <span class="w-sm text-danger">
+                                        {{ (profile.commercialDiscount|myJson)  | number:2  }}
+                                    </span>
+                                    </li>
+                                </ul>
+                                <ul class="col-xs-3" style="list-style: none">
+                                    <li ng-repeat="item in profile.ratioJson">
+                                        <label class="w-sm text-info-color">
+                                            {{ item.content }}:
+                                        </label>
+                                        <span class="w-sm text-danger">
+                                        {{ item.ratio  | number:2  }}
+                                    </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel b-a" ng-if="profile.errorMsg">
+                    <div class="panel-heading b-b b-light">
+                        <div>
+                            <span>报价公司：</span>
+                            <span ng-if="profile.insuranceCompanyName">
+                                <button class="btn btn-info">{{ profile.insuranceCompanyName }}</button>
+                            </span>
+                            <span ng-if="!profile.insuranceCompanyName">
+                                <span class="text-danger">暂无报价公司</span>
+                            </span>
+                            <span ng-if="$scope.errorInfo" class="text-danger">{{ profile.errorMsg.message }},{{ profile.description }}</span>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <ul class="col-xs-12 wrapper-md" style="list-style: none">
+                            <li>
+                                <label class="text-info-color">
+                                    {{ profile.errorMsg.message }}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="createList.offerDetail.insurances.length < 1" class="wrapper">
+            暂无报价数据！
+        </div>
+    </div>
+</div>

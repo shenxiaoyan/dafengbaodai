@@ -1,0 +1,42 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">应用管理</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="applications.new"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新增应用" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新增 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="applications.application({application_id:1})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;小金平台
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="applications.application({application_id:2})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;物流钱庄IOS
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

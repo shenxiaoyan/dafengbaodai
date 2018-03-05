@@ -1,0 +1,27 @@
+<script>
+    app.controller("departmentTypeProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state, $filter) {
+console.log("profile");
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="departmentTypeProfileCtrl">
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

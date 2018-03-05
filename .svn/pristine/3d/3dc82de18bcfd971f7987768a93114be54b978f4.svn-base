@@ -1,0 +1,85 @@
+<script>
+	/*
+	 * @author  金杭
+	 * @date    2017/07/21
+	 * */
+	"use strict";
+	app.controller("configWorkflowStatesCtrl",
+		[
+			"$rootScope",
+			"$scope",
+            "$http",
+            "$resource",
+            "$location",
+            "$state",
+            "$filter",
+            "routeCase",
+            "getListResource",
+            "getDetailResource",
+            "editableOptions",
+            "editableThemes",
+            function ($rootScope, $scope, $http, $resource, $location, $state, $filter, routeCase, getListResource, getDetailResource, editableOptions, editableThemes) {
+				//获取资源化的工作流，getListResource 方法在自定义服务中查看
+                getListResource($location.$$path.split("/")[2] + "Workflows").then(function(resResult){
+                	$scope.workflows = resResult._embedded[$location.$$path.split("/")[2] + "Workflows"];
+                	$scope.workflow = $scope.workflows[0];
+                	console.log($scope.workflows)
+                });
+				
+				//获取资源化的状态，getListResource 方法在自定义服务中查看
+                getListResource($location.$$path.split("/")[2] + "States").then(function(resResult){
+                	$scope.states = resResult._embedded[$location.$$path.split("/")[2] + "States"];
+                	console.log($scope.states)
+                });
+				
+				$scope.checkAllState = function($event){
+					var inputs = $("#workflow_state_table tbody input[type='checkbox']");
+
+	                inputs.prop("checked",$($event.delegateTarget).find("input").prop("checked"));
+				};
+				
+				
+			}	
+		]
+	)
+</script>
+<div class="wrapper-md" ng-controller="configWorkflowStatesCtrl">
+	<div class="b-a">
+		<div class="wrapper">
+			<div class="clearfix">
+				<select class="pull-left m-r-sm input-sm form-control w-sm inline v-middle" ng-model="workflow" ng-options="workflow.label for workflow in workflows"></select>
+				<button class="pull-left btn btn-sm btn-default">关联</button>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table id="workflow_state_table" class="table table-striped b-t b-light">
+				<thead>
+					<tr>
+						<th style="width: 20px;">
+							<label class="i-checks m-b-none" ng-click="checkAllState($event)">
+								<input type="checkbox"><i></i>
+							</label>
+						</th>
+						<th>状态名</th>
+						<th>状态编码（英文）</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="state in states">
+						<td>
+							<label class="i-checks m-b-none">
+								<input type="checkbox" data-value="{{ state._links.self.href }}"><i></i>
+							</label>
+						</td>
+						<td>
+							{{ state.label }}
+						</td>
+						<td>
+							{{ state.stateCode }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,212 @@
+<script>
+
+    app.controller("roleInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, $state) {
+
+                $scope.form = {};
+                $scope.form_id = $stateParams.id;
+
+//                $scope.getMenu = function(ownMenus) {
+//                    $scope.allMenus = $rootScope.menus;
+//
+//                    angular.forEach($scope.allMenus, function(value, index) {
+//                        value.isSelected = false;
+//                        angular.forEach(ownMenus, function(v2, i2) {
+//                            if (v2.id === value.id) {
+//                                value.isSelected = true;
+//                            }
+//                        });
+//                        if (value.children) {
+//                            angular.forEach(value.children, function(value, index) {
+//                                value.isSelected = false;
+//                                angular.forEach(ownMenus, function(v2, i2) {
+//                                    if (v2.id === value.id) {
+//                                        value.isSelected = true;
+//                                    }
+//                                });
+//                            });
+//                        }
+//                    });
+//
+//                };
+
+                if ($scope.form_id) {
+                    $http.get("rest/roles/" + $scope.form_id).success(function (resResult) {
+                        $scope.form = resResult;
+                        $http.get($scope.form._links.visibleMenu.href).success(function (resResult2) {
+                            $scope.ownMenus = resResult2._embedded["menus"];
+                            console.log($scope.ownMenus)
+                            $scope.getMenu($scope.ownMenus);
+                        });
+
+//                        $http.get($scope.form._links.departmenttype.href).success(function (resResult) {
+////                            $scope.ownMenus = resResult2._embedded["menus"];
+//                            if (resResult) {
+//                                $scope.getDepartment(resResult);
+//                            } else {
+//                                $scope.getDepartment(false);
+//                            }
+//
+//                        });
+                    });
+
+                } else {
+                    $scope.form = {};
+                }
+
+                /*
+                 *
+                 * */
+                $scope.changeMenuRole = function (menu) {
+
+                    //增加
+                    if (menu.isSelected) {
+
+                        console.log($scope.form._link.self.href)
+                        $http({
+                            method: "PATCH",
+//                            url: $scope.form._links.self.href,
+                            url: "rest/menus/" + menu.id + "/visibleRoles",
+                            data: $scope.form._links.self.href,
+                            headers: {"Content-Type": "text/uri-list"}
+                        }).success(function (resResult) {
+                            $rootScope.toasterSuccess("成功！", "关联成功！");
+                        });
+                    } else {//删除
+                        $http({
+                            method: "DELETE",
+                            url: $scope.form._links.visibleMenus.href + "/" + menu.id
+                        }).success(function (resResult) {
+                            $rootScope.toasterInfo("成功！", "已取消关联！");
+                        });
+                    }
+
+                };
+
+
+//                console.log($scope.id)
+
+                /*
+                 * 角色和权限的关联
+                 * */
+//                $scope.changeRole = function (auId,item) {
+//
+//                    $http.get("/rest/authorities/" + auId).success(function (resResult){
+//                        console.log(resResult);
+//                        $scope.auth = resResult;
+//                    });
+//
+//                    console.log($scope.auth._links.self.href);
+//
+//                    if (item.isSelected) {
+//                        //新增
+//                        $http({
+//                            method: "PATCH",
+//                            url: "rest/roles/" + $scope.id,
+//                            data: $scope.auth._links.self.href,
+//                            headers: {"Content-Type": "text/uri-list"}
+//                        }).success(function (resResult) {
+//                            $rootScope.toasterInfo("成功！", "新增关联！");
+//                        });
+//                    } else {
+//                        //删除
+//                        $http({
+//                            method: "DELETE",
+//                            url: $scope.auth._links.self.href + "/" + $scope.id
+//                        }).success(function (resResult) {
+//                            $rootScope.toasterSuccess("成功！", "删除成功！");
+//                        });
+//                    }
+//                };
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="wrapper-md" ng-controller="roleInfoCtrl">
+    <tabset class="tab-container" ng-init="steps={percent:20, step1:true, step2:false, step3:false}">
+        <tab heading="{{ menu.label }}" active="steps.step1" select="steps.percent=10" ng-repeat="menu in menus">
+            <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+                <div class="table-responsive" ng-repeat="child in menu.children">
+                    <table class="table table-striped b-t b-light">
+                        <thead>
+                            <th>
+                                <label class="i-checks m-b-none">
+                                    <input type="checkbox"
+                                           ng-model="menu.isSelected"
+                                           ng-change="changeMenuRole(menu);">
+                                    <i></i>
+                                </label>
+                            </th>
+                            <th>{{ child.label }}</th>
+                        </thead>
+                        <tbody>
+                        <!--<tr ng-repeat="menu in menus" class="ng-scope">-->
+                            <!--<td class="v-middle">-->
+                                <!--<label class="i-checks m-b-none">-->
+                                    <!--<input type="checkbox"-->
+                                           <!--ng-model="menu.isSelected"-->
+                                           <!--ng-change="changeMenuRole(menu);">-->
+                                    <!--<i></i>-->
+                                <!--</label>-->
+                            <!--</td>-->
+                            <!--<td class="v-middle">-->
+                                <!--<span class="text-ellipsis ng-binding">{{ menu.label }}</span>-->
+                            <!--</td>-->
+                        <!--</tr>-->
+                        </tbody>
+                    </table>
+                </div>
+        </tab>
+    </tabset>
+
+
+    <tabset class="tab-container" ng-init="steps={percent:20, step1:true, step2:false, step3:false}">
+        <tab heading="Step 1" active="steps.step1" select="steps.percent=10">
+            <p class="m-b">Use the Bootstrap tab components and ngForm to build the form wizard.</p>
+            <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+            <h4>Validate Form</h4>
+            <form name="step1" class="form-validation">
+                <p>Your email:</p>
+                <input type="email" name="email" class="form-control" ng-model="email" required ng-change="step1.email.$valid ? (steps.percent=30) : (steps.percent=20)">
+                <p class="m-t">Your website:</p>
+                <input type="url" name="url" placeholder="http://" class="form-control" ng-model="website" required>
+                <div class="m-t m-b">
+                    <button type="submit" ng-disabled="step1.$invalid" class="btn btn-default btn-rounded" ng-click="steps.step2=true">Next</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 2" disabled="step1.$invalid" active="steps.step2" select="steps.percent=30">
+            <form name="step2" class="form-validation">
+                <p class="m-b">Continue the next step</p>
+                <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+                <p>Your age:</p>
+                <input type="number" name="age" class="form-control" ng-model="age" required>
+                <div class="m-t m-b">
+                    <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step1=true">Prev</button>
+                    <button type="submit" ng-disabled="step2.$invalid" class="btn btn-default btn-rounded" ng-click="steps.step3=true">Next</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 3" disabled="step2.$invalid" active="steps.step3" select="steps.percent=60">
+            <p class="m-b">Congraduations! You got the last step.</p>
+            <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+            <p>Just one click to finish it.</p>
+            <div class="m-t m-b">
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step2=true">Prev</button>
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.percent=100">Click me to Finish</button>
+            </div>
+        </tab>
+    </tabset>
+</div>
+
+
+

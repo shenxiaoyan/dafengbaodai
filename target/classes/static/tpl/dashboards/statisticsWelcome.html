@@ -1,0 +1,90 @@
+<script>
+    "use strict";
+    app.controller("dashboardCtrl",
+        [
+            "$scope",
+            "$http",
+            function ($scope, $http) {
+                $scope.getOutlineList = function () {
+                    $http({
+                        method: "POST",
+                        url: "dafeng/claimPolicyReward/countProfit",
+                        data: {}
+                    }).success(function (resResult) {
+                        $scope.outlineList = resResult.data;
+                    })
+                };
+
+                $scope.getOutlineList();
+
+    }])
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="dashboardCtrl">
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="bg-light lter b-b wrapper-md">
+                <h1 class="m-n h3">情况概览</h1>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="wrapper-md">
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">总部数据统计</div>
+                                    <div class="panel-body bg-light">
+                                        <div class="list-group-item col-xs-6 col-sm-2" style="margin-right: 20px;width: auto;min-width:220px;height: 92px">
+                                            <div>
+                                                <i class="pull-left thumb-md fa fa-arrow-circle-down fa-4x"></i>
+                                            </div>
+                                            <div class="clear">
+                                                <div style="font-size: large">累计收入</div>
+                                                <div style="font-size: xx-large; color: #00b0ff;width: auto;margin-right: 100px">
+                                                    {{ outlineList.headquarter.headquartersAccumulatedIncome ? outlineList.headquarter.headquartersAccumulatedIncome:"0" | number:2 }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item col-xs-6 col-sm-2" style="width: auto;min-width:220px;height: 92px">
+                                            <div>
+                                                <i class="pull-left thumb-md fa fa-calculator fa-4x"></i>
+                                            </div>
+                                            <div class="clear">
+                                                <div style="font-size: large">累计收益</div>
+                                                <div style="font-size: xx-large; color: #00b0ff;width: auto;margin-right: 100px">
+                                                    {{ outlineList.headquarter.headquartersAccumulatedProfit ? outlineList.headquarter.headquartersAccumulatedProfit:"0" | number:2 }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">营业部数据统计</div>
+                                    <div class="table-responsive bg-white">
+                                        <table class="table table-hover table-bordered b-t b-light">
+                                            <thead>
+                                            <tr>
+                                                <th>营业部</th>
+                                                <th>累计认领金额</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="item in outlineList.departmentsCommission">
+                                                <th>{{ item.departmentLabel }}</th>
+                                                <th>
+                                                    {{ item.accumulatedCommission ? (item.accumulatedCommission| number:2) :"0" }}
+                                                </th>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

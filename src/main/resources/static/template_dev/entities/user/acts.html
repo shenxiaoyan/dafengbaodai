@@ -1,0 +1,298 @@
+<script>
+    /*
+     * @author  金杭
+     * @date    2017/07/18
+     * */
+    "use strict";
+    app.controller("configActsCtrl",
+        [
+        	"$rootScope",
+			"$scope",
+            "$http",
+            "$resource",
+            "$location",
+            "$state",
+            "$filter",
+            "routeCase",
+            "getListResource",
+            "getDetailResource",
+            "editableOptions",
+            "editableThemes",
+            function ($rootScope, $scope, $http, $resource, $location, $state, $filter, routeCase, getListResource, getDetailResource, editableOptions, editableThemes) {
+                //设置可编辑表格的默认参数
+                editableThemes.bs3.inputClass   = "input-sm";
+                editableThemes.bs3.buttonsClass = "btn-sm";
+                editableOptions.theme           = "bs3";
+
+                $scope.route = routeCase($location.$$path);
+
+                //获取资源化的工作流，getListResource 方法在自定义服务中查看
+                getListResource($scope.route).then(function(resResult){
+                	$scope.acts = resResult._embedded[$scope.route];
+                	angular.forEach($scope.acts,function(v,k){
+                		var promise	= getDetailResource(v._links.startWorkflow.href);
+                		
+      					promise.then(function(resResult){
+                       		v.startWorkflow =  resResult.label;
+                       	});
+                	})
+                	console.log($scope.acts);
+                });
+
+                //通知来源
+                $scope.firstNotices = [
+                    {text: "SELF"},
+                    {text: "SHOW_USER"},
+                    {text: "SELF_AND_SHOW_USER"}
+                ];
+
+                //是否手动通知
+                $scope.handNotices = [
+                    {value: true, text: "开启"},
+                    {value: false, text: "关闭"}
+                ];
+
+                //通知类型
+                $scope.messageTypes = [
+                    {value: "TIMTextElem", text: "文本"},
+                    {value: "TIMLocationElem", text: "地点"},
+                    {value: "TIMFaceElem", text: "表情"},
+                    {value: "TIMCustomElem", text: "自定义"},
+                    {value: "TIMSoundElem", text: "音频"},
+                    {value: "TIMImageElem", text: "图片"},
+                    {value: "TIMFileElem", text: "文件"}
+                ];
+
+                //通知模板
+                $scope.noticeTemplates = [
+                    {text: "#{entity.label}"},
+                    {text: "#{entity.id}"},
+                    {text: "#{user.nickname}"},
+                    {text: "#{act.actCode}"},
+                    {text: "#{user?.role.roleCode}"}
+                ];
+
+                //行为类型
+                $scope.actTypes = [
+                    {text: "END"},
+                    {text: "START"},
+                    {text: "NORMAL"}
+                ];
+                
+               
+				//获取资源化的工作流，getListResource 方法在自定义服务中查看
+                getListResource($location.$$path.split("/")[2] + "Workflows").then(function(resResult){
+                	$scope.workflows = resResult._embedded[$location.$$path.split("/")[2] + "Workflows"];
+                	console.log($scope.workflows)
+                });
+
+                //显示表格中消息来源
+                $scope.showFirstNotice = function (act) {
+                    var selected = [];
+                    if (act && act.firstNotice) {
+                        selected = $filter("filter")($scope.firstNotices, {text: act.firstNotice});
+                    }
+                    return selected.length ? selected[0].text : "未选择";
+                };
+
+                //显示是否手动通知
+                $scope.showHandNotice = function (act) {
+                    var selected = [];
+                    if (act && act.handNotice !== null) {
+                        selected = $filter("filter")($scope.handNotices, {value: act.handNotice});
+                    }
+                    return selected.length ? selected[0].text : "未选择";
+                };
+
+                //显示通知类型
+                $scope.showMessageType = function (act) {
+                    var selected = [];
+                    if (act && act.messageType) {
+                        selected = $filter("filter")($scope.messageTypes, {value: act.messageType});
+                    }
+                    return selected.length ? selected[0].text : "未选择";
+                };
+
+                //显示通知类型
+                $scope.showNoticeTemplate = function (act) {
+                    var selected = [];
+                    if (act && act.noticeTemplate) {
+                        selected = $filter("filter")($scope.noticeTemplates, {text: act.noticeTemplate});
+                    }
+                    return selected.length ? selected[0].text : "未选择";
+                };
+
+                //表格中显示行为类型
+                $scope.showActType = function (act) {
+                    var selected = [];
+                    if (act && act.actType) {
+                        selected = $filter("filter")($scope.actTypes, {text: act.actType});
+                    }
+                    return selected.length ? selected[0].text : "未选择";
+                };
+                
+              	//表格中显示工作流
+                $scope.showWorkflow = function (act) {
+              		return act.startWorkflow ? act.startWorkflow : "未选择";
+                };
+
+                /*
+                 * 保存行为函数
+                 * @author  金杭
+                 * @param   {object}  act 单个行为对象
+                 * @return  无
+                 * */
+                $scope.saveAct = function (act) {
+                	if(act._links){
+                		//修改需要获取资源化的对象，getDetailResource 方法在自定义服务中查看
+                		var promise = getDetailResource(act);
+                    	
+                    	promise.then(function(resResult){
+                    		resResult.$patch(function(){
+                    			$state.reload();
+                        		$rootScope.toasterSuccess("成功！","修改成功！");
+                    		},function(){
+                    			$rootScope.toasterError("失败！","修改失败！，请联系管理员");
+                    		});
+                    	});
+                	}else{
+                		$http.post("rest/" + $scope.route,act).success(function(resResult){
+                			$state.reload();
+                 			$rootScope.toasterSuccess("成功！","新增成功！");
+                		})
+                	}
+                };
+
+                // removeAct
+                $scope.removeAct = function (index, act) {
+                	//使用_links来判断是否是新增还是已有的
+                	if(act._links){
+                		$rootScope.sweetConfirm({
+                			title: "确定删除这条数据嘛？",
+              			  	text: "删除后此条数据将不可恢复！",
+              			  	type: "warning",
+              			  	callback:function(){
+              			  		//删除需要获取资源化的对象，getDetailResource 方法在自定义服务中查看
+                				var promise = getDetailResource(act);
+                				
+                            	promise.then(function(resResult){
+                            		resResult.$delete(function(){
+                            			$state.reload();
+                                		$rootScope.toasterSuccess("成功！","删除成功！");
+                            		},function(){
+                            			$rootScope.toasterError("失败！","删除失败！，请联系管理员");
+                            		});
+                            	});	
+              			  	}
+                		});
+                	}else{
+                		//新增时取消就直接根据索引来删除
+                		$scope.acts.splice(index, 1);
+                	}
+                };
+
+                /* 
+                 * 新增行为按钮函数，此函数仅仅是将一个空的对象压入已获得的行为中
+                 * @author  金杭
+                 * */
+                $scope.addAct = function () {
+                    $scope.inserted = {
+                        id: $scope.acts.length + 1,
+	                    label: "",
+	                    act_code: "",
+	                    first_notice: "",
+	                    hand_notice: false,
+	                    message_type: "",
+	                    notice_template: "",
+	                    act_type: "",
+	                    startWorkflow:""
+                    };
+                    $scope.acts.push($scope.inserted);
+                };
+            }
+        ]
+    );
+</script>
+<div class="wrapper-md" ng-controller="configActsCtrl">
+    <button class="btn btn-default m-b-md" ng-click="addAct()">新增行为</button>
+    <table class="table table-bordered table-hover table-condensed bg-white-only">
+        <tr style="font-weight: bold;">
+            <td>行为</td>
+            <td>行为编码（英文）</td>
+            <td>通知来源</td>
+            <td>手动通知</td>
+            <td>通知类型</td>
+            <td>通知模板</td>
+            <td>类型</td>
+            <td>工作流</td>
+            <td>操作</td>
+        </tr>
+        <tr ng-repeat="act in acts">
+            <td class="v-middle">
+                <span editable-text="act.label" e-name="label" e-form="rowform"
+                      e-required>
+                  {{ act.label || "未填写" }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-text="act.actCode" e-name="actCode" e-form="rowform"
+                      e-required>
+                  {{ act.actCode || "未填写" }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-select="act.firstNotice" e-name="firstNotice" e-form="rowform"
+                      e-ng-options="f.text as f.text for f in firstNotices">
+                  {{ showFirstNotice(act) }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-select="act.handNotice" e-name="handNotice" e-form="rowform"
+                      e-ng-options="h.value as h.text for h in handNotices">
+                  {{ showHandNotice(act) }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-select="act.messageType" e-name="messageType" e-form="rowform"
+                      e-ng-options="m.value as m.text for m in messageTypes">
+                  {{ showMessageType(act) }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-select="act.noticeTemplate" e-name="noticeTemplate" e-form="rowform"
+                      e-ng-options="t.text as t.text for t in noticeTemplates">
+                  {{ showNoticeTemplate(act) }}
+                </span>
+            </td>
+            <td class="v-middle">
+                <span editable-select="act.actType" e-name="actType" e-form="rowform"
+                      e-ng-options="t.text as t.text for t in actTypes">
+                  {{ showActType(act) }}
+                </span>
+            </td>
+            <td class="v-middle">
+            	<span editable-select="act.startWorkflow" e-name="startWorkflow" e-form="rowform" 
+            		  e-ng-options="w._links.self.href as w.label for w in workflows">
+		          {{ showWorkflow(act) }}
+		        </span>
+            </td>
+            <td style="white-space: nowrap;">
+                <!-- form -->
+                <form editable-form name="rowform" onbeforesave="saveAct(act)" ng-show="rowform.$visible"
+                      class="form-buttons form-inline" shown="inserted == act">
+                    <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-sm btn-info">
+                    	保存
+                    </button>
+                    <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()"
+                            class="btn btn-sm btn-default">
+                                                                         取消
+                    </button>
+                </form>
+                <div class="buttons" ng-show="!rowform.$visible">
+                    <button class="btn btn-sm btn-info" ng-click="rowform.$show()">修改</button>
+                    <button class="btn btn-sm btn-danger" ng-click="removeAct($index, act)">删除</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,60 @@
+package com.liyang.domain.advertise;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.user.User;
+
+/**
+ * @author Administrator
+ *
+ */
+public interface AdvertiseRepository extends AuditorEntityRepository<Advertise>, JpaSpecificationExecutor<Advertise>{
+	public Advertise getById(Integer id);
+	
+	@Query("from Advertise a where a.state.stateCode = ?1 order by a.publishTime desc")
+	public Page<Advertise> getByStateCode(@Param("state") String state, Pageable p);
+	
+	public Advertise save(Advertise ad) ;
+	
+	@Query("select a from Advertise a where a.type = 2 and a.token = ?1 order by a.createdAt desc")
+	public Page<Advertise> getZnx(@Param("token") String token, Pageable p);
+
+	@Query("from Advertise a where a.type = 1 and a.state.stateCode = 'PUBLISHED' order by a.publishTime desc")
+	public Page<Advertise> getAdvertise(Pageable pageable);
+	
+	@Transactional
+	@Modifying
+	@Query("update Advertise a set a.isRead = 1 where a.token = ?1")
+	public void setZnxState(@Param("token") String token);
+	
+	@Query("select count(*) from Advertise a where a.token = ?1 and a.type = 2 and a.isRead = 0 ")
+	public Integer queryNotReadNum(@Param("token") String token);
+	
+	@Query("from Advertise a where a.type = 1 and a.state.stateCode = 'PUBLISHED' order by a.publishTime desc")
+	public List<Advertise> getLatestAdvertise();
+	
+	public List<Advertise> findByOfferIdAndZnxType(String offerId, Integer znxType);
+	
+	public Page<Advertise> findByUserAndIsReadAndUserNotNull(User user, Integer isRead, Pageable pageable);
+	
+	public List<Advertise> findByUserAndIsReadAndUserNotNull(User user, Integer isRead);
+	
+	public int countByUserAndIsReadAndUserNotNull(User user, Integer isRead);
+
+	public Page<Advertise> findByUserAndUserNotNull(User user, Pageable pageable);
+	
+//	@Transactional
+//	@Modifying
+//	@Query("update Advertise a set a.isRead = 1 where a.user = ?1")
+//	public void updateReadStateByUser(User user);
+}

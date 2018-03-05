@@ -1,0 +1,196 @@
+/*基础样式*/
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei UI";
+}
+
+.clearfix:before, .clearfix:after {
+    content: "";
+    display: table;
+    clear:both;
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+/*登录样式*/
+.background-container {
+    background: url("../img/login-bg-img.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.login-form-container {
+    width: 350px;
+    margin: 95px auto 0;
+    padding: 20px;
+    position: relative;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0 0 20px rgba(0,0,0,0.15);
+    -o-box-shadow: 0 0 20px rgba(0,0,0,0.15);
+}
+
+.other-login-handle {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.account-login-img {
+    background: url("../img/qr-code.png") no-repeat -40px -40px;
+}
+
+.qr-code-login-img {
+    background: url("../img/qr-code.png") no-repeat 0 0;
+}
+
+#qr-code-login {
+    display: none;
+}
+
+.login-title-container {
+    margin: 15px 0;
+}
+
+.login-title {
+    color: #2b425b;
+    font-weight: 600;
+}
+
+.login-tip {
+    color: #afb9c3;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.login-error-info {
+    margin-bottom: 15px;
+}
+
+.login-error-info p {
+    padding: 3px 10px;
+    font-size: 14px;
+}
+
+.error-info-danger {
+    color: #6C6C6C;
+    margin-bottom: 15px;
+    border:1px solid #FFB4A8;
+    background-color: #FEF2F2;
+}
+
+.error-info-warning {
+    color: #DF9C1F;
+    border:1px solid #F3D995;
+    background-color: #FEFCEE;
+}
+
+.login-form {
+    margin-bottom: 15px;
+}
+
+.input-box {
+    margin-bottom: 15px;
+}
+
+.input-box > input {
+    height: 40px;
+    font-size: 13px;
+    padding-left: 10px;
+    outline: none;
+    border: 1px solid #E9E9E9;
+}
+
+.input-box > input:focus {
+    border: 1px solid #42A5F5;
+}
+
+.input-box > label input {
+    margin: 2px 5px 0 0;
+}
+
+.input-box > label span {
+    font-size: 13px;
+}
+
+.submit-button {
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    background-color: #38A0F4;
+    height: 40px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #1690F3;
+}
+
+.submit-button:focus {
+    background-color: #204D74;
+}
+
+.register-forget-container {
+    width: 200px;
+    margin: 0 auto 15px;
+}
+
+.register-forget-container a {
+    color: #647484;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.register-forget-container a:hover {
+    text-decoration: underline;
+}
+
+.login-form-line {
+    border-bottom: 1px solid #E9E9E9;
+}
+
+#login_container iframe {
+    display: block;
+    margin: 0 auto;
+}

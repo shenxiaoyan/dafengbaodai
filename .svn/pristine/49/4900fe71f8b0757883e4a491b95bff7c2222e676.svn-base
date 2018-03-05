@@ -1,0 +1,494 @@
+{
+    "_embedded": {
+        "userWorkflows": [
+            {
+                "label": "创建",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "create",
+                "sort": 10,
+                "actGroup": "UPDATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/1"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/1"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/1/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/1/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/1/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/1/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/1/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/1/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/1/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/1/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "读取",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "read",
+                "sort": 20,
+                "actGroup": "READ",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/2"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/2"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/2/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/2/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/2/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/2/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/2/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/2/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/2/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/2/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "更新",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "update",
+                "sort": 30,
+                "actGroup": "UPDATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/3"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/3"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/3/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/3/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/3/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/3/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/3/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/3/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/3/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/3/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "删除",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "delete",
+                "sort": 40,
+                "actGroup": "UPDATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/4"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/4"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/4/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/4/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/4/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/4/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/4/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/4/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/4/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/4/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "自己的列表",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "listOwn",
+                "sort": 50,
+                "actGroup": "READ",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/5"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/5"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/5/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/5/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/5/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/5/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/5/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/5/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/5/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/5/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "部门的列表",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "listOwnDepartment",
+                "sort": 60,
+                "actGroup": "READ",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/6"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/6"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/6/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/6/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/6/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/6/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/6/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/6/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/6/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/6/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "部门和下属部门的列表",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "listOwnDepartmentAndChildren",
+                "sort": 70,
+                "actGroup": "READ",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/7"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/7"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/7/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/7/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/7/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/7/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/7/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/7/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/7/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/7/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "手动通知",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "handNotice",
+                "sort": 80,
+                "actGroup": "OPERATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/8"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/8"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/8/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/8/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/8/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/8/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/8/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/8/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/8/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/8/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "通知给操作者",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "noticeActUser",
+                "sort": 90,
+                "actGroup": "OPERATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/9"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/9"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/9/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/9/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/9/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/9/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/9/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/9/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/9/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/9/lastModifiedBy"
+                    }
+                }
+            },
+            {
+                "label": "通知给展示人",
+                "createdAt": "2017-08-03T01:45:36.000+0000",
+                "lastModifiedAt": "2017-08-03T01:45:36.000+0000",
+                "firstNotice": null,
+                "handNotice": false,
+                "noticeTemplate": null,
+                "actCode": "noticeShowUser",
+                "sort": 100,
+                "actGroup": "OPERATE",
+                "actType": "NORMAL",
+                "done": false,
+                "importance": false,
+                "messageType": null,
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/userActs/10"
+                    },
+                    "userAct": {
+                        "href": "http://localhost/userActs/10"
+                    },
+                    "targetState": {
+                        "href": "http://localhost/userActs/10/targetState"
+                    },
+                    "createdBy": {
+                        "href": "http://localhost/userActs/10/createdBy"
+                    },
+                    "startWorkflow": {
+                        "href": "http://localhost/userActs/10/startWorkflow"
+                    },
+                    "nextWorkflow": {
+                        "href": "http://localhost/userActs/10/nextWorkflow"
+                    },
+                    "roles": {
+                        "href": "http://localhost/userActs/10/roles"
+                    },
+                    "createdByDepartment": {
+                        "href": "http://localhost/userActs/10/createdByDepartment"
+                    },
+                    "states": {
+                        "href": "http://localhost/userActs/10/states"
+                    },
+                    "lastModifiedBy": {
+                        "href": "http://localhost/userActs/10/lastModifiedBy"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://localhost/userActs{?page,size,sort}",
+            "templated": true
+        },
+        "profile": {
+            "href": "http://localhost/profile/userActs"
+        },
+        "search": {
+            "href": "http://localhost/userActs/search"
+        }
+    },
+    "page": {
+        "size": 20,
+        "totalElements": 10,
+        "totalPages": 1,
+        "number": 0
+    }
+}

@@ -1,0 +1,163 @@
+<div class="aside-wrap">
+    <!-- if you want to use a custom scroll when aside fixed, use the slimScroll
+      <div class="navi-wrap" ui-jq="slimScroll" ui-options="{height:'100%', size:'8px'}">
+    -->
+    <div class="navi-wrap">
+        <!-- list -->
+        <ul class="nav">
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>工作台</span>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="dashboard">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;概览</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="messages">
+                    <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+                    <b class="badge bg-info pull-right">3</b>
+
+                     <span class="font-bold">&nbsp;消息</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="users">
+                    <i class="glyphicon glyphicon-envelope icon text-info-lter"></i>
+                    <span class="font-bold">&nbsp;联系人</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="stores">
+                    <i class="fa fa-sitemap icon text-success"></i>
+                    <span class="font-bold">&nbsp;门店</span>
+                </a>
+            </li>    
+            <li ui-sref-active="active">
+                <a ui-sref="distributors">
+                    <i class="fa fa-sitemap icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;渠道</span>
+                </a>
+            </li>    
+            <li class="line dk"></li>
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>业务管理</span>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="orders.list({status:'all'})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;随借随还</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="orders.list({status:'all'})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;先息后本</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="orders.list({status:'all'})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;面单白条</span>
+                </a>
+            </li>
+
+            <li class="line dk"></li>
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>风控</span>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="risks({})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;风控模型考核</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="risksperson">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;个人查询</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="risksasset">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;资产查询</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="risksentertprise">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;企业查询</span>
+                </a>
+            </li>
+
+            <li class="line dk"></li>
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>财务</span>
+            </li>
+            <li  ui-sref-active="active">
+                <a ui-sref="repayments">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;还款</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="lendouts">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;放款</span>
+                </a>
+            </li>
+
+
+
+            <li class="line dk"></li>
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>数据与分析</span>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="orders.list({status:'auto_risk'})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;还款报表</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="orders.list({status:'auto_risk'})">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;放款报表</span>
+                </a>
+            </li>
+            <li class="line dk"></li>
+            <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                <span>开发&配置</span>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="entities">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;实体配置</span>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="products">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;产品线</span>
+                </a>
+            </li>
+            
+             <li ui-sref-active="active">
+                <a ui-sref="products">
+                    <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
+                    <span class="font-bold">&nbsp;风控模型</span>
+                </a>
+            </li>
+
+            <br />
+            <br />
+            <br />
+
+        </ul>
+
+        <!-- / list -->
+
+    </div>
+</div>

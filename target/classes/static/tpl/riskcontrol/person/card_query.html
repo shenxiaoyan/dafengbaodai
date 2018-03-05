@@ -1,0 +1,306 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/07/31
+     *银行卡核查信息
+     * */
+    //    var app = angular.module('app', []);
+    app.controller('cardQueryCheck', ['$scope', function ($scope) {
+        $scope.inquiryMode = {
+            name: true,
+            phone: true,
+            idCard: false,
+            bank: false
+        };
+
+        //没有接口 自己模拟的数据
+        $scope.mockData = {
+            name: "沈小艳",
+            phone: "18860469557",
+            idCard: "341623199405284820",
+            bank: "123456"
+        };
+
+        // 当前选中的单选类型 默认为第一个
+        $scope.radioType = 1;
+
+
+        //数据初始化
+        $scope.info = {
+            name: '',
+            phone: '',
+            idCard: '',
+            bank: ''
+        };
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        $scope.changeInputShow = function (type) {
+
+            $scope.inquiryMode = {
+                name: false,
+                phone: false,
+                idCard: false,
+                bank: false
+            };
+            // 改变当前的选中单选按钮
+            $scope.radioType = type;
+            console.log(type);
+
+            // 切换按钮的时候，把样例表格切换回来
+            $scope.resultSwitch = false;
+
+            switch (type) {
+                case 1:
+                    $scope.inquiryMode.name = true;
+                    $scope.inquiryMode.phone = true;
+                    $scope.info.idCard = '';
+                    $scope.info.bank = '';
+                    break;
+                case 2:
+                    $scope.inquiryMode.name = true;
+                    $scope.inquiryMode.idCard = true;
+                    $scope.info.phone = '';
+                    $scope.info.bank = '';
+                    break;
+                case 3:
+                    $scope.inquiryMode.name = true;
+                    $scope.inquiryMode.phone = true;
+                    $scope.inquiryMode.idCard = true;
+                    $scope.info.bank = '';
+                    break;
+                case 4:
+                    $scope.inquiryMode.name = true;
+                    $scope.inquiryMode.phone = true;
+                    $scope.inquiryMode.bank = true;
+                    $scope.inquiryMode.idCard = true;
+                    break;
+            }
+        };
+
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.name = '';
+            $scope.info.phone = '';
+            $scope.info.idCard = '';
+            $scope.info.bank = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            //数据信息格式错误时阻止表单提交
+
+            if (myForm.name) {
+                myForm.name.$dirty = true
+            }
+            if (myForm.phone) {
+                myForm.phone.$dirty = true
+            }
+            if (myForm.idCard) {
+                myForm.idCard.$dirty = true
+            }
+            if (myForm.bank) {
+                myForm.bank.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = true;
+
+            if ($scope.radioType === 1) {
+                if ($scope.info.name === $scope.mockData.name && $scope.info.phone === $scope.mockData.phone) {
+                    $scope.resultMsg = "一致"
+                } else {
+                    $scope.resultMsg = "不一致"
+                }
+            }
+            if ($scope.radioType === 2) {
+                if ($scope.info.name === $scope.mockData.name && $scope.info.idCard === $scope.mockData
+                        .idCard) {
+                    $scope.resultMsg = "一致"
+                } else {
+                    $scope.resultMsg = "不一致"
+                }
+            }
+            if ($scope.radioType === 3) {
+                if ($scope.info.name === $scope.mockData.name && $scope.info.phone === $scope.mockData.phone &&
+                    $scope.info.idCard === $scope.mockData.idCard) {
+                    $scope.resultMsg = "一致"
+                } else {
+                    $scope.resultMsg = "不一致"
+                }
+            }
+            if ($scope.radioType === 4) {
+                if ($scope.info.name === $scope.mockData.name && $scope.info.phone === $scope.mockData.phone &&
+                    $scope.info.idCard === $scope.mockData.idCard && $scope.info.bank === $scope.mockData
+                        .bank) {
+                    $scope.resultMsg = "一致"
+                } else {
+                    $scope.resultMsg = "不一致"
+                }
+            }
+        };
+
+    }]);
+</script>
+<div class="vbox" ng-controller="cardQueryCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading" style="font-size: 16px">银行卡核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <div class="form-group validate" ng-if="inquiryMode.name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>姓名：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.name" name="name" class="form-control" ng-required="true" pattern="[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.name.$dirty&&myForm.name.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.pattern">姓名格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group validate" ng-if="inquiryMode.phone">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>手机号：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.phone" name="phone" class="form-control" ng-required="true" pattern="^1[3|4|5|7|8][0-9]{9}$">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.phone.$dirty && myForm.phone.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.required">手机号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.pattern">手机号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group validate" ng-if="inquiryMode.idCard">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>身份证：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.idCard" name="idCard" class="form-control" ng-required="true" pattern="(^\d{15}$)|(^\d{17}([0-9]|X)$)">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.idCard.$dirty && myForm.idCard.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.required">身份证号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.pattern">身份证号格式错误</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group validate" ng-if="inquiryMode.bank">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>银行卡：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.bank" name="bank" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.bank.$dirty && myForm.bank.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.bank.$error.required">银行卡号不能为空</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>查询方式：</label>
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8 col-md-10" style="height: 30px">
+                                        <label for="my-name" ng-click="changeInputShow(1)">
+                                            <input type="radio" id="my-name" name="my-radio" checked>
+                                            <span>姓名、手机号</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-10 col-md-10" style="height: 30px">
+                                        <label for="my-idCard" ng-click="changeInputShow(2)">
+                                            <input type="radio" id="my-idCard" name="my-radio">
+                                            <span>姓名、身份证</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8 col-md-10" style="height: 30px">
+                                        <label for="my-phone" ng-click="changeInputShow(3)">
+                                            <input type="radio" id="my-phone" name="my-radio">
+                                            <span>姓名、手机号、身份证</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8 col-md-10" style="height: 30px">
+                                        <label for="my-bank" ng-click="changeInputShow(4)">
+                                            <input type="radio" id="my-bank" name="my-radio">
+                                            <span>姓名、手机号、银行卡、身份证</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button" class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button" class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!--样例-->
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr>
+                                    <td width="50%">姓名、身份证</td>
+                                    <td width="50%">一致</td>
+                                </tr>
+                                <tr>
+                                    <td>姓名、手机号</td>
+                                    <td>一致</td>
+                                </tr>
+                                <tr>
+                                    <td>姓名、手机号、身份证</td>
+                                    <td>一致</td>
+                                </tr>
+                                <tr>
+                                    <td>姓名、手机号、银行卡、身份证</td>
+                                    <td>一致</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--结果-->
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr ng-if="radioType==1">
+                                    <td width="50%">姓名、手机号</td>
+                                    <td width="50%" ng-bind="resultMsg"></td>
+                                </tr>
+                                <tr ng-if="radioType==2">
+                                    <td>姓名、身份证</td>
+                                    <td ng-bind="resultMsg"></td>
+                                </tr>
+                                <tr ng-if="radioType==3">
+                                    <td>姓名、手机号、身份证</td>
+                                    <td ng-bind="resultMsg"></td>
+                                </tr>
+                                <tr ng-if="radioType==4">
+                                    <td>姓名、手机号、银行卡、身份证</td>
+                                    <td ng-bind="resultMsg"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

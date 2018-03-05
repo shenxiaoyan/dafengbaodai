@@ -1,0 +1,29 @@
+<div class="hbox hbox-auto-xs bg-light" ng-controller="workflowEntityHomeController">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 28.5px 20px 0 20px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.profile.info({})">主页</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'list'})">关联列表</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'info'})">关联消息</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'file'})">文件列表</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'log'})">操作记录</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row-row bg-white"  ui-view>
+            </div>
+        </div>
+    </div>
+</div>

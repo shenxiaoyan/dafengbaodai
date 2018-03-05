@@ -1,0 +1,45 @@
+<div class="vbox">
+    <div class="wrapper b-b">
+        <a class="btn btn-sm btn-danger" tooltip="这是操作说明" tooltip-placement="bottom"><i class="fa fa-fw fa-tag"></i> 新增员工 </a>
+    </div>
+    <div class="row-row">
+        <div class="cell  scrollable hover">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>姓名</th>
+                                <th>手机号</th>
+                                <th>身份证</th>
+                                <th>角色</th>
+                                <th>入职时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="active">
+                                <th scope="row">1</th>
+                                <td>
+                                    <a  ui-sref="users.user.page({user_id:1,entity_type:'user',view_type:'dashboard'})" class="avatar thumb pull-left m-r">
+                                        <img ng-src="img/a10.jpg" src="img/a10.jpg">
+                                    </a>
+                                    <a ui-sref="users.user.page({order_id:1,entity_type:'user',view_type:'dashboard'})">容儿</a></td>
+                                <td>容儿</td>
+                                <td>15967170639</td>
+                                <td>360149198603182221</td>
+                                <td>风控专员</td>
+                                <td>2017.06.15</td>
+                                <td><span class="badge bg-success">在职</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,194 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *车辆违章查询
+     * */
+    app.controller('carPeccancyCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            {
+                carNumber: "12345678",
+                frameNumber: "654321",
+                engineNumber: "00654321"
+            };
+        //数据初始化
+        $scope.info = {
+            carNumber: "12345678",
+            frameNumber: "654321",
+            engineNumber: "00654321"
+
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.carNumber = '';
+            $scope.info.frameNumber = '';
+            $scope.info.engineNumber = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            //数据信息格式错误时阻止表单提交
+            if (myForm.carNumber) {
+                myForm.carNumber.$dirty = true
+            }
+            if (myForm.frameNumber) {
+                myForm.frameNumber.$dirty = true
+            }
+            if (myForm.engineNumber) {
+                myForm.engineNumber.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+
+            if($scope.info.carNumber === $scope.mockData.carNumber && $scope.info.frameNumber === $scope.mockData.frameNumber && $scope.info.engineNumber === $scope.mockData.engineNumber){
+                $scope.resultSwitch = true;
+                console.log('aaa')
+            }else{
+                $scope.resultSwitch = false;
+                console.log('bbb')
+            }
+
+
+
+        };
+
+        $scope.test=[
+            {
+                sheanType:"aa",
+                sheanCla:"ee",
+                sheanClass:"qq"
+            },
+            {
+                sheanType:"11",
+                sheanCla:"66",
+                sheanClass:"88"
+            }
+        ]
+
+
+
+    }]);
+</script>
+<div class="vbox" ng-controller="carPeccancyCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">资产信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">车辆违章查询</div>
+                        <div class="panel-body">
+                            <form name="myForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span style="color: #ff0000">*</span>车牌号:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.carNumber" name="carNumber" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.carNumber.$dirty&&myForm.carNumber.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.carNumber.$error.required">车牌号不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span style="color: #ff0000">*</span>车架号:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.frameNumber" name="frameNumber" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.frameNumber.$dirty&&myForm.frameNumber.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.frameNumber.$error.required">车架号不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span style="color: #ff0000">*</span>发动机号:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.engineNumber" name="engineNumber" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.engineNumber.$dirty&&myForm.engineNumber.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.engineNumber.$error.required">车架号不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-3 col-md-offset-3 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table  class="table-border-style">
+                                <tr><th style="background-color: #f6f8f8" colspan="2">信息1</td></tr>
+                                <tr><td>违章时间</td><td>2016-07-01 10:19:00</td></tr>
+                                <tr><td>违章地点</td><td>北京市朝阳区xx路xx路西口</td></tr>
+                                <tr><td>违章原因</td><td>机动车违反停车规定的</td></tr>
+                                <tr><td>违章罚款金额</td><td>200</td></tr>
+                                <tr><td>违章纪录状态0 未处理 1已处理</td><td>0</td></tr>
+                                <tr><td>违章扣分</td><td>0</td></tr>
+                                <tr><td>违章代码</td><td>1039</td></tr>
+                                <tr><td>违章项文书编号</td><td></td></tr>
+                                <tr><td>联系电话</td><td></td></tr>
+                                <tr><td>违章处理地址</td><td></td></tr>
+                                <tr><td>执行部门</td><td></td></tr>
+                                <tr><td>违章分类类别</td><td></td></tr>
+                                <tr><td>处罚依据</td><td></td></tr>
+                                <tr><td>违法条款</td><td></td></tr>
+                                <tr><td>滞纳金</td><td>0</td></tr>
+                                <tr><td>违章归属地点ID</td><td>11</td></tr>
+                                <tr><td>违章归属地点名</td><td>北京</td></tr>
+                                <tr><td>查询数据源ID</td><td>9983</td></tr>
+                                <tr><td>实时数据/历史数据</td><td>实时数据</td></tr>
+                                <tr><td>是否可以代办 0不可以 1可以</td><td>0</td></tr>
+                                <tr><td>违章信息的特征码</td><td>dfbc2736ece19d1c6e35bbb1cf38ea73</td></tr>
+                                <tr><td>违章纪录ID，用于下单</td><td>725382247</td></tr>
+                                <tr><td>扣分手续费</td><td>0</td></tr>
+                                <tr><td>手续费</td><td>0</td></tr>
+                                <tr><td>预留</td><td>0</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style" ng-repeat="(index,value) in test">
+                                <tr><th  style="background-color: #f6f8f8" colspan="2">信息{{index+1}}</th></tr>
+                                <tr><td>违章时间</td><td>{{value.sheanClass}}</td></tr>
+                                <tr><td>违章地点</td><td>{{value.sheanCla}}</td></tr>
+                                <tr><td>违章原因</td><td>{{value.sheanType}}</td></tr>
+                                <tr><td>违章罚款金额</td><td>{{value.sheanClass}}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

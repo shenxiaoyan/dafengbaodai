@@ -1,0 +1,353 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *注册信息核查
+     *
+     * */
+    app.controller('registrationInfoCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            $scope.mockData = {
+                enterpriseName:"商道科技",
+                creditRegister: [
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/02 17:20:20"
+                    },
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/08 12:20:20"
+                    }
+                ],
+                loanApplication: [
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/02 17:20:20",
+                        registerMoney: "0w~0.2w",
+                        result: "失败"
+                    },
+                    {
+                        platformType: 1,
+                        registerTime: "2016/01/02 16:20:20",
+                        registerMoney: "0w~0.2w",
+                        result: "成功"
+                    }
+                ]
+            };
+        //select
+        $scope.enterprise=[
+            {
+                type:'按企业名称查'
+            },
+            {
+                type:'按企业工商注册号查'
+            }
+        ];
+        $scope.YourOption =$scope.enterprise[0];
+        $scope.$watch("YourOption", function(n){
+            $scope.type = n.type;
+            $scope.info.enterpriseName = '';
+        });
+
+
+        //数据初始化
+        $scope.info = {
+            enterpriseName: "商道科技"
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.enterpriseName = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            //数据信息格式错误时阻止表单提交
+            if (myForm.enterpriseName) {
+                myForm.enterpriseName.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+
+            if($scope.info.enterpriseName === $scope.mockData.enterpriseName){
+                $scope.resultSwitch = true;
+                console.log('aaa')
+            }else {
+                $scope.resultSwitch = false;
+                console.log('bbb')
+            }
+
+
+
+
+        };
+
+    }]);
+</script>
+
+
+<div class="vbox" ng-controller="registrationInfoCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">注册信息核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>{{type}}:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.enterpriseName" name="enterpriseName" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.enterpriseName.$dirty && myForm.enterpriseName.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.enterpriseName.$error.required">所填内容不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>查询方式:</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="YourOption" class="form-control" ng-options="enterpriseType.type for enterpriseType in enterprise">
+                                            <!--<option value="name">按企业名称查</option>-->
+                                            <!--<option value="regNo">按企业工商注册号查</option>-->
+                                        </select>
+                                        <input id="queryMidValue" type="hidden" class="type" value="regNo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                         </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业照面信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td  width="50%">法定代表人/负责人/执行事务合伙人</td><td width="50%">	卢XXX</td></tr>
+                                <tr><td>国民经济行业代码</td><td>	3311</td></tr>
+                                <tr><td>所在省份</td><td>北京市</td></tr>
+                                <tr><td>联系人电话</td><td>81536635</td></tr>
+                                <tr><td>住所所在行政区划</td><td>81536635</td></tr>
+                                <tr><td>注册号</td><td>81536635</td></tr>
+                                <tr><td>注册资本币种</td><td>	人民币</td></tr>
+                                <tr><td>经营期限至</td><td>2027-10-18</td></tr>
+                                <tr><td>经营(业务)范围</td><td></td></tr>
+                                <tr><td>行业门类代码及名称</td><td>C制造业</td></tr>
+                                <tr><td>员工人数</td><td>3</td></tr>
+                                <tr><td>注册地址行政区编号</td><td>110112</td></tr>
+                                <tr><td>经营场所</td><td></td></tr>
+                                <tr><td>注册资本(万元)</td><td>10.000000</td></tr>
+                                <tr><td>住址</td><td>北京市XXX区XXXX镇</td></tr>
+                                <tr><td>经营(业务)范围及方式</td><td></td></tr>
+                                <tr><td>行业门类代码</td><td>C</td></tr>
+                                <tr><td>企业英文名称</td><td>北京XXXXXXX有限公司</td></tr>
+                                <tr><td>原注册号</td><td></td></tr>
+                                <tr><td>实收资本(万元)</td><td>10.000000</td></tr>
+                                <tr><td>许可经营项目</td><td></td></tr>
+                                <tr><td>登记机关</td><td>北京市XXX区工商行政管理局</td></tr>
+                                <tr><td>省节点编号</td><td></td></tr>
+                                <tr><td>经营业务范围</td><td>加工钢窗、户外广告钢结构加工；销售五金交电、建材、化工产品（不含危险化学品）、其他日用品。</td></tr>
+                                <tr><td>最后年检日期</td><td></td></tr>
+                                <tr><td>成立日期</td><td>2007-10-19</td></tr>
+                                <tr><td>最后年检年度</td><td></td></tr>
+                                <tr><td>变更日期</td><td>2015-12-09</td></tr>
+                                <tr><td>行业门类名称</td><td></td></tr>
+                                <tr><td>国民经济行业名称</td><td>金属结构制造</td></tr>
+                                <tr><td>吊销日期</td><td></td></tr>
+                                <tr><td>经营期限自</td><td>2007-10-19</td></tr>
+                                <tr><td>企业(机构)类型</td><td>有限责任公司(自然人独资)</td></tr>
+                                <tr><td>国民经济行业代码及名称</td><td>3311金属结构制造</td></tr>
+                                <tr><td>注销日期</td><td></td></tr>
+                                <tr><td>经营状态</td><td>在营（开业）</td></tr>
+                                <tr><td>企业名称</td><td>北京XXXX有限公司</td></tr>
+                                <tr><td>一般经营项目</td><td>加工钢窗、户外广告钢结构加工；销售五金交电、建材、
+                                    化工产品（不含危险化学品）、其他日用品。</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业股东及出资信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>股东名称</td><td>卢XXX</td></tr>
+                                <tr><td>出资日期</td><td>2007-10-19</td></tr>
+                                <tr><td>出资方式</td><td>货币</td></tr>
+                                <tr><td>股东总数量</td><td>1</td></tr>
+                                <tr><td>股东出资比例总和</td><td>100.00%</td></tr>
+                                <tr><td>国别</td><td>中国</td></tr>
+                                <tr><td>认缴出资币种</td><td>	人民币</td></tr>
+                                <tr><td>股东出资总和(万元)</td><td>100.00</td></tr>
+                                <tr><td>认缴出资额(万元)</td><td>100.00</td></tr>
+                                <tr><td>出资比例</td><td>100%</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业主要管理人员信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>人员姓名</td><td>卢XXX</td></tr>
+                                <tr><td>出生年份</td><td>2007-10-19</td></tr>
+                                <tr><td>职务</td><td>监事</td></tr>
+                                <tr><td>人员总数量</td><td>5</td></tr>
+                                <tr><td>性别</td><td>女</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业法定代表人对外投资信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业法定代表人其他公司任职信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>法定代表人姓名</td><td>卢XX</td></tr>
+                                <tr><td>是否法定代表人</td><td>是</td></tr>
+                                <tr><td>企业(机构)名称</td><td>北京XXXXX有限公司</td></tr>
+                                <tr><td>注册号</td><td>110112012550665</td></tr>
+                                <tr><td>职务</td><td>监事</td></tr>
+                                <tr><td>开业日期</td><td>2010-01-07</td></tr>
+                                <tr><td>企业总数量</td><td>1</td></tr>
+                                <tr><td>注销日期</td><td></td></tr>
+                                <tr><td>注册地址行政区编号</td><td>100211</td></tr>
+                                <tr><td>企业(机构)类型</td><td>有限责任公司(自然人独资)</td></tr>
+                                <tr><td>吊销日期</td><td></td></tr>
+                                <tr><td>注册资本(万元)</td><td>100.000000</td></tr>
+                                <tr><td>注册资本币种</td><td>人民币</td></tr>
+                                <tr><td>企业状态</td><td>在营（开业）</td></tr>
+                                <tr><td>登记机关</td><td>北京市XX区工商行政管理局</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业对外投资信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">最终控股股东信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>最终控股股东名称</td><td>卢XX</td></tr>
+                                <tr><td>认缴出资额(万元)</td><td>10,10</td></tr>
+                                <tr><td>出资比例</td><td>100%</td></tr>
+                                <tr><td>出资链</td><td>卢XX-＞100.0%北京XXX有限公司</td></tr>
+                                <tr><td>股东类型</td><td>自然人股东</td></tr>
+                                <tr><td>实缴出资额(万元)</td><td>10</td></tr>
+                                <tr><td>出资方式</td><td>货币</td></tr>
+                                <tr><td>出资额</td><td>12112</td></tr>
+                                <tr><td>出资日期</td><td>2007-10-19</td></tr>
+                                <tr><td>国别</td><td>中国</td></tr>
+                                <tr><td>认缴出资额币种</td><td>人民币</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业历史变更信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业分支机构信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">股权出质历史信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">动产抵押信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">动产抵押物信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">动产抵押物信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">失信被执行人信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>法定代表人/负责人姓名</td><td>卢XX</td></tr>
+                                <tr><td>执行法院</td><td>北京市XXXX人民法院</td></tr>
+                                <tr><td>省份</td><td>北京</td></tr>
+                                <tr><td>失信被执行人行为具体情形</td><td>其他有履行能力而拒不履行生效法律文书确定义务</td></tr>
+                                <tr><td>未履行(元)</td><td></td></tr>
+                                <tr><td>年龄</td><td></td></tr>
+                                <tr><td>被执行人姓名/名称</td><td>北京XXXXX有限公司</td></tr>
+                                <tr><td>已履行(元)</td><td></td></tr>
+                                <tr><td>立案时间</td><td>20150521</td></tr>
+                                <tr><td>发布时间</td><td>20150521</td></tr>
+                                <tr><td>被执行人的履行情况</td><td>失信记录已退出</td></tr>
+                                <tr><td>做出执行依据单位</td><td>北京市XXXX人民法院</td></tr>
+                                <tr><td>性别</td><td></td></tr>
+                                <tr><td>失信人类型</td><td>法人或其他组织</td></tr>
+                                <tr><td>执行依据文号</td><td></td></tr>
+                                <tr><td>关注次数</td><td></td></tr>
+                                <tr><td>案号</td><td>(2015)通执字第03346号</td></tr>
+                                <tr><td>身份证号码/工商注册号</td><td>668431484</td></tr>
+                                <tr><td>身份证原始发证地</td><td></td></tr>
+                                <tr><td>退出日期</td><td></td></tr>
+                                <tr><td>执行法院</td><td>2696CD78AF3F24A1E05302C711ACE469</td></tr>
+                                <tr><td>生效法律文书确定的义务</td><td>经本院主持调解，各方当事人自愿达成如下协议</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">被执行人信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>被执行人姓名/名称</td><td>卢XX</td></tr>
+                                <tr><td>性别</td><td>男</td></tr>
+                                <tr><td>年龄</td><td>30</td></tr>
+                                <tr><td>省份</td><td></td></tr>
+                                <tr><td>执行法院</td><td>北京市XXXX人民法院</td></tr>
+                                <tr><td>案号</td><td>(2015)通执字第06045号</td></tr>
+                                <tr><td>立案时间</td><td>2015-10-10</td></tr>
+                                <tr><td>案件状态</td><td>执行中</td></tr>
+                                <tr><td>关注次数</td><td>0</td></tr>
+                                <tr><td>身份证号码/企业注册号</td><td>110223196411088173</td></tr>
+                                <tr><td>执行标的（元）</td><td>1466857.5</td></tr>
+                                <tr><td>身份证原始发证地</td><td>北京市通县</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">股权冻结历史信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">清算信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">行政处罚历史信息</th></tr>
+                                <tr><td colspan="2">无</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业照面信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td  width="50%">法定代表人/负责人/执行事务合伙人</td><td width="50%">{{value.platformType}}</td></tr>
+                                <tr><td>国民经济行业代码</td><td>	{{value.registerTime}}</td></tr>
+                                <tr><td>所在省份</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>联系人电话</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>住所所在行政区划</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>注册号</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>注册资本币种</td><td>	人民币</td></tr>
+                                <tr><td>经营期限至</td><td>2027-10-18</td></tr>
+                                <tr><td>经营(业务)范围</td><td>哈哈哈</td></tr>
+                                </tbody>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业股东及出资信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.loanApplication">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>股东名称</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>出资日期</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>出资方式</td><td>{{value.registerMoney}}</td></tr>
+                                <tr><td>股东总数量</td><td>{{value.result}}</td></tr>
+                                <tr><td>股东出资比例总和</td><td>100.00%</td></tr>
+                                <tr><td>国别</td><td>中国</td></tr>
+                                <tr><td>认缴出资币种</td><td>	人民币</td></tr>
+                                <tr><td>股东出资总和(万元)</td><td>100.00</td></tr>
+                                </tbody>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">企业主要管理人员信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>人员姓名</td><td>卢XXX</td></tr>
+                                <tr><td>出生年份</td><td>2007-10-19</td></tr>
+                                <tr><td>职务</td><td>监事</td></tr>
+                                <tr><td>人员总数量</td><td>5</td></tr>
+                                <tr><td>性别</td><td>女</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

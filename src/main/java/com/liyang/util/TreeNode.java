@@ -1,0 +1,32 @@
+package com.liyang.util;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * @author Administrator
+ *
+ * @param <T>
+ */
+public interface TreeNode<T extends TreeNode> extends Serializable{
+	
+	Integer getId();
+	void setId(Integer id);
+	
+	String getLabel();
+	void setLabel(String str);
+	
+	Integer getSort();
+	void setSort(Integer sort);
+	
+	T getParent();
+	void setParent(T t);
+	
+	Integer getParentId();
+	void setParentId(Integer id);
+	
+	List<T> getChildren();
+	
+	void setChildren(List<T> children);
+
+}

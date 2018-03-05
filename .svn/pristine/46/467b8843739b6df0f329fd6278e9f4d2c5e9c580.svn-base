@@ -1,0 +1,34 @@
+<script>
+    app.controller("workflowEntityHomeController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state) {
+                $scope.id = $stateParams.id;
+                console.log("home");
+            }
+        ]
+    );
+</script>
+<div class="hbox hbox-auto-xs bg-light" ng-controller="workflowEntityHomeController">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix">
+                <!--<div class="pull-right">-->
+                <!--<ul class="nav nav-tabs" style="margin-bottom: -1px;">-->
+                <!--<li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.info({})">管理员</a></li>-->
+                <!--<li ui-sref-active="active"><a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'list'})">普通用户</a></li>-->
+                <!--<li ui-sref-active="active"><a ui-sref="workflowEntity.home.page({entity_key:'user',view_type:'info'})">所认领列表</a></li>-->
+                <!--</ul>-->
+                <!--</div>-->
+                <!--<h4 class="pull-left  m-t-none">{{module_entity_type}}</h4>-->
+            </div>
+            <div class="row-row bg-white" ui-view="">
+            </div>
+        </div>
+    </div>
+</div>

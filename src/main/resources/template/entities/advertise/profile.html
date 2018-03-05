@@ -1,0 +1,14 @@
+<div class="vbox bg-white" ng-controller="workflowEntityProfileController">
+    <div class="wrapper b-b b-light clearfix">
+        <button class="pull-left btn btn-sm btn-primary btn-addon m-r-sm"  ng-click="excute(act.actCode)" tooltip="{{act.help}}" tooltip-placement="bottom" ng-repeat="act in canActs">
+            <i class="fa fa-plus"></i> {{act.label}}
+        </button>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

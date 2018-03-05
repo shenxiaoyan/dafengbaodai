@@ -1,0 +1,239 @@
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script>
+
+    app.controller("roleInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "FileUploader",
+            function ($rootScope, $scope, $http, $stateParams, $state, FileUploader) {
+
+                $scope.companyInfo = {
+                };
+                $scope.id = $stateParams.id;
+
+//                if($scope.id){
+//                    $http.get("/rest/insureCompanies/" + $scope.id).success(function(resResult){
+//                        $scope.companyInfo = resResult;
+//                        console.log($scope.companyInfo)
+//                    })
+//                }
+
+                //进度条控制
+                $scope.successLength = 0;
+                $scope.progressCtrl = function (id) {
+                    var a= setInterval(
+                        function () {
+//                            console.log($scope.successLength);
+                            if ($scope.successLength < 100) {
+                                $("#"+id).css("display", "block");
+                                if($scope.successLength < 99)
+                                $scope.successLength += 1;
+                                $("div[role='progressbar']").css("width", $scope.successLength + "%");
+                            } else {
+                                clearInterval(a);
+                                $("div[role='progressbar']").css("width", "100%");
+                                $("#"+id).css("display", "none");
+                            }
+                        }, 50
+                    )
+                };
+
+
+                $scope.listTip = "选择文件后请先点击上传";
+                $scope.saveListIcon = function() {
+                    $scope.listTip = "正在上传，请勿反复提交";
+                    var fd = new FormData();
+                    $scope.successLength = 0;
+                    $scope.progressCtrl("listProgress");
+                    //图片上传
+                    var listIcon = $('#list_icon')[0].files[0];
+
+                    if (listIcon) {
+                        fd.append("file", listIcon);
+
+                        $http({
+                            method: "POST",
+                            url: "dafeng/fileUpload",
+                            headers: {
+                                "Content-Type": undefined
+//                            "connection":open
+                            },
+                            timeout: 0,
+                            transformRequest: angular.identity,
+                            data: fd
+                        }).success(function (resResult) {
+                            $scope.successLength = 100;
+
+                            $rootScope.toasterSuccess("成功！", "上传图片成功！");
+                            $scope.companyInfo.listIcon = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+                            $scope.listTip = "文件已上传，请勿反复提交";
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "上传图片失败！");
+                        });
+                    } else {
+                        $rootScope.toasterError("失败！", "请先上传图片");
+                    }
+                };
+
+                $scope.detailTip = "选择文件后请先点击上传";
+                $scope.saveDetailIcon = function(){
+
+                    var fd = new FormData();
+                    $scope.detailTip = "正在上传，请勿反复提交";
+                    $scope.successLength = 0;
+                    $scope.progressCtrl("detailProgress");
+                    //图片上传
+                    var detailIcon = $('#detail_icon')[0].files[0];
+
+
+                    if (detailIcon) {
+                        fd.append("file", detailIcon);
+
+                    $http({
+                        method:"POST",
+                        url:"dafeng/fileUpload",
+                        headers:{
+                            "Content-Type": undefined
+//                            "connection":open
+                        },
+                        timeout:0,
+                        transformRequest:angular.identity,
+                        data:fd
+                    }).success(function(resResult){
+                        $scope.successLength = 100;
+                        $rootScope.toasterSuccess("成功！","上传图片成功！");
+                        $scope.companyInfo.detailIcon = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+                        $scope.detailTip = "文件已上传，请勿反复提交";
+                    }).error(function(){
+                        $rootScope.toasterError("失败！","上传图片失败！");
+                    });
+                    }else{
+                        $rootScope.toasterError("失败！","请先上传图片");
+                    }
+                };
+
+                /*
+               * 保险公司基本信息保存
+               * */
+                $scope.saveBaseInfo = function(){
+
+                    if(!($scope.companyInfo.listIcon && $scope.companyInfo.detailIcon)) {
+                        $rootScope.toasterWarning("失败！","请先保存图片！");
+                        return;
+                    } else if($scope.companyInfo.name && $scope.companyInfo.insurerCompanyId){
+                        if($scope.companyInfo.insurerCompanyId && !(/^[0-9]*$/.test($scope.companyInfo.insurerCompanyId))){
+                            $rootScope.toasterWarning("失败！","请填写纯数字的保险公司ID");
+                        }else{
+                            $http({
+                                "method":"POST",
+                                url: "/dafeng/insurerCompany/save",
+                                data: $scope.companyInfo
+                            }).success(function(resResult){
+
+                                if(resResult.ErrorCode){
+                                    $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                                }else{
+                                    $rootScope.toasterSuccess("成功！", "新增成功！");
+                                    $state.go("workflowEntity.list",{entity_key:"insureCompany"},{reload:true});
+                                }
+
+                            }).error(function(resResult){
+                                $rootScope.toasterError("失败！",resResult.data.ErrorInfo);
+                            })
+                        }
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写完整信息！");
+                    }
+
+                };
+
+                /*
+                * 取消按钮
+                * */
+                $scope.clear = function(){
+                    $scope.companyInfo = {};
+                    $state.go("workflowEntity.list",{entity_key:"insureCompany"},{reload:true});
+                }
+
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="wrapper-md" ng-controller="roleInfoCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading font-bold">保险公司详情</div>
+        <div class="panel-body">
+            <form role="form" class="ng-pristine ng-valid">
+                <div class="form-group">
+                    <label>保险公司ID</label>
+                    <input type="text" class="form-control"
+                        ng-model="companyInfo.insurerCompanyId"
+                        id="insure_company_ID"
+                        placeholder="请填写纯数字ID"
+                        autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>保险公司名称</label>
+                    <input type="text" class="form-control"
+                        ng-model="companyInfo.name"
+                        id="insure_company_name"
+                        placeholder="保险公司名称"
+                        autocomplete="off">
+                </div>
+         <form class="form-horizontal">
+             <div class="form-group" style="height: 40px;">
+                 <label for="list_icon" class="col-sm-2 control-label">列表icon</label>
+                 <div class="col-sm-10">
+                     <input type="file" id="list_icon" class="inline">
+                      <div class="m-l inline">
+                          <button type="button" class="btn btn-default btn-rounded"
+                             ng-click="saveListIcon()">
+                              <i class="fa fa-arrow-circle-o-up"></i> 上传列表图片
+                          </button>
+                          <span class="text-danger text-xs" ng-model="listTip">
+                              {{listTip}}
+                          </span>
+                      </div>
+                     <div id="listProgress" class="progress progress-striped active" style="width: 30%;margin: 10px 300px;display: none">
+                         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
+                              aria-valuemin="0" aria-valuemax="100" style="width: 0;">
+                             <span class="sr-only" ng-model="successLength">{{successLength}}%</span>
+                         </div>
+                     </div>
+                </div>
+             </div>
+             <div class="form-group" style="height: 40px;">
+                 <label for="detail_icon" class="col-sm-2 control-label">详情icon</label>
+                 <div class="col-sm-10">
+                     <input type="file" id="detail_icon" class="inline">
+                     <div class="m-l inline">
+                         <button type="button" class="btn btn-default btn-rounded" ng-click="saveDetailIcon()">
+                             <i class="fa fa-arrow-circle-o-up"></i> 上传详情图片
+                         </button>
+                         <span class="text-danger text-xs" ng-model="detailTip">
+                              {{detailTip}}
+                          </span>
+                     </div>
+                     <div id="detailProgress" class="progress progress-striped active" style="width: 30%;margin: 10px 300px;display: none">
+                         <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0"
+                              aria-valuemin="0" aria-valuemax="100" style="width: 0;">
+                             <span class="sr-only" ng-model="successLength">{{successLength}}%</span>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </form>
+     <button  class="btn btn-sm btn-default" ng-click="clear()">取消</button>
+     <button type="submit" class="btn btn-sm btn-primary" ng-click="saveBaseInfo()">确认提交</button>
+ </form>
+</div>
+</div>
+</div>

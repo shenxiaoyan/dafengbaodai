@@ -1,0 +1,311 @@
+<script>
+
+    app.controller("achieveInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams, $state, $filter) {
+
+                $scope.teamId = $stateParams.id;
+
+                $scope.team = {};
+                $scope.list = {};
+                $scope.teamMemberModal = {};
+                $scope.searchInfo = {
+                    teamId : $scope.teamId
+                };
+                $scope.dt  = "";
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                var date=new Date;
+                var year=date.getFullYear();
+                var month=date.getMonth()+1;
+                var mon=date.getMonth()+2;
+                month =(month<10 ? "0"+month:month);
+                mon =(mon<10 ? "0"+mon:mon);
+                $scope.thisMonth = (year.toString()+month.toString());
+                $scope.nextMonth = (year.toString()+mon.toString());
+
+                //当前列表
+                $scope.getList = function (page) {
+
+                    $scope.dateS = $scope.searchInfo.dateStart;
+
+
+                    if($scope.searchInfo.dateStart){
+
+                        $scope.dt = $filter("date")($scope.dateS, "yyyy-MM-dd");
+
+                        $scope.searchInfo = {
+                            teamId : $scope.teamId,
+                            periodTime : $scope.dt
+                        };
+                    }
+
+
+                    $http.get("/dafeng/team/info?teamId=" + $scope.teamId).then(function(resResult){
+                        $scope.team = resResult.data.data.team;
+                    });
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method : "POST",
+                        url : "/dafeng/team/objective/query?size=15&page=" + page,
+                        data : $scope.searchInfo
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.teamObjectives;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                /*编辑本月和上月的业绩目标*/
+                $scope.eduitTax = function(id,date){
+
+                    $scope.teamMemberModal.id = id;
+                    $scope.eduitDate = date;
+
+                    $http.post("/dafeng/team/objective/query",{id : id}).then(function(resResult){
+                        $scope.teamMemberModal = resResult.data.data.teamObjectives[0];
+                    });
+
+                    $scope.confirmEduit = function(){
+
+                        if($scope.teamMemberModal.autoObjective < 0){
+                            $rootScope.toasterWarning("失败！", "请设置大于等于0的车险目标业绩！");
+                        }else if($scope.teamMemberModal.lifeObjective < 0){
+                            $rootScope.toasterWarning("失败！", "请设置大于等于0的非车险目标业绩！");
+                        }else{
+                            $http({
+                                method : "POST",
+                                url : "/dafeng/team/objective/update",
+                                data : {
+                                    id : $scope.teamMemberModal.id,
+                                    autoObjective : $scope.teamMemberModal.autoObjective,
+                                    lifeObjective : $scope.teamMemberModal.lifeObjective
+                                }
+                            }).then(function(resResult){
+                                if(resResult.ErrorCode){
+                                    $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                                }else{
+                                    $rootScope.toasterSuccess("成功！", "编辑成功！");
+                                    $("#add_achieve_modal").modal("hide");
+                                    $scope.getList(0);
+                                    $scope.teamMemberModal = {};
+
+                                }
+                            })
+                        }
+
+                    }
+                };
+
+
+
+                /*
+                * 清除填写的信息
+                * */
+                $scope.clearSearch = function(){
+                    $scope.teamMemberModal = {};
+                    $scope.searchInfo = {
+                        teamId : $scope.teamId
+                    };
+                    $scope.getList(0);
+                };
+
+            }
+        ]
+    );
+</script>
+
+
+<div ng-controller="achieveInfoCtrl">
+    <div style="background:url(img/c1.jpg) center center; background-size:cover">
+        <div class="wrapper-lg bg-white-opacity">
+            <div class="row m-t">
+                <div class="col-sm-7">
+                    <div class="clear m-b">
+                        <div class="m-b m-t-sm">
+                            <span class="h3 text-black">{{team.label}}</span>
+                            <div class="text-black" style="margin: 10px 0 0 20px;">
+                                <small class="m-l">队长名称：{{team.contactName}}</small>
+                                <small class="m-l">队长联系方式：{{team.contactPhone}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper b-b clearfix b-light">
+        <div class="pull-left">
+            <div class="w inline_tab input-group">
+
+
+                <input type="text"
+                       datepickerMode="month"
+                        disabled
+                        style="float:none"
+                        datepicker-popup="yyyy-MM"
+                        placeholder="绩效月份"
+                        is-open="opened"
+                        ng-model="searchInfo.dateStart"
+                        datepicker-options="dateOptions"
+                        close-text="关闭"
+                        clear-text="清空"
+                        current-text="本月"
+                        class="form-control"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-default"
+                            type="button"
+                            ng-click="open($event)">
+                        <i class="fa fa-calendar"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="inline">
+                <button type="button" class="btn btn-primary m-r" ng-click="getList(0)">
+                    <span>查询</span>
+                </button>
+                <button type="button" class="btn btn-default m-r" ng-click="clearSearch()">
+                    <span>清除</span>
+                </button>
+            </div>
+            <!--<div class="inline pull-right">-->
+                <!--<button type="button" class="btn btn-danger m-r" ng-click="getList(0)">-->
+                    <!--<span>新建下月目标业绩</span>-->
+                <!--</button>-->
+            <!--</div>-->
+        </div>
+    </div>
+    <div class="wrapper-md"  style="padding-bottom: 0">
+        <table class="table" style="margin-bottom: 0">
+            <caption style="font-weight:900;font-size:20px;">本团队的所有业绩</caption>
+            <thead>
+            <tr>
+                <th>日期</th>
+                <th>车险业绩（万元）</th>
+                <th>车险目标业绩（万元）</th>
+                <th>车险业绩完成率(%)</th>
+                <th>非车险业绩（万元）</th>
+                <th>非车险目标业绩（万元）</th>
+                <th>非车险业绩完成率(%)</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in list">
+                <td class="v-middle">{{item.period ? item.period : "暂无"}}</td>
+                <td class="v-middle">{{item.autoCompletion ? ((item.autoCompletion/10000) | number : 2) : "0" }}</td>
+                <td class="v-middle">{{item.autoObjective ? item.autoObjective : "0" }}</td>
+                <td class="v-middle">{{ item.autoCompletion ? (item.autoObjective ? (((item.autoCompletion/100) / item.autoObjective) | number : 2): "0") : "0"}}</td>
+                <td class="v-middle">{{item.lifeCompletion ? ((item.lifeCompletion/10000) | number : 2) : "0" }}</td>
+                <td class="v-middle">{{item.lifeObjective ? item.lifeObjective : "0" }}</td>
+                <td class="v-middle">{{ item.lifeCompletion ? (item.lifeObjective ? (((item.lifeCompletion/100) / item.lifeObjective) | number : 2): "0") : "0"}}</td>
+                <td class="v-middle">
+                    <button class="btn btn-xs btn-success"
+                            id="eduitBtn"
+                            ng-if="item.period === thisMonth || item.period === nextMonth"
+                            data-toggle="modal"
+                            data-target="#add_achieve_modal"
+                            ng-click="eduitTax(item.id,item.period)">
+                        编辑
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="b-t b-light clearfix">
+        <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+    </div>
+
+    <div class="modal fade" id="add_achieve_modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"  data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">业绩设置</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="get">
+                        <div class="form-group">
+                            <label for="tax_date">时间</label>
+                            <input type="text"
+                                   id="tax_date"
+                                   disabled
+                                   class="form-control"
+                                   ng-model="eduitDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="autoObjective">车险目标业绩（万元）</label>
+                            <input type="number"
+                                   id="autoObjective"
+                                   required="required"
+                                   class="form-control"
+                                   ng-model="teamMemberModal.autoObjective"
+                                   placeholder="请输入车险目标业绩">
+                        </div>
+                        <div class="form-group">
+                            <label for="lifeObjective">非车险目标业绩（万元）</label>
+                            <input type="number"
+                                   id="lifeObjective"
+                                   required="required"
+                                   class="form-control"
+                                   ng-model="teamMemberModal.lifeObjective"
+                                   placeholder="请输入非车险目标业绩">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                    <button class="btn btn-primary" type="button" id="addMember" ng-click="confirmEduit()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

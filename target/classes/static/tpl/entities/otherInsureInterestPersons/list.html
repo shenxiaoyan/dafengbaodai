@@ -1,0 +1,106 @@
+<script>
+
+    "use strict";
+    app.controller("unInsuranceCusCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+                //获取当前接口
+                $scope.id = $stateParams.id;
+                console.log($scope.id)
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+                $scope.getList = function () {
+
+                    //传递参数
+                    $http({
+                        method: "GET",
+                        url : "/rest/otherInsureInterestPersons/" + $scope.id + "/customer"
+                    }).success(function(resResult){
+
+                        $scope.list = resResult;
+                        console.log($scope.list);
+
+//                        $scope.pageList = {
+//                            size: resResult.page.size,
+//                            total_elements: resResult.page.totalElements,
+//                            current_page: resResult.page.number === 0 ? 0 : resResult.page.number,
+//                            num_page: resResult.page.totalPages,
+//                            total_page: resResult.page.totalPages
+//                        };
+//
+//                        if ($scope.list.length > 0) {
+//                            $rootScope.setPaginator("#otherInsureInterestPersons_list_paginator", $scope.pageList, $scope.getList);
+//                        }
+                    })
+                };
+                $scope.getList();
+
+
+            }
+        ]
+    )
+</script>
+
+<div class="vbox" ng-controller="unInsuranceCusCtrl">
+    <div class="wrapper-md b-b clearfix" style="padding: 14.5px 20px;">
+        <div class="font-thin h4 pull-left">非车险客户</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div ng-if="list.length < 1">
+                        暂无数据！
+                    </div>
+                    <div class="panel panel-default">
+                        <table class="table table-striped m-b-none">
+                            <thead>
+                            <tr>
+                                <th>用户ID</th>
+                                <th>昵称</th>
+                                <th>手机号</th>
+                                <th>关注时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in list">
+                                <td class="v-middle">
+                                    {{ item.id }}
+                                </td>
+                                <td class="v-middle">
+                                    {{ item.nickname }}
+                                </td>
+                                <td class="v-middle">
+                                    {{ item.phone }}
+                                </td>
+                                <td class="v-middle">
+                                    {{ item.clickTime|datetime }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

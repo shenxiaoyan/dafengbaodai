@@ -1,0 +1,263 @@
+package com.liyang.service;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.hibernate.collection.internal.PersistentSet;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.liyang.domain.base.AbstractAuditorAct;
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.base.AbstractAuditorEntity;
+import com.liyang.domain.base.AbstractAuditorLog;
+import com.liyang.domain.base.AbstractAuditorState;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.base.StateRepository;
+import com.liyang.domain.role.Role;
+import com.liyang.domain.user.User;
+import com.liyang.domain.user.UserRepository;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.util.CommonUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.ReturnObject;
+
+/**
+ * @author Administrator
+ *
+ * @param <T>
+ * @param <S>
+ * @param <A>
+ * @param <L>
+ */
+public abstract class AbstractAuditorService<T extends AbstractAuditorEntity, S extends AbstractAuditorState, A extends AbstractAuditorAct, L extends AbstractAuditorLog>
+		implements ServiceImpl<T, S, A, L> {
+
+	@Autowired
+	private HttpServletRequest request;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private TIMService timService;
+
+	@Autowired
+	private StateRepository<S> stateRepository;
+
+	@Autowired
+	private ActRepository<A> actRepository;
+
+	@Autowired
+	private LogRepository<L> logRepository;
+
+	protected A getActByRole(Set<A> acts, String code, Role role) {
+		for (A abstractAuditorAct : acts) {
+			if (abstractAuditorAct.getActCode().equals(code)) {
+				Set roles = abstractAuditorAct.getRoles();
+				if (roles == null) {
+					throw new FailReturnObject(ExceptionResultEnum.ABSTRACT_AUDITOR_NOACT_ERROR);
+				}
+				for (Object object : roles) {
+					if (((Role) object).getRoleCode().equals(role.getRoleCode())) {
+						return abstractAuditorAct;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<A> findByIdInAndRolesRoleCode(List<Integer> ids, String roleCode) {
+		// TODO Auto-generated method stub
+		return getActRepository().findByIdInAndRolesRoleCode(ids, roleCode);
+	}
+
+	@Override
+	public A getAct(T entity, String code, Role role) {
+
+		if (role == null) {
+			if (CommonUtil.getPrincipal() != null) {
+				role = CommonUtil.getPrincipal().getRole();
+			} else {
+				role = new Role();
+				// role.setRoleCode(Role.RoleCode.valueOf("USER"));
+				// role.setRoleCode("USER");
+				role.setRoleCode("ANONYMOUS");
+				// role.setAct("read");
+			}
+		}
+		Set<A> acts = new HashSet<A>();
+		if (entity.getBeforeState() != null) {
+			acts = entity.getBeforeState().getActs();
+		} else {
+			acts = entity.getState().getActs();
+		}
+
+		if (acts.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			throw new FailReturnObject(1170, sb.append("角色").append(role.getRoleCode().toString()).append("，状态")
+					.append(entity.getBeforeState().getStateCode()).append("不允许").append(code).append("操作").toString());
+		}
+
+		A act = getActByRole(acts, code, role);
+		if (act == null) {
+			StringBuilder sb2 = new StringBuilder();
+			throw new FailReturnObject(660, sb2.append("状态:").append(entity.getBeforeState().getStateCode().toString())
+					.append(",没有为角色").append(role.getRoleCode().toString()).append("设置动作:").append(code));
+		}
+		return act;
+	}
+
+	@Override
+	public final Boolean canAct(T entity, String code) {
+		getAct(entity, code, null);
+		return true;
+	}
+
+	@Override
+	public final void canUpdateByOthers(T entity, A act) {
+		Role role = new Role();
+		role.setRoleCode("ANONYMOUS");
+		if (CommonUtil.getPrincipal() != null) {
+			role = CommonUtil.getPrincipal().getRole();
+		}
+
+		if (CommonUtil.getPrincipal() != null) {
+			if (!CommonUtil.getCurrentUserRoleCode().equals("ADMINISTRATOR")) {
+				if (entity.getCreatedBy() != null
+						&& !CommonUtil.getPrincipal().getId().equals(entity.getCreatedBy().getId())) {
+					Set<A> acts = new HashSet<A>();
+					if (entity.getBeforeState() != null) {
+						acts = entity.getBeforeState().getActs();
+					} else {
+						acts = entity.getState().getActs();
+					}
+					A actByRole = getActByRole(acts, "updateOthers", role);
+					if (actByRole == null) {
+						throw new FailReturnObject(679, "不允许角色" + role.getRoleCode().toString() + "修改其他人资料",
+								ReturnObject.Level.DISPLAY);
+					}
+				}
+			}
+		} else {
+			throw new FailReturnObject(ExceptionResultEnum.ABSTRACT_AUDITOR_NEEDLOGIN_ERROR,
+					ReturnObject.Level.DISPLAY);
+			// throw new FailReturnObject(3123, "需要登录",
+			// ReturnObject.Level.DISPLAY);
+		}
+
+	}
+
+	protected L buildLogByEntity(T entity, Object linked) {
+		L log = getLogInstance();
+		log.setAct(entity.getLastAct());
+		if (entity.getLastAct() != null) {
+			log.setActGroup(entity.getLastAct().getActGroup());
+		}
+		log.setEntity(entity);
+		System.out.println(entity.getLastAct());
+		log.setLabel(entity.getLastAct().getLabel());
+		log.setBeforeState(entity.getBeforeState());
+		log.setAfterState(entity.getState());
+		Map entityToDiffMap = CommonUtil.entityToDiffMap(entity, linked);
+		log.setDifference(CommonUtil.prettyPrint(entityToDiffMap));
+
+		log.setAppCode(request.getHeader("app_code"));
+		log.setClient(request.getHeader("client"));
+		log.setImei(request.getHeader("imei"));
+		log.setIp(request.getRemoteHost());
+
+		return log;
+	}
+
+	public void prepareForBuildLog(T entity, String lastActCode) {
+		if (!"create".equals(lastActCode)) {
+			entity.setupMap();
+		}
+		entity.setBeforeState(entity.getState());
+		A lastAct = actRepository.findByActCode(lastActCode);
+		entity.setLastAct(lastAct);
+	}
+
+	// 不使用save，避免logAspect的切面
+	public void createLog(T entity) {
+		L log = buildLogByEntity(entity, null);
+		logRepository.save(log);
+	}
+
+	@Override
+	public void doActLog(T entity, Object linked) {
+
+		L log = buildLogByEntity(entity, linked);
+
+		getLogRepository().save(log);
+
+	}
+
+	@Override
+	public T doBeforeAct(T entity, A act, Object linked, User fromUser) {
+		entity.setLastAct(act);
+		if (entity.getCreatedByDepartment() == null && act.getActGroup().equals(ActGroup.OPERATE)) {
+			User createdBy = CommonUtil.getPrincipal();
+			if (createdBy != null && createdBy instanceof User) {
+				entity.setCreatedByDepartment(createdBy.getDepartment());
+			}
+		}
+
+		if (linked != null && entity.getLinkedKey() == null) {
+			PersistentSet linkedset = (PersistentSet) linked;
+			String role = linkedset.getRole();
+			entity.setLinkedKey(role.substring(role.lastIndexOf(".") + 1));
+		}
+		StringBuilder sb3 = new StringBuilder();
+		String doActStr = sb3.append("do").append(CommonUtil.toUpperCaseFirstOne(act.getActCode().trim().toLowerCase()))
+				.toString();
+
+		try {
+
+			Method m2 = getClass().getDeclaredMethod(doActStr, entity.getClass());
+			System.out.println(m2.toString());
+			try {
+				m2.invoke(this, entity);
+				// } catch (IllegalAccessException | IllegalArgumentException |
+				// InvocationTargetException e) {
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+
+				e.printStackTrace();
+			}
+		} catch (NoSuchMethodException e) {
+			System.out.println(entity.getClass() + ":" + act.getClass() + doActStr);
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			throw new FailReturnObject(ExceptionResultEnum.ABSTRACT_AUDITOR_METHOD_ERROR);
+			// throw new FailReturnObject(2332, "方法不可访问");
+		}
+		return entity;
+	}
+
+	@Override
+	public T doAfterAct(T entity, Object linked, User fromUser) {
+
+		if (fromUser == null && request.getParameter("fromUser") != null) {
+			fromUser = userRepository.findByUnionid(request.getParameter("fromUser"));
+		}
+
+		if (entity.getLastAct().getActCode().equals("delete")) {
+			entity.setState(stateRepository.findByStateCode("DELETED"));
+		}
+
+		doActLog(entity, linked);
+		timService.doNotice(fromUser, entity, entity.getLastAct());
+
+		return entity;
+	}
+
+}

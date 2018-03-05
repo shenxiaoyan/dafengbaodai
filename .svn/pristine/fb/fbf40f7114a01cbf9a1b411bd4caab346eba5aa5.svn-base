@@ -1,0 +1,263 @@
+<script>
+
+    "use strict";
+    app.controller("applyListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                //状态栏
+                $scope.states    = [];
+                $scope.link = "";
+                $scope.list = [];
+                $scope.applyModal = {};
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getStates = function () {
+                    $http.get("/rest/roleStates")
+                        .success(function (resResult) {
+
+                            $scope.states = resResult._embedded.roleStates;
+
+                        });
+                };
+
+                $scope.getStates();
+
+                //当前列表
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/team/query?size=15&page=" + page,
+                        data: {
+                            stateCode : "APPLIED"
+                        }
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.teams;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+
+                /*
+                * 通过申请
+                * */
+                $scope.passApply = function(id){
+                    var pass = function(){
+
+                        $http({
+                            method : "POST",
+                            url : "/dafeng/team/verify",
+                            data : {
+                                id : id,
+                                stateCode : "ENABLED"
+                            }
+                        }).then(function(resResult){
+
+                            if(resResult.ErrorCode){
+                                $rootScope.toasterError("失败！",resResult.ErrorInfo);
+                            }else{
+                                $rootScope.toasterSuccess("成功！","审核通过！");
+                                $scope.getList(0);
+                            }
+                        })
+                    };
+                    $rootScope.sweetConfirm("确定通过此团队的申请吗？" , pass)
+                };
+
+                $scope.eduitUser = function(id){
+                    $scope.nopassId = id;
+                };
+
+                /*
+            * 不通过申请
+            * */
+                $scope.noPassApply = function(){
+
+                  $http({
+                      method : "POST",
+                      url : "/dafeng/team/verify",
+                      data : {
+                          id : $scope.nopassId,
+                          stateCode : "REJECTED",
+                          rejectReason : $scope.applyModal.reason
+                      }
+                  }).then(function(resResult){
+
+                      if(resResult.ErrorCode){
+                          $rootScope.toasterError("失败！",resResult.ErrorInfo);
+                      }else{
+                          $rootScope.toasterSuccess("成功！","审核不通过提交成功！");
+                          $("#apply_modal").modal("hide");
+                          $scope.getList(0);
+                      }
+                  })
+                };
+
+            }
+        ]
+    );
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="applyListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="pull-left h4">
+                    <span>
+                        团队详情
+                    </span>
+                </div>
+                <!--<div class="inline pull-left">-->
+                    <!--&lt;!&ndash;<span translate="createEnquiries.self.label"></span>&ndash;&gt;-->
+                    <!--状态：-->
+                <!--</div>-->
+                <!--<div class="inline pull-left m-r">-->
+                    <!--<label class="i-checks pull-left m-n" ng-click="getAll()">-->
+                        <!--<input type="radio" name="state" checked="checked"/><i></i>全部-->
+                    <!--</label>-->
+                <!--</div>-->
+                <!--<div class="inline pull-left m-r" ng-repeat="state in states">-->
+                    <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">-->
+                        <!--<input type="radio" name="state" value="{{state.stateCode}}" ng-model="state_code"><i></i> {{ state.label }}-->
+                    <!--</label>-->
+                <!--</div>-->
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>团队名称</th>
+                                            <th>团队队长</th>
+                                            <th>团队负责人联系电话</th>
+                                            <th>当月已完成业绩</th>
+                                            <th>队长所有业绩</th>
+                                            <th>申请时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.label ? item.label : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.contactName ? item.contactName : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.contactPhone ? item.contactPhone : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.labe ? item.labe : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.labe ? item.labe : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt ? (item.createdAt | dateSecondTime) : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                <button class="btn btn-xs btn-info"
+                                                        id="nopassBtn"
+                                                        ng-click="eduitUser(item.id)"
+                                                        data-target="#apply_modal"
+                                                        data-toggle="modal">
+                                                    不通过
+                                                </button>
+                                                <button class="btn btn-xs btn-success"
+                                                        id="passBtn"
+                                                        ng-click="passApply(item.id)">
+                                                    通过
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="apply_modal" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"  data-dismiss="modal" ng-click="clearRoleInfo()">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="createRole">审核不通过理由</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div class="form-group">
+                                    <label>不通过理由（可不填写直接确认）</label>
+                                    <textarea  class="form-control"
+                                               id="apply_reason"
+                                               autocomplete="off"
+                                               ng-model="applyModal.reason"
+                                               placeholder="请填写审核不通过的理由">
+                                    </textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearRoleInfo()">取消</button>
+                            <button type="button" class="btn btn-primary" ng-click="noPassApply()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+
+<!-- /hbox layout -->

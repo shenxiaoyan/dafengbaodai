@@ -1,0 +1,12 @@
+/*
+alter table user_state_acts add constraint FKjaqpt4drfeqotgjbqpc4k907o foreign key (state_id) references user_state (id)
+*/
+select  * from user_state_acts where state_id not in (select id from user_state);
+
+/*
+INSERT INTO `dafeng_new`.`user_state` (`id`, `created_at`, `label`, `last_modified_at`, `sort`, `state_code`, `state_group`, `created_by`, `created_by_department`, `last_modified_by`) VALUES ('7', '2017-09-18 17:32:11', '其他', '2017-09-18 17:32:23', '600', 'DELETED', NULL, NULL, NULL, NULL);
+INSERT INTO `dafeng_new`.`user_state` (`id`, `created_at`, `label`, `last_modified_at`, `sort`, `state_code`, `state_group`, `created_by`, `created_by_department`, `last_modified_by`) VALUES ('8', '2017-09-18 17:32:11', '其他', '2017-09-18 17:32:23', '600', 'DELETED', NULL, NULL, NULL, NULL);
+*/
+
+select * from user_act where id in (2,3);
+select  * from user_state_acts where state_id=8;

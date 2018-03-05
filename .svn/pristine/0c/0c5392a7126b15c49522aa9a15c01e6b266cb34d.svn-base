@@ -1,0 +1,273 @@
+package com.liyang.controller;
+
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.liyang.client.IMessage;
+import com.liyang.client.IResult;
+import com.liyang.client.tianan.MessageInsureConfirmation;
+import com.liyang.client.tianan.TypeDate;
+import com.liyang.client.tianan.dto.ApplyInfoDto;
+import com.liyang.client.tianan.dto.CarOwerDto;
+import com.liyang.client.tianan.dto.DeliveryDto;
+import com.liyang.client.tianan.dto.InsureInfoDto;
+import com.liyang.client.tianan.exception.ExceptionTiananInitFailed;
+import com.liyang.client.tianan.exception.ExceptionTiananParamInvliad;
+import com.liyang.client.tianan.thread.InsureConfirmationThread;
+import com.liyang.domain.advertise.AdvertiseRepository;
+import com.liyang.domain.api.tianan.IApiParams;
+import com.liyang.domain.api.tianan.InsureConfirmationParams;
+import com.liyang.domain.createenquiry.CreateEnquiry;
+import com.liyang.domain.createenquiry.CreateEnquiryRepository;
+import com.liyang.domain.createenquiry.CreateEnquiryState;
+import com.liyang.domain.createenquiry.CreateEnquiryStateRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.customer.CustomerRepository;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.offerresult.OfferResultRepository;
+import com.liyang.domain.platform.Platform;
+import com.liyang.domain.platform.PlatformRepository;
+import com.liyang.domain.submitproposal.SubProParamsContactAddress;
+import com.liyang.domain.submitproposal.SubProParamsInvoiceInfo;
+import com.liyang.domain.submitproposal.SubmitProposal;
+import com.liyang.domain.submitproposal.SubmitProposalActRepository;
+import com.liyang.domain.submitproposal.SubmitProposalParams;
+import com.liyang.domain.submitproposal.SubmitProposalRepository;
+import com.liyang.domain.submitproposal.SubmitProposalStateRepository;
+import com.liyang.domain.underwritingresult.UnderwritingResultRepository;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.helper.IDCardFormatException;
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.XinGeService;
+import com.liyang.util.CityCodeUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.IDCardUtil;
+import com.liyang.util.RequestUtill;
+
+/**
+ * 天安提交核保单接口
+ * 
+ * @author huanghengkun
+ * @create 2017年12月17日
+ */
+@RestController
+public class InsureConfirmationController implements IApiController {
+
+	@Value("${tianan.base.url}")
+	private String tiananBaseUrl;
+
+	@Autowired
+	private PlatformRepository platformRepository;
+	@Autowired
+	private OfferResultRepository offerResultRepository;
+	@Autowired
+	private CustomerRepository customerRepository;
+	@Autowired
+	private CreateEnquiryStateRepository createEnquiryStateRepository;
+	@Autowired
+	private CreateEnquiryRepository createEnquiryRepository;
+	@Autowired
+	private SubmitProposalStateRepository submitProposalStateRepository;
+	@Autowired
+	private SubmitProposalActRepository submitProposalActRepository;
+	@Autowired
+	private SubmitProposalRepository submitProposalRepository;
+	@Autowired
+	private XinGeService xinGeService;
+	@Autowired
+	private UnderwritingResultRepository underwritingResultRepository;
+	@Autowired
+	private AdvertiseRepository advertiseRepository;
+	
+	private final static Logger logger = LoggerFactory.getLogger(InsureConfirmationController.class);
+
+	public ResponseBody mobileInsureConfirmation(InsureConfirmationParams params, HttpServletRequest request) {
+		logger.info("天安核保开始---------------");
+		MessageInsureConfirmation message = null;
+		try {
+			message = (MessageInsureConfirmation) buildMessage(params, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (e instanceof ExceptionTiananInitFailed) {
+				throw new FailReturnObject(ExceptionResultEnum.API_TIANAN_INITFAILED, ":" + e.getMessage());
+			} else if (e instanceof ExceptionTiananParamInvliad) {
+				throw new FailReturnObject(ExceptionResultEnum.API_TIANAN_PARAMINVLIAD, ":" + e.getMessage());
+			} else if (e instanceof IDCardFormatException) {
+				throw new FailReturnObject(ExceptionResultEnum.API_TIANAN_PARAMINVLIAD, ":身份证格式错误");
+			} else {
+				throw new FailReturnObject(ExceptionResultEnum.API_TIANAN_ERROR, ":" + e.getMessage());
+			}
+		}
+		SubmitProposal submitProposal = convert(message);
+		submitProposal.getParams().setOwnerName(params.getOwnerName());
+		submitProposal.getParams().setOwnerMobilePhone(params.getOwnerMobilePhone());
+		submitProposal.getParams().setOwnerAddress(params.getOwnerAddress());
+		
+		// 关联订单
+		// orderId=tradeNo
+		List<OfferResult> offerResultList = offerResultRepository.findByDataResultOfferId(params.getTradeNo());
+		if (null == offerResultList || offerResultList.isEmpty()) {
+			throw new FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_OFFERRES_DATA_MIS_ERROR);
+		}
+		submitProposal.setOfferResult(offerResultList.get(0));
+		// 关联平台
+		Platform platform = RequestUtill.getMobileAppPlatform(request, platformRepository);
+		submitProposal.setPlatform(platform);
+		// 关联用户
+		String token = request.getHeader("token");
+		Customer customer = customerRepository.findByToken(token);
+		submitProposal.setCustomer(customer);
+		// 设置订单创建时间
+		submitProposal.setCreateTime(new Date());
+		// 修改询价信息的状态
+		CreateEnquiryState state = createEnquiryStateRepository.findByStateCode("SUBMIT_ALREADY");
+		CreateEnquiry createEnquiry = offerResultList.get(0).getCreateEnquiry();
+		createEnquiry.setState(state);
+		createEnquiryRepository.save(createEnquiry);
+		// 设置工作流的初始状态：核保中
+		submitProposal.setState(submitProposalStateRepository.findByStateCode("HENBAOING"));
+		// 设置工作流：出单管理流程
+		submitProposal.setWorkflow(submitProposalActRepository.findByActCode("create").getStartWorkflow());
+		// orderId=tradeNo
+		List<SubmitProposal> submitProposalList = submitProposalRepository.findByParamsOrderId(params.getTradeNo());
+		if (null != submitProposalList && (!submitProposalList.isEmpty())) {
+			submitProposal.setId(submitProposalList.get(0).getId());
+		}
+		submitProposalRepository.save(submitProposal);
+
+		InsureConfirmationThread command = new InsureConfirmationThread(tiananBaseUrl, params, message, xinGeService,
+				submitProposalRepository, underwritingResultRepository, advertiseRepository,
+				submitProposalStateRepository);
+		ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("premiumAccurateThreadPool").build();
+		ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>(1024), threadFactory, new ThreadPoolExecutor.AbortPolicy());
+		singleThreadPool.execute(command);
+		logger.info("天安核保结束,线程启动---------------");
+		singleThreadPool.shutdown();
+		// Thread thread = new Thread(
+		// new InsureConfirmationThread(tiananBaseUrl, params, message,
+		// xinGeService, submitProposalRepository,
+		// underwritingResultRepository, advertiseRepository,
+		// submitProposalStateRepository));
+		// thread.start();
+		return new ResponseBody(ExceptionResultEnum.SUCCESS);
+	}
+
+	@Override
+	public IMessage buildMessage(IApiParams params, HttpServletRequest request) throws Exception {
+		InsureConfirmationParams detailParams = (InsureConfirmationParams) params;
+		////////////////////////// ApplyInfoDto
+		Date applybirthDate = IDCardUtil.getBirthByIdCard(detailParams.getCustomerIdNo());
+		// 0-男1-女
+		String applysex = IDCardUtil.isMale(detailParams.getCustomerIdNo()) ? "0" : "1";
+		// 证件类型固定为身份证
+		ApplyInfoDto applyInfo = new ApplyInfoDto.Builder(detailParams.getCustomerName(), "01", 
+				detailParams.getCustomerIdNo()).applybirthDate(new TypeDate(applybirthDate)).applysex(applysex)
+						.insuredType("1").applymobilePhone(detailParams.getCustomerPhone())// 投保人类型固定为1-个人
+						.applyAddress(detailParams.getApplicantAddress()).build();
+		/////////////////////////// InsureInfoDto
+		Date insuredbirthDate = IDCardUtil.getBirthByIdCard(detailParams.getInsuredIdNo());
+		// 0-男1-女
+		String insuredsex = IDCardUtil.isMale(detailParams.getInsuredIdNo()) ? "0" : "1";
+		InsureInfoDto insureInfo = new InsureInfoDto.Builder(new TypeDate(insuredbirthDate),
+				detailParams.getInsuredName(), "01", detailParams.getInsuredIdNo(), insuredsex, // 证件类型固定为身份证
+				detailParams.getInsuredPhone(), detailParams.getInsuredAddress()).build();
+		/////////////////////////// CarOwerDto
+		// 证件类型固定为身份证
+		CarOwerDto carOwer = new CarOwerDto("01", detailParams.getOwnerIdCard());
+		/////////////////////////// DeliveryDto
+		String acceptTown = detailParams.getContactAddressCityCode();
+		// 省行政区划是县区行政区划的前2位+0000
+		String acceptProvince = acceptTown.substring(0, 2) + "0000";
+		// 市行政区划是县区行政区划的前4位+00
+		String acceptCity = acceptTown.substring(0, 4) + "00";
+		DeliveryDto.Builder deliveryBuilder = new DeliveryDto.Builder(detailParams.getContactName(),
+				detailParams.getContactPhone(), acceptProvince, acceptCity, acceptTown,
+				detailParams.getContactAddress().getContactAddressDetail(), detailParams.getLicenceNo(),
+				detailParams.getDeliveryType(), new TypeDate(detailParams.getAppointmentTime()));
+		if (!StringUtils.isEmpty(detailParams.getInvoiceTitle())) {
+			deliveryBuilder.invoiceTitle(detailParams.getInvoiceTitle());
+		}
+		DeliveryDto delivery = deliveryBuilder.build();
+
+		/////////////////////////// MessageInsureConfirmation
+		// orderId=tradeNo
+		OfferResult offerResult = offerResultRepository.findOfferResultByOfferId(detailParams.getTradeNo());
+		MessageInsureConfirmation message = new MessageInsureConfirmation.Builder(tiananBaseUrl,
+				detailParams.getTradeNo(), "2", // 产品类型固定为2-电网销产品
+				offerResult.getData().getResult().getCarPremiumCaculateNo(), applyInfo, insureInfo, carOwer, delivery)
+						.build();
+		return message;
+	}
+
+	@Override
+	public ResponseBody response(IResult result) throws Exception {
+		return null;
+	}
+
+	private SubmitProposal convert(MessageInsureConfirmation message) {
+		SubmitProposal submitProposal = new SubmitProposal();
+		SubmitProposalParams params = new SubmitProposalParams();
+		// orderId=tradeNo
+		params.setOrderId(message.getRequestHead().getTradeNo());
+		////////////////////// 被保人
+		params.setInsuredName(message.getInsureInfoDto().getInsuredName());
+		params.setInsuredIdNo(message.getInsureInfoDto().getInsuredidentifyNumber());
+		params.setInsuredPhone(message.getInsureInfoDto().getInsuredmobilePhone());
+		params.setInsuredAddress(message.getInsureInfoDto().getInsuredAddress());
+		///////////////////// 投保人
+		params.setCustomerName(message.getApplyInfoDto().getApplyName());
+		params.setCustomerIdNo(message.getApplyInfoDto().getApplyidentifyNumber());
+		params.setCustomerPhone(message.getApplyInfoDto().getApplymobilePhone());
+		params.setApplicantAddress(message.getApplyInfoDto().getApplyAddress());
+		//////////////////// 收件人
+		params.setContactName(message.getDeliveryDto().getAcceptName());
+		params.setContactPhone(message.getDeliveryDto().getAcceptTelephone());
+		SubProParamsContactAddress contactAddress = new SubProParamsContactAddress();
+		contactAddress.setContactAddressDetail(message.getDeliveryDto().getAcceptAddress());
+		contactAddress.setCityCode(message.getDeliveryDto().getAcceptTown());
+		String provinceCode = message.getDeliveryDto().getAcceptTown().substring(0, 2) + "0000";
+		String cityCode = message.getDeliveryDto().getAcceptTown().substring(0, 4) + "00";
+		// 设置省名
+		contactAddress.setProvinceName(CityCodeUtil.getCityName(provinceCode));
+		// 设置市名
+		contactAddress.setCityName(CityCodeUtil.getCityName(cityCode));
+		// 设置县区名
+		contactAddress.setAreaName(CityCodeUtil.getCityName(message.getDeliveryDto().getAcceptTown()));
+		params.setContactAddress(contactAddress);
+		
+		//复制大蜂使用的复制,初始时与contactAddress相同
+		params.setDafengContactName(params.getContactName());
+		params.setDafengContactPhone(params.getContactPhone());
+		params.setDafengAddress(contactAddress.getProvinceName()+"省"+contactAddress.getCityName()+"市"+
+				contactAddress.getAreaName()+"区（县）"+message.getDeliveryDto().getAcceptAddress());
+		
+		//////////////////// 车主
+		params.setOwnerIdCard(message.getCarOwerDto().getCarOwnerIdentifyNumber());
+		submitProposal.setParams(params);
+		////////////////////// 发票
+		SubProParamsInvoiceInfo invoiceInfo = new SubProParamsInvoiceInfo();
+		if (StringUtils.isEmpty(message.getDeliveryDto().getInvoiceTitle())) {
+			invoiceInfo.setIsInvoice("0");
+		} else {
+			invoiceInfo.setIsInvoice("1");
+			invoiceInfo.setTitle(message.getDeliveryDto().getInvoiceTitle());
+		}
+		return submitProposal;
+	}
+}

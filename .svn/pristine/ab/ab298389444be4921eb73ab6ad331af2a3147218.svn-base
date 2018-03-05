@@ -1,0 +1,68 @@
+<script type="text/javascript">
+	app.controller('customerInfoCtrl',function($stateParams,$scope,$http){
+		$scope.message=$stateParams.myInvite;
+		$scope.gradeText=['普通用户','粉丝'];
+		console.log($scope.message);
+		$http({
+			method:'GET',
+			url:'rest/customers/search/getByInvited?invite='+$scope.message.myInvite
+		}).then(function(response){
+			$scope.list=response.data._embedded.customers;
+			console.log('list');
+			console.log($scope.list);
+		});
+	});
+</script>
+<div ng-controller="customerInfoCtrl">
+<div style="background:url(img/c4.jpg) center center; background-size:cover">
+      <div class="wrapper-lg bg-white-opacity">
+        <div class="row m-t">
+          <div class="col-sm-7">
+            <a href="" class="thumb-lg pull-left m-r">
+              <img ng-src="{{message.headimgurl?message.headimgurl:'img/userHead.png'}}" class="img-circle">
+            </a>
+            <div class="clear m-b">
+              <div class="m-b m-t-sm">
+                <span class="h3 text-black">{{message.nickname}}</span>
+                <small class="m-l">{{message.phone}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wrapper-md">
+        <table class="table">
+        	<caption style="font-weight:900;font-size:20px;">邀请列表</caption>
+        	<thead>
+        		<tr>
+        			<th>ID</th>
+        			<th>邀请码</th>
+        			<th>头像</th>
+        			<th>昵称</th>
+        			<th>手机号</th>
+        			<th>等级</th>
+        			<th>创建时间</th>
+        			<th>更新时间</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr ng-repeat="item in list">
+        			<td class="v-middle">{{item.id}}</td>
+        			<td class="v-middle">{{item.myInvite}}</td>
+        			<td class="v-middle">
+<span class="pull-left thumb avatar m-r">
+                        	<img ng-src="{{ item.headimgurl?item.headimgurl:'img/userHead.png' }}">
+                    	</span>
+					</td>
+        			<td class="v-middle">{{item.nickname}}</td>
+        			<td class="v-middle">{{item.phone}}</td>
+        			<td class="v-middle">{{gradeText[item.grade-1]}}</td>
+	    			<td class="v-middle">{{item.createdAt}}</td>
+	    			<td class="v-middle">{{item.lastModifiedAt}}</td>
+	    		</tr>
+	    	</tbody>
+	    </table>
+	</div>
+</div>
+<div style="width:20%;height:57px;position:fixed;right:0;top:54px;background-color:#F6F8F8;"></div>

@@ -1,0 +1,67 @@
+<script>
+    "use strict";
+
+    app.controller("usersListController",
+        [
+            '$rootScope',
+            '$scope',
+            '$http',
+            '$resource',
+            '$stateParams',
+            '$state',
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state) {
+                $scope.getUsersList = function () {
+                    $http.get('http://www.xiaojinpingtai.com/linkman').then(function (resResult) {
+                        console.log(resResult);
+                        $scope.userList = resResult.data;
+                    });
+                };
+                $scope.getUsersList();
+            }
+        ]
+    )
+
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col w-md b-r ">
+        <div class="vbox">
+            <div class="wrapper-md b-b clearfix" >
+                <div class="font-thin h4 pull-left">联系人</div>
+                <div class="pull-right">
+                    <button class="btn btn-success" ui-sref="users.create">新增</button>
+                </div>
+
+            </div>
+            <div class="row-row" ng-controller="usersListController">
+                <div class="cell scrollable">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <ul class="list-group no-bg no-borders pull-in">
+                                <li class="list-group-item" ng-repeat="(key, value) in userList">
+                                    <a ui-sref="users.user.page({user_id:value.id,entity_type:'users',view_type:'dashboard'})"
+                                       class="pull-left thumb-sm avatar m-r">
+                                        <img ng-src=" {{ value.headimgurl }} "  class="img-circle">
+                                        <i class="on b-white bottom"></i>
+                                    </a>
+                                    <div class="clear">
+                                        <div>
+                                            <a ui-sref="users.user.page({user_id:value.id,entity_type:'users',view_type:'dashboard'})">{{ value.nickname }}</a>
+                                        </div>
+                                        <small class="text-muted">{{ value.department }} {{ value.role }}</small>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

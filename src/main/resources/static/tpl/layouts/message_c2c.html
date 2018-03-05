@@ -1,0 +1,129 @@
+<div class="hbox hbox-auto-xs bg-light ">
+    <!-- column -->
+    <div class="col lter" style="width:500px;">
+        <div class="vbox"  ng-controller="C2CSessionCtrl">
+            <div class="wrapper b-b">
+                <div class="font-thin h4">{{session_id}}</div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell  scrollable hover">
+                    <div class="cell-inner msgflow" id="session_wrapper">
+                        <div ng-show='message_loading' class="text-center text-info" style='padding:5px;'>
+                            <i class='fa fa-times-circle'></i> {{message_loading}}
+                        </div>
+                        <div class="wrapper-md">
+                            <div ng-repeat="(key, item) in sessions[session_key].msgs">
+
+                                <div class="m-b">
+                                    <a href class=" thumb-sm avatar pull-right"  ng-if="item.isSend"><img src="{{myinfo.headimgurl}}" alt="..."></a> 
+                                    <a href class=" thumb-sm avatar pull-left"  ng-if="!item.isSend"><img src="img/friend.jpg" alt="..."></a> 
+                                    <div ng-class="item.isSend ? 'm-r-xxl' : 'm-l-xxl'">
+                                        <div class="pos-rlt wrapper-sm bg-white b b-light r r-2x">
+                                            <span class="arrow  pull-up arrow-light" ng-class="item.isSend ? 'right' : 'left'"></span>
+                                            <p class="m-b-none">
+                                                <span ng-repeat="element in item.elems">
+                                                    <span ng-if="element.type == 'TIMTextElem'" ng-controller="C2CTIMTextElemCtrl">
+                                                        <!--文本：<br />-->
+                                                        {{element.content.text}}
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMLocationElem'" ng-controller="C2CTIMLocationElemCtrl">
+                                                        位置：<br />
+                                                        Desc: {{element.content.desc}}<br />
+                                                        Latitude: {{element.content.latitude}}<br />
+                                                        Longitude: {{element.content.longitude}}<br />
+
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMFaceElem'" ng-controller="C2CTIMFaceElemCtrl">
+                                                        <!--表情：<br />
+                                                        <img src="{{element.content.emotionUrl}}" />-->
+                                                        {{element.content.data}}
+                                                        {{element.content.index}}
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMCustomElem'" ng-controller="C2CTIMCustomElemCtrl">
+                                                        {{element.content.data}}
+                                                        <br />
+                                                        <a ng-if="element.content.ext" class="btn btn-primary btn-xs" href="#/{{element.content.ext.entityType}}/{{element.content.ext.entityName}}s/{{element.content.ext.entityId}}/profile/info" ng-if="element.content.ext">链接</a>
+                                                        
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMSoundElem'" ng-controller="C2CTIMSoundElemCtrl">
+                                                        <audio src="{{element.content.downUrl}}" controls="controls" preload="none"></audio>
+                                                        <!--
+                                                       声音<br />
+                                                       "UUID": {{element.content.uuid}}<br />
+                                                       "Size": {{element.content.size}}<br />
+                                                       "Second": {{element.content.second}}
+                                                        -->
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMImageElem'" ng-controller="C2CTIMImageElemCtrl">
+                                                        <!--
+                                                        图片：<br />
+                                                        "UUID": {{element.content.UUID}}<br/>
+                                                        -->
+                                                        <span ng-repeat="image in element.content.ImageInfoArray">
+                                                            <span ng-if="image.type == 3">
+                                                                <!--
+                                                               图片（要做对应的弹窗处理，与弹窗后下载原图处理）：<br />
+                                                               "type":  {{image.type}}（对应1原图、2中图、3小图）<br />
+                                                               "size": {{image.size}}<br />
+                                                               "width": {{image.width}}<br />
+                                                               "height": {{image.height}}<br />
+                                                               "url": {{image.url}}
+                                                                --> 
+                                                                <img ng-src="{{image.url}}" />
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMFileElem'" ng-controller="C2CTIMFileElemCtrl">
+                                                        <!--
+                                                        文件 ：<br />
+                                                        "uuid": {{element.content.uuid}}<br />
+                                                        "downUrl": {{element.content.downUrl}}<br />
+                                                        "name": {{element.content.name}}<br />
+                                                        -->
+                                                        <a href="{{element.content.downUrl}}" target="_blank">{{element.content.name}}</a>
+                                                    </span>
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <small class="text-muted"><i class="fa fa-ok text-success"></i> {{item.time| datetime}}</small>
+                                        <br />
+                                        <br />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="padder b-t b-light bg-white"  ng-controller="C2CMessageFormCtrl">
+                <progressbar value="message_form_upload_bar" class="progress-xxs m-n" ng-show='message_form_upload_bar'></progressbar>
+                <div  style="padding:4px 10px 24px 10px;">
+                    <form>
+                        <div class="text-left" style="margin: 10px 0;">
+                            <input type="file" id="upd_pic" />
+                            <button class="btn btn-sm btn-primary" ng-click="upload_picture()" >
+                                上传图片
+                            </button>
+                            <input type="file" id="upd_file" />
+                            <button class="btn btn-sm btn-primary" ng-click="upload_file()">
+                                上传文件
+                            </button>
+
+                        </div>
+                        <div>
+                            <span class="input-group-btn" style="position: absolute;right:70px; bottom:10px;">
+                                <button class="btn btn-default btn-sm" type="button" ng-click="form_submit()" style="width:65px;">发送(S)</button>
+                            </span>
+                            <textarea id="message_form_input" class="no-borders" ng-model="message_input" ng-keyup="form_keyup($event)" style="height:100px;width:100%;vertical-align: top; padding:0;margin:0"></textarea>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col b-l" ui-view></div>
+</div>

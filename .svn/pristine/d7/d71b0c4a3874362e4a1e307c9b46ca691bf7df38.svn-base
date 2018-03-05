@@ -1,0 +1,156 @@
+<div class="vbox bg-white">
+    <div class="wrapper b-b b-light">
+        <button  class=" btn btn-sm btn-info" ng-click="SweetComfirm()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-subscript"></i> 提交 </button>
+        <button  class="btn btn-sm btn-success" ng-click="SweetSuccess()"  tooltip="说明" tooltip-placement="bottom"><i class="fa fa-comment"></i> 通过 </button>
+        <button  class=" btn btn-sm btn-danger" ng-click="SweetError()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-remove"></i> 驳回 </button>
+        <button  class=" btn btn-sm btn-primary" ng-click="SweetInfo()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-money"></i> 放款 </button>
+        <button  class=" btn btn-sm btn-default" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-money"></i> 垫资 </button>
+        <button  class=" btn btn-sm btn-default" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-money"></i> 分配给 </button>
+        <button  class=" btn btn-sm btn-default" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-file-pdf-o"></i> PDF融资确认书 </button>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md b-r ">
+                    <h4>标的概况</h4>
+                    <b>主体：</b>容儿<br />                            
+                    <b>金额：</b>80000元<br />                            
+                    <b>日期：</b>2017.06.16<br />                            
+                    <b>产品：</b>网点贷<br />
+                    <b>还款：</b>先息后本<br />
+                    <b>状态：</b>还款中<br />
+                    <br />
+                    <br />
+                    <br />
+
+                    <div class="panel panel-default" draggable="true">
+                        <div class="panel-heading">
+                            分期信息 <span class="badge">24期</span>                    
+                        </div>
+                        <div class="panel-body" style="padding:0;">
+                            <table class="table table-striped bg-white" style="text-align: center;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center b-r">期别</th>
+                                        <th class="text-center">本金</th>
+                                        <th class="text-center">利息</th>
+                                        <th class="text-center">费用</th>                        
+                                        <th class="text-center b-r">本期应还</th>                        
+                                        <th class="text-center">应还日期</th>                        
+                                        <th class="text-center">实还日期</th>                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="b-r">  
+                                            立即收取
+                                        </td>
+                                        <td>8900</td>
+                                        <td>410</td>
+                                        <td>410</td>
+                                        <td class="text-center b-r">180</td>
+                                        <td>2017.06.17</td>
+                                        <td>2017.06.17</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="b-r">  
+                                            第1期
+                                        </td>
+                                        <td>8900</td>
+                                        <td>410</td>
+                                        <td>410</td>
+                                        <td class="text-center b-r">50</td>
+                                        <td>2017.06.17</td>
+                                        <td>2017.06.17</td>
+                                    </tr> 
+                                    <tr>
+                                        <td class="b-r">  
+                                            第2期
+                                        </td>
+                                        <td>8900</td>
+                                        <td>410</td>
+                                        <td>410</td>
+                                        <td class="text-center b-r">50</td>
+                                        <td>2017.06.17</td>
+                                        <td>2017.06.17</td>
+                                    </tr>
+
+                                </tbody>
+                            </table> 
+
+
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="btn-toolbar m-b-sm btn-editor" data-role="editor-toolbar" data-target="#editor">
+                            <div class="btn-group dropdown" dropdown="">
+                                <a class="btn btn-default" dropdown-toggle="" tooltip="Font" aria-haspopup="true" aria-expanded="false"><i class="fa fa-font"></i><b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="" data-edit="fontName Serif" style="font-family:'Serif'">Serif</a></li> 
+                                    <li><a href="" data-edit="fontName Sans" style="font-family:'Sans'">Sans</a></li>
+                                    <li><a href="" data-edit="fontName Arial" style="font-family:'Arial'">Arial</a></li></ul>
+                            </div>
+                            <div class="btn-group dropdown" dropdown="">
+                                <a class="btn btn-default" dropdown-toggle="" data-toggle="dropdown" tooltip="Font Size" aria-haspopup="true" aria-expanded="false"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="" data-edit="fontSize 5" style="font-size:24px">Huge</a></li>
+                                    <li><a href="" data-edit="fontSize 3" style="font-size:18px">Normal</a></li>
+                                    <li><a href="" data-edit="fontSize 1" style="font-size:14px">Small</a></li>
+                                </ul>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-default" data-edit="bold" tooltip="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
+                                <a class="btn btn-default" data-edit="italic" tooltip="Italic (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
+                                <a class="btn btn-default" data-edit="strikethrough" tooltip="Strikethrough"><i class="fa fa-strikethrough"></i></a>
+                                <a class="btn btn-default" data-edit="underline" tooltip="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-default" data-edit="insertunorderedlist" tooltip="Bullet list"><i class="fa fa-list-ul"></i></a>
+                                <a class="btn btn-default" data-edit="insertorderedlist" tooltip="Number list"><i class="fa fa-list-ol"></i></a>
+                                <a class="btn btn-default" data-edit="outdent" tooltip="Reduce indent (Shift+Tab)"><i class="fa fa-dedent"></i></a>
+                                <a class="btn btn-default" data-edit="indent" tooltip="Indent (Tab)"><i class="fa fa-indent"></i></a>
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-default btn-info" data-edit="justifyleft" tooltip="Align Left (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                                <a class="btn btn-default" data-edit="justifycenter" tooltip="Center (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                                <a class="btn btn-default" data-edit="justifyright" tooltip="Align Right (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
+                                <a class="btn btn-default" data-edit="justifyfull" tooltip="Justify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
+                            </div>
+                            <div class="btn-group dropdown" dropdown="">
+                                <a class="btn btn-default" dropdown-toggle="" tooltip="Hyperlink" aria-haspopup="true" aria-expanded="false"><i class="fa fa-link"></i></a>
+                                <div class="dropdown-menu">
+                                    <div class="input-group m-l-xs m-r-xs">
+                                        <input class="form-control input-sm" id="LinkInput" placeholder="URL" data-edit="createLink" type="text">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-default" type="button">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="btn btn-default" data-edit="unlink" tooltip="Remove Hyperlink"><i class="fa fa-cut"></i></a>
+                            </div>
+
+                            <div class="btn-group">
+                                <a class="btn btn-default" tooltip="Insert picture (or just drag &amp; drop)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
+                                <input data-edit="insertImage" style="position:absolute; opacity:0; width:41px; height:34px" type="file">
+                            </div>
+                            <div class="btn-group">
+                                <a class="btn btn-default" data-edit="undo" tooltip="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
+                                <a class="btn btn-default" data-edit="redo" tooltip="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+                            </div>
+                        </div>
+                        <div ui-jq="wysiwyg" class="form-control" style="overflow:scroll;height:200px;max-height:200px" contenteditable="true">
+                            Go ahead…
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-default">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

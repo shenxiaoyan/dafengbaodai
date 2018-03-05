@@ -1,0 +1,78 @@
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+    <div class="col w-md b-r ">
+
+
+        <div class="vbox">
+            <div class="wrapper b-b">
+                <div class="font-thin h4">消息</div>
+            </div>
+            <div class="nav-tabs-alt">
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="active">
+                        <a data-target="#tab-1" role="tab" data-toggle="tab" aria-expanded="true"><i class="glyphicon glyphicon-transfer text-md text-muted"></i></a>
+                    </li>
+                    <li class="">
+                        <a data-target="#tab-2" role="tab" data-toggle="tab" aria-expanded="false"><i class="fa fa-group text-md text-muted"></i></a>
+                    </li>
+                    <li class="">
+                        <a data-target="#tab-3" role="tab" data-toggle="tab" aria-expanded="false"><i class="fa fa-user text-md text-muted"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="row-row">
+                <div class="cell scrollable hover">
+                    <div class="cell-inner">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab-1">
+                                <div class="wrapper-md" ng-controller="SessionListCtrl">
+                                    <ul class="list-group no-bg no-borders pull-in">
+                                        <li class="list-group-item" ng-repeat="(key,item) in sessions">
+                                            <b class="badge bg-info pull-right" ng-show="item.UnreadMsgCount > 0">{{item.UnreadMsgCount}}</b>
+                                            <a href="#/messages/{{item.SessionType}}/{{item.SessionId}}" class="pull-left thumb-sm avatar m-r">
+                                                <img ng-src="{{item.SessionImage}}" alt="..." class="img-circle">
+                                                <i class="on b-white bottom"></i>
+                                            </a>
+                                            <div class="clear" >
+                                                <div><a href="#/messages/{{item.SessionType}}/{{item.SessionId}}">{{item.SessionNick}}</a></div>
+                                                <small class="text-muted">{{item.C2cNick}}{{item.MsgShow}}</small><br />
+                                                <small class="text-muted">{{item.MsgTimeStamp}}</small>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab-2">
+                                <div class="wrapper-md">
+                                    <ul class="list-group no-bg no-borders pull-in">
+                                        <li class="list-group-item" ng-repeat="(key,item) in groups" >
+                                            <a href="#/messages/GROUP/{{key}}">{{item.Name}} {{item.GroupId}} {{item.FaceUrl}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab-3">
+                                <div class="wrapper-md">
+                                    <ul class="list-group no-bg no-borders pull-in">
+                                        <li class="list-group-item" ng-repeat="(key,item) in friends" >
+                                            <a href="#/messages/C2C/{{key}}">{{item.name}} {{item.gender}}{{item.image}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+
+    </div>
+
+    <div class="col lter" ui-view=''>
+    </div>
+
+</div>
+<!-- /hbox layout -->

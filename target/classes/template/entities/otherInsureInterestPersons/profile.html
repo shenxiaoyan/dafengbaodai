@@ -1,0 +1,41 @@
+<script>
+    app.controller("unInsuranceCUSProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state,$filter) {
+
+                $scope.profile = {};
+
+                $scope.getProfile = function () {
+
+                    $http.get("/rest/authorities").success(function (resResult){
+                        console.log(resResult);
+                        $scope.list = resResult._embedded.authorities;
+                    })
+                };
+                $scope.getProfile();
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="unInsuranceCUSProfileCtrl">
+    <div class="wrapper-md b-b b-light clearfix" style="padding: 22.5px 20px">
+        <div class="font-thin h4">客户详情</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

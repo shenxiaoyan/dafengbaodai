@@ -1,0 +1,262 @@
+<script type="text/javascript">
+app.controller("fanListCtrl",
+	    [
+	        "$rootScope",
+	        "$scope",
+	        "$http",
+	        "$stateParams",
+	        function ($rootScope, $scope, $http, $stateParams) {
+				//状态栏
+	        	$scope.states = [];
+	        	$scope.byState='all';
+	        	$scope.searchInfo={};
+                $scope.gradeText=['普通用户','粉丝'];
+                $scope.enabledList=[];
+                $scope.disabledList=[];
+
+                $scope.getStates = function () {
+                    $http.get("/rest/customerStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.customerStates;
+                        });
+                };
+
+                $scope.getStates();
+				$scope.entity_key = $stateParams.entity_key;
+
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+
+	            //单数 例user
+	            $scope.state_code = $stateParams.state_code;
+
+	            $scope.list = [];
+
+	            //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                    	$scope.byState='state';
+                        $scope.state_code = stateCode;
+                        $scope.searchInfo = {};
+                        $scope.getList(0);
+                    }
+                };
+
+	            $scope.getList = function (page) {
+	               	if($scope.byState==='state'){
+	               		$scope.link = "/rest/customers/search/getByGradeAndStateCode?grade=2&projection=showFans&size=15&page=" + page+"&stateCode="+$scope.state_code;
+	               	}
+	               	else if($scope.byState==='all'){
+	               		$scope.link='/rest/customers/search/getByGrade?grade=2&projection=showFans&size=15&page='+page;
+	               	}
+	                $http({method: "GET", url: $scope.link}).success(function (resResult) {
+	                    $scope.list = resResult._embedded["customers"];
+	                    $scope.allList=$scope.list;
+
+	                    for(var i=0;i<$scope.list.length;i++){
+	                    	if($scope.list[i].stateCode=='ENABLED'){
+	                    		$scope.enabledList.push($scope.list[i]);
+	                    	}
+	                    	else if($scope.list[i].stateCode=='DISABLED'){
+	                    		$scope.disabledList.push($scope.list[i]);
+	                    	}
+	                    }
+	                    $scope.pageList = {
+	                        size: resResult.page.size,
+	                        total_elements: resResult.page.totalElements,
+	                        current_page: resResult.page.number,
+	                        num_page: resResult.page.totalPages,
+	                        total_page: resResult.page.totalPages
+	                    };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+
+	                });
+	            };
+
+	            $scope.getList(0);
+	            
+	            $scope.getAll=function(){
+	            	$scope.byState='all';
+	            	$scope.searchInfo = {};
+	            	$scope.getList(0);
+	            };
+				
+				$scope.changeStateRequest=function(){
+					$http({
+						method:'PATCH',
+						url:'rest/customers/'+$scope.id,
+						data:{
+							state:'rest/customerStates/' + $scope.toState
+						}
+					}).then(function(response){
+						console.log(response);
+						 $http({method: "GET", url: $scope.link}).success(function (resResult) {
+			                  $scope.list = resResult._embedded["customers"];
+						 });
+					});
+				};
+
+				$scope.search=function(){
+				    var stateCode;
+                    if($scope.byState==='state'){
+                        stateCode = $scope.state_code;
+					} else {
+                        stateCode = "";
+					}
+					$http({
+						method:'POST',
+						url:'dafeng/user/searchFansList?grade2',
+						data:{
+                            nickname:$scope.searchInfo.nickName,
+							phone:$scope.searchInfo.phoneNum,
+							stateCode: stateCode
+						}
+					}).then(function(response){
+                        response = response.data.data;
+						$scope.list=response.customers;
+                        $scope.pageList = {
+                            size: response.page.size,
+                            total_elements: response.page.totalElements,
+                            current_page: response.page.number,
+                            num_page: response.page.totalPages,
+                            total_page: response.page.totalPages
+                        };
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+					});
+				};
+
+                /*
+              * 清空按钮
+              * */
+                $scope.clearSearch = function () {
+                    $scope.insureCompanyId = "";
+                    $scope.getList(0);
+                    $scope.searchInfo = {};
+                };
+	        }
+	    ]
+	);
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="fanListCtrl">
+	
+	<div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+        <div class="inline pull-left m-r">
+            <label class="i-checks pull-left m-n">
+				<input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+            </label>
+        </div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"><i></i> {{ state.label }}
+            </label>
+        </div>
+    </div>
+	
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" ng-if="list.length < 1">
+                            暂无数据！
+                        </div>
+                        <div class="wrapper-md clearfix" style="padding:11.5px 20px;" ng-if="list.length > 0">
+				        <div class="font-thin h4">
+				            <div>
+				                <form class="clearfix">
+									<div class="pull-left m-r w inline">
+										<input type="text"
+											   class="form-control"
+											   id="release_waybill_order_sn"
+											   placeholder="请输入昵称"
+											   ng-model="searchInfo.nickName">
+									</div>
+				                    <div class="pull-left m-r winline">
+				                        <input type="text"
+											   class="form-control"
+											   id="release_waybill_number"
+				                               placeholder="请输入手机号"
+											   ng-model="searchInfo.phoneNum">
+				                    </div>
+				                    <div class="pull-left m-r inline">
+				                        <button type="button" class="btn btn-primary" ng-click="search()">
+				                            <span>查询</span>
+				                        </button>
+										<button type="button" class="btn btn-default" ng-click="clearSearch()">
+											<span>清除</span>
+										</button>
+				                    </div>
+				                </form>
+				            </div>
+				        </div>
+				    </div>
+                        <div class="table-responsive" ng-if="list.length > 0">
+                            <table ng-if="list.length>0" class="table table-hover b-t b-light">
+                    	<thead>
+                    		<tr>
+                    			<th>头像</th>
+                    			<th>昵称</th>
+                    			<th>手机号</th>
+                    			<th>真实姓名</th>
+                    			<th>身份证号</th>
+                    			<th>支付账号</th>
+                    			<th ng-if="byState==='all'">状态</th>
+                    			<th>创建时间</th>
+                    			<th>认证时间</th>
+                    			<th>操作</th>
+                    		</tr>
+                    	</thead>
+                    	<tbody>
+                    		<tr ng-repeat="item in list">
+                    			<td class="v-middle">
+									<span class="pull-left thumb avatar m-r">
+                                    	<img ng-src="{{ item.headimgurl?item.headimgurl:'img/userHead.png' }}">
+                                	</span>
+								</td>
+                    			<td class="v-middle">{{item.nickname}}</td>
+                    			<td class="v-middle">{{item.phone}}</td>
+                    			<td class="v-middle">{{item.account.realName}}</td>
+                    			<td class="v-middle">{{item.account.identity}}</td>
+                    			<td class="v-middle">{{item.account.pay_account_id}}</td>
+                    			<td class="v-middle" ng-if="byState==='all'">{{item.state.label}}</td>
+                    			<td class="v-middle">{{item.createdAt}}</td>
+                    			<td class="v-middle">{{item.account.createTime}}</td>
+                    			<td class="v-middle">
+                    				<button class="btn btn-xs btn-info"
+											ui-sref="workflowEntity.home.profile.info.fan({myInvite:{myInvite:item.myInvite,id:item.id,headimgurl:item.headimgurl,phone:item.phone,nickname:item.nickname,state:item.state.label,grade:gradeText[item.grade-1]}})"
+									>
+                                        <a>
+                                            详情
+                                        </a>
+                                    </button>
+                    			</td>
+                    		</tr>
+                    	</tbody>
+                    </table>
+                        </div>
+                    </div>
+                </div>
+				<div class="wrapper b-t b-light clearfix">
+					<ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+					<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>

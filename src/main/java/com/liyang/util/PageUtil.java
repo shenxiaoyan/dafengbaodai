@@ -1,0 +1,47 @@
+package com.liyang.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.data.domain.Page;
+
+/**
+ * 获取Page中分页信息
+ * @author Jmj
+ *
+ */
+public class PageUtil {
+	
+	/**
+	 * 获取page部分分页数据信息
+	 * @param page
+	 * @return
+	 */
+	public static Map<String, Integer> getPageData(Page<?> page) {
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", page.getSize());
+		pageDataMap.put("totalElements", (int) page.getTotalElements());
+		pageDataMap.put("totalPages", page.getTotalPages());
+		pageDataMap.put("number", page.getNumber());
+		return pageDataMap;
+	}
+	
+	/**
+	 * 获取page全部分页信息
+	 * @return
+	 */
+	public static Map<String, Object> getResultMapPage(Page<?> page){
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put("last", page.isLast());
+		resultMap.put("totalElements", page.getTotalElements());
+		resultMap.put("totalPages", page.getTotalPages());
+		resultMap.put("number", page.getNumber());
+		resultMap.put("size", page.getSize());
+		resultMap.put("sort", page.getSort());
+		resultMap.put("first", page.isFirst());
+		resultMap.put("numberOfElements", page.getNumberOfElements());
+		return resultMap;
+	}
+	
+	
+}

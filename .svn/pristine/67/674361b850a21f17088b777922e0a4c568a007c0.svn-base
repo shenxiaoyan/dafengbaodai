@@ -1,0 +1,41 @@
+<div class="vbox">
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>账户所有人</th>
+                                <th>账户类型</th>
+                                <th>余额</th>
+                                <th>冻结额</th>
+                                <th>总额</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="active">
+                                <th scope="row">1</th>
+                                <td>
+                                    <a  ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})" class="avatar thumb pull-left m-r">
+                                        <img ng-src="img/a10.jpg" src="img/a10.jpg">
+                                    </a>
+                                    <a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})">容儿</a></td>
+                                <td>普通账户</td>
+                                <td>970016</td>
+                                <td>15210</td>
+                                <td>985226</td>
+                                <td><span class="badge bg-success">有效</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

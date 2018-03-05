@@ -1,0 +1,119 @@
+package com.liyang.domain.advertise;
+
+import java.util.Date;
+
+import com.liyang.domain.base.BaseEntityVO;
+
+/**
+ * @author Hame
+ *
+ */
+public class AdvertiseVO extends BaseEntityVO {
+
+	private String title;
+
+	private String content;
+
+	private Date publishTime;
+
+	private Integer znxType;
+
+	// private OfferResult offerResult;
+
+	private Integer type;
+
+	private Integer isRead;
+
+	private String token;
+
+	private String offerId;
+
+	private String createEnqId;
+
+	// private WebAdvertiseType webAdvertiseType;
+
+	//	private User user;
+
+	private String linkUrl;
+
+	public String getLinkUrl() {
+		return linkUrl;
+	}
+
+	public void setLinkUrl(String linkUrl) {
+		this.linkUrl = linkUrl;
+	}
+
+	public String getCreateEnqId() {
+		return createEnqId;
+	}
+
+	public void setCreateEnqId(String createEnqId) {
+		this.createEnqId = createEnqId;
+	}
+
+	public String getOfferId() {
+		return offerId;
+	}
+
+	public void setOfferId(String offerId) {
+		this.offerId = offerId;
+	}
+
+	public Integer getZnxType() {
+		return znxType;
+	}
+
+	public void setZnxType(Integer znxType) {
+		this.znxType = znxType;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public Integer getIsRead() {
+		return isRead;
+	}
+
+	public void setIsRead(Integer isRead) {
+		this.isRead = isRead;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public Date getPublishTime() {
+		return publishTime;
+	}
+
+	public void setPublishTime(Date publishTime) {
+		this.publishTime = publishTime;
+	}
+
+}

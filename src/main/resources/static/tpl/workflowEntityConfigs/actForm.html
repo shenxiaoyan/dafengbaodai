@@ -1,0 +1,220 @@
+<div class="vbox">
+    <div class="wrapper-md b-b">
+        {{entity_key}} / actForm
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="panel-body">
+                    <form class="form-horizontal" method="get">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">全名</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.label" class="form-control">
+                                <span class="help-block m-b-none">行为全名</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">别称</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.alias" class="form-control">
+                                <span class="help-block m-b-none">显示在按钮上的名称</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">行为的code</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.actCode" class="form-control">
+                                <span class="help-block m-b-none">小驼峰，唯一的code，如果该行为存在类里的方法，则会执行方法，否则用通用的act方法</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">小图标Class</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.iconClass" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">按钮class</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.btnClass" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">按钮的tooltip</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.tip" class="form-control"></textarea>
+                                <span class="help-block m-b-none">会显示在按钮鼠标悬停时显示</span>
+                            </div>
+                        </div>
+
+           
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">排序</label>
+                            <div class="col-sm-8">
+                                <input type="text" ng-model="act.sort" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否有弹窗视图</label>
+                            <div class="col-sm-8">
+                                <label class="i-switch m-t-xs m-r">
+                                    <input type="checkbox" ng-model="act.view" ng-checked="act.view">
+                                    <i></i>
+                                </label>
+                                <span class="help-block m-b-none">如果是，则会引用act_"actCode"的弹窗视图（例如传文件）</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">教程</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.help" class="form-control"></textarea>
+                                <span class="help-block m-b-none">暂时没有具体用途，大约是为了某个行为的帮助页</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">内部备注</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.secret" class="form-control"></textarea>
+                                <span class="help-block m-b-none">为开发者备注用途</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">所属分组</label>
+                            <div class="col-sm-8">
+                                <select ng-model="act.actGroup" class="form-control m-b">
+                                    <option value="">不选择</option>
+                                    <option value="READ">READ</option>
+                                    <option value="UPDATE">UPDATE</option>
+                                    <option value="FILE_OPERATE">FILE_OPERATE</option>
+                                    <option value="OPERATE">OPERATE</option>
+                                    <option value="NOTICE">NOTICE</option>
+                                </select>
+                                <span class="help-block m-b-none">前台读取时需要分组来读</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否可以手动通知</label>
+                            <div class="col-sm-8">
+                                <label class="i-switch m-t-xs m-r">
+                                    <input type="checkbox" ng-model="act.handNotice" ng-checked="act.handNotice">
+                                    <i></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否为重要行为</label>
+                            <div class="col-sm-8">
+                                <label class="i-switch m-t-xs m-r">
+                                    <input type="checkbox" ng-model="act.importance" ng-checked="act.importance">
+                                    <i></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">消息类型</label>
+                            <div class="col-sm-8">
+                                <select ng-model="act.messageType" class="form-control m-b">
+                                    <option value="">不选择</option>
+                                    <option value="TIMTextElem">TIMTextElem</option>
+                                    <option value="TIMFileElem">TIMFileElem</option>
+                                    <option value="TIMImageElem">TIMImageElem</option>
+                                    <option value="TIMSoundElem">TIMSoundElem</option>
+                                    <option value="TIMFaceElem">TIMFaceElem</option>
+                                    <option value="TIMCustomElem">TIMCustomElem</option>
+                                    <option value="TIMLocationElem">TIMLocationElem</option>
+                                </select>
+                                <span class="help-block m-b-none">在流转记录或TIM聊天里显示用</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">noticeSelfTemplate</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.noticeSelfTemplate" class="form-control"></textarea>
+                                <span class="help-block m-b-none">通知给执行人自己的消息模板</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">noticeOtherTemplate</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.noticeOtherTemplate" class="form-control"></textarea>
+                                <span class="help-block m-b-none">通知给其他人的消息模板</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">noticeShowTemplate</label>
+                            <div class="col-sm-8">
+                                <textarea ng-model="act.noticeShowTemplate" class="form-control"></textarea>
+                                <span class="help-block m-b-none">通知来源的消息模板</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">行为类型</label>
+                            <div class="col-sm-8">
+                                <select ng-model="act.actType" class="form-control m-b">
+                                    <option value="">不选择</option>
+                                    <option value="START">START</option>
+                                    <option value="NORMAL">NORMAL</option>
+                                    <option value="END">END</option>
+                                </select>
+                                <span class="help-block m-b-none">工作流中，该act的类型（START, NORMAL, END）</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">通知给该类型的部门</label>
+                            <div class="col-sm-8">
+                                <select ng-model="noticeDepartmenttype"
+                                        ng-options="departmenttype.label for departmenttype in allDepartmenttypes"
+                                        ng-change="setRoleFromDepartment(false)"
+                                        class="form-control m-b">
+                                    <option value="">不选择</option>
+                                </select>
+                                <span class="help-block m-b-none">与部门下的角色交集</span>
+                            </div>
+                        </div>
+                        <div class="form-group" id="act_form_roles">
+                            <label class="col-sm-2 control-label">通知给部门下的该角色</label>
+                            <div class="col-sm-8">
+                                <select ng-model="noticeRole"
+                                        ng-options="role.label for role in allRoles"
+                                        class="form-control m-b">
+                                    <option value="">不选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">下一个工作流</label>
+                            <div class="col-sm-8">
+                                <select ng-model="nextWorkflow"
+                                        ng-options="workflow.label for workflow in allWorkflows"
+                                        class="form-control m-b">
+                                    <option value="">不选择</option>
+                                </select>
+                                <span class="help-block m-b-none">nextWorkflow</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">变更实体状态为</label>
+                            <div class="col-sm-8">
+                                <select ng-model="targetState"
+                                        ng-options="state.label for state in allStates"
+                                        class="form-control m-b">
+                                    <option value="">不选择</option>
+                                </select>
+                                <span class="help-block m-b-none">targetState</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a href="javascript:history.go(-1);" class="btn btn-default">取消</a>
+                                <button type="button" ng-click="save()" class="btn btn-primary">保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

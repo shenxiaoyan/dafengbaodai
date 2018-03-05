@@ -1,0 +1,262 @@
+<script>
+    "use strict";
+
+    app.controller("feedbackListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams,$filter) {
+
+                //反馈列表
+                $scope.list = [];
+
+                if($stateParams.entity_key === "feedback"){
+                    $scope.entity_key = "feedback";
+                }else{
+                    $scope.entity_key = $stateParams.entity_key;
+                }
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+                    $scope.link = "/dafeng/feedback/search?beginDate=" + $('#startTime').val()+ "&endDate="+ $('#endTime').val() +"&size=15&page=" + page;
+
+
+                    $http({method: "GET", url: $scope.link}).success(function (resResult) {
+
+                        $scope.list = resResult.data.feedbacks;
+                        console.log($scope.list);
+
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+                };
+
+                $scope.getList(0);
+                /*
+                   * 根据时间查询意见反馈
+                */
+                $scope.search = function(){
+                    if($('#startTime').val() && $('#endTime').val()){
+                        $scope.getList(0)
+                    }else{
+                        $rootScope.toasterWarning("请输入需要查询的时间段!");
+                    }
+                };
+
+                /*
+                * 清空按钮
+                * */
+                $scope.clearSearch = function(){
+                    $('#startTime').val("");
+                    $('#endTime').val("");
+                    $scope.getList(0)
+                };
+
+
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                $scope.endOpen = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.endOpened = true;
+                };
+                $scope.endDateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="feedbackListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <!--开始-->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <!--<div class="w inline m-r">-->
+                                        <!--<input type="date" class="form-control"-->
+                                               <!--placeholder="请输入需要查询的起始时间"-->
+                                               <!--ng-model="startTime"-->
+                                               <!--id="startTime"-->
+                                               <!--autocomplete="off">-->
+                                    <!--</div>-->
+                                    <!--<div class="w inline m-r">-->
+                                        <!--<input type="date" class="form-control"-->
+                                               <!--placeholder="请输入需要查询的终止时间"-->
+                                               <!--ng-model="endTime"-->
+                                               <!--id="endTime"-->
+                                               <!--autocomplete="off">-->
+                                    <!--</div>-->
+                                    <div class="w-sm inline_tab input-group">
+                                        <input type="text"
+                                               disabled
+                                               style="float: none;"
+                                               class="form-control"
+                                               datepicker-popup="yyyy-MM-dd"
+                                               placeholder="查询起始时间"
+                                               ng-model="startTime"
+                                               id="startTime"
+                                               popup-placement="bottom-right"
+                                               is-open="opened"
+                                               datepicker-options="dateOptions"
+                                               close-text="关闭"
+                                               clear-text="清空"
+                                               current-text="今天"/>
+                                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                                    </div>
+                                    <div class="w-sm inline_tab input-group">
+                                        <input type="text"
+                                               disabled
+                                               style="float: none;"
+                                               class="form-control"
+                                               datepicker-popup="yyyy-MM-dd"
+                                               placeholder="查询截止时间"
+                                               ng-model="endTime"
+                                               id="endTime"
+                                               is-open="endOpened"
+                                               popup-placement="bottom-right"
+                                               datepicker-options="endDateOptions"
+                                               close-text="关闭"
+                                               clear-text="清空"
+                                               current-text="今天"/>
+                                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="endOpen($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            <div class="table-responsive" ng-if="list.length > 0">
+                                <table class="table table-hover b-t b-light">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 150px">提交用户</th>
+                                        <th style="width: 200px">提交时间</th>
+                                        <th style="width: 600px;">提交文字内容</th>
+                                        <th style="width: 800px">提交图片</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                                <div class="table-responsive" ng-if="list.length > 0" style="max-height: 570px;overflow: auto">
+                                    <!--<table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">-->
+                                    <table ng-if="list.length>0" class="table table-hover b-t b-light">
+                                    <tbody>
+                                    <tr ng-repeat="item in list">
+                                        <td class="v-middle" style="width: 150px">
+                                            {{ item.submitCustomer }}
+                                        </td>
+                                        <td class="v-middle" style="width: 200px">
+                                            {{ item.submitTime| datetime }}
+                                        </td>
+                                        <td class="v-middle" style="width: 600px;">
+                                            {{ item.content }}
+                                        </td>
+                                        <td class="v-middle" style="display: flex;width: 800px">
+                                            <p ng-if="item.imgURL.length<1">暂无图片</p>
+                                            <img ng-if="item.imgURL.length>0" style="height: 80px;width:150px;margin: 10px 20px 10px 0px;" class="img-responsive"  ng-repeat="img in item.imgURL" ng-src={{img}}>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--<div class="wrapper b-t b-light clearfix">-->
+                                <!--<ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"></ul>-->
+                                <!--<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>-->
+                            <!--</div>-->
+                            </div>
+                            <div>
+                            <!--结束-->
+                        </div>
+                    </div>
+                </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+
+

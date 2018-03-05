@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+	<title>核保详情</title>
+	<link rel="stylesheet" type="text/css" href="css/invite.css"/>
+	<link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css" />
+	<script src="https://cdn.bootcss.com/angular.js/1.5.8/angular.min.js"></script>
+</head>
+<body ng-app="submitApp">
+<div class="subContent"  id="subContent" ng-controller="subContentCtrl">
+	<div class="bg_yellow">
+		<div class="m-a bg_white" style="margin-top: 0;margin-bottom: 0;">
+			<div id="submit" class="submitBody text-sm">
+				<div class="bg_header"></div>
+				<div class="submitHeader">
+					<div class="wrapper">
+						<div class="b-b-y">
+							<div class="subHImg">
+								<img ng-src="{{submitInfo.company.detailIcon}}" style="width: 200px; height: 40px;">
+							</div>
+							<div class="pull-right">
+								<img ng-src="{{stateImg}}" alt="" style="margin-top: -40px;">
+							</div>
+							<div class="subHName text m">
+								<span class="">蜂险无忧</span>
+								<span >({{ submitInfo.schemeName }})</span>
+							</div>
+							<div ng-if="stateCode !== '承保成功'">
+								<div class=" text-gray text-sm m" ng-if="submitInfo.underwritingJson.ciNo.name">
+									<span class="m-r-md">
+										{{ submitInfo.underwritingJson.ciNo.name }}
+									</span>
+									<span>
+										{{ submitInfo.underwritingJson.ciNo.value }}
+									</span>
+								</div>
+								<div class=" text-gray text-sm m" ng-if="submitInfo.underwritingJson.biNo.name">
+									<span class="m-r-md">
+										{{ submitInfo.underwritingJson.biNo.name }}
+									</span>
+									<span>
+										{{ submitInfo.underwritingJson.biNo.value }}
+									</span>
+								</div>
+							</div>
+							<div ng-if="stateCode === '承保成功'">
+								<div class=" text-gray text-sm m" ng-if="submitInfo.insuranceResult.ciPolicyNo">
+									<span class="m-r-md">
+										交强险保单号：
+									</span>
+									<span>
+										{{ submitInfo.insuranceResult.ciPolicyNo }}
+									</span>
+								</div>
+								<div class=" text-gray text-sm m" ng-if="submitInfo.insuranceResult.biPolicyNoe">
+									<span class="m-r-md">
+										 商业险保单号：
+									</span>
+									<span>
+										{{ submitInfo.insuranceResult.biPolicyNoe }}
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="submitContent">
+					<div class="wrapper wrapper-t-t text-sm">
+						<div>
+							<span ng-if="submitInfo.biBeginDate">商业险起保日期</span>
+							<span class="pull-right" ng-if="submitInfo.offerDetail.taxPrice.quotesPrice > 0">交强险起保日期</span>
+						</div>
+						<div>
+							<span ng-if="submitInfo.biBeginDate">{{ subBi | date : 'yyyy-MM-dd' }}</span>
+							<span class="pull-right" ng-if="submitInfo.offerDetail.taxPrice.quotesPrice > 0"> {{ subCi | date : 'yyyy-MM-dd' }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>投保车辆</span>
+							<span class="pull-right">{{ submitInfo.licenseNumber }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>车主</span>
+							<span class="pull-right">{{ submitInfo.params.ownerName }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>投保人</span>
+							<span class="pull-right">{{ submitInfo.params.customerName }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>被保人</span>
+							<span class="pull-right">{{ submitInfo.params.insuredName }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>投保城市</span>
+							<span class="pull-right"> {{ submitInfo.city }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>保险公司</span>
+							<span class="pull-right"> {{ submitInfo.company.name }}</span>
+						</div>
+					</div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>保险方案</span>
+						</div>
+					</div>
+					<div class="wrapper wrapper-t-t text-sm b-b">
+						<div class="m-l b-b">
+							<div ng-if="submitInfo.offerDetail.taxPrice.quotesPrice > 0">
+								<div class="b-b">
+									<div class="m m-l-xs">
+										<span>强制险</span>
+										<span class="pull-right">￥{{ submitInfo.offerDetail.ciBasePrice }}</span>
+									</div>
+								</div>
+								<div class="wrapper-sm wrapper-t-r">
+									<div class="row">
+										<span class="col-xs-6 col-sm-6">车船税</span>
+										<span class="col-xs-6"><span class="pull-right">￥{{ submitInfo.offerDetail.taxPrice.quotesPrice }}</span></span>
+									</div>
+								</div>
+								<div class="wrapper-sm wrapper-t-r">
+									<div class="row">
+										<span class="col-xs-6 col-sm-6">交强险</span>
+										<span class="col-xs-6"><span class="pull-right">￥{{ submitInfo.offerDetail.forcePremium.quotesPrice }}</span></span>
+									</div>
+								</div>
+							</div>
+							<div ng-if="submitInfo.offerDetail.insurances">
+								<div class="b-b">
+									<div class="m m-l-xs">
+										<span>商业险</span>
+										<span class="pull-right">￥{{ submitInfo.offerDetail.originalPrice  | number : 2}}</span>
+									</div>
+								</div>
+								<div class="wrapper-sm wrapper-t-r" ng-repeat="item in submitInfo.offerDetail.insurances">
+									<div class="row">
+										<span class="col-xs-5 col-sm-6">{{ item.insuranceName }}</span>
+										<span class="col-xs-4 col-sm-3">{{ item.amountStr }}</span>
+										<span class="col-xs-3"><span class="pull-right">￥{{ item.quotesPrice  | number : 2 }}</span></span>
+									</div>
+								</div>
+							</div>
+							<div class="wrapper-sm wrapper-t-r">
+								<div class="row">
+									<span class="col-xs-4 col-sm-6">不计免赔</span>
+									<a tabindex="0"
+									   class="btn btn-xs col-xs-5 col-sm-3 text-yellow left"
+									   role="button"
+									   ng-click="showDetail()">
+										查看详情
+									</a>
+									<div ng-if="detailShow" class="errorDivCss">
+										<div class="errorTipCss">
+											<div ng-click="hideDetail()">
+												<span class="pull-right text-md">×</span>
+											</div>
+											{{ submitInfo.deductibleDetail }}
+										</div>
+									</div>
+									<!--<span class="text-yellow col-xs-4 col-sm-3">-->
+									<!--查看详情-->
+									<!--</span>-->
+									<span class="col-xs-3"><span class="pull-right">￥{{ submitInfo.offerDetail.additionalPrice  | number : 2 }}</span></span>
+								</div>
+							</div>
+						</div>
+						<div class="wrapper text-sm wrapper-t-r wrapper-t-b">
+							<div>
+								<span>总计</span>
+								<span class="pull-right" ng-if="submitInfo.offerDetail.ciBasePrice">￥{{(submitInfo.offerDetail.originalPrice  + submitInfo.offerDetail.ciBasePrice) | number : 2}}</span>
+								<span class="pull-right" ng-if="!submitInfo.offerDetail.ciBasePrice">￥{{ submitInfo.offerDetail.originalPrice   | number : 2}}</span>
+							</div>
+						</div>
+					</div>
+					<div class="space-gray"></div>
+					<div class="wrapper text-sm b-b">
+						<div>
+							<span>保费总额</span>
+							<span class="pull-right text-danger">{{ submitInfo.sumPrice | number : 2 }}元</span>
+						</div>
+					</div>
+					<div class="space-gray"></div>
+					<div ng-if="submitInfo.ratioJson">
+						<div class="wrapper text-sm b-b">
+							<div>
+								<span>定价系数</span>
+							</div>
+						</div>
+						<div class="wrapper wrapper-t-b text-sm wrapper-t-t">
+							<div class="m-l">
+								<div class="m wrapper-t-r" ng-repeat="ratio in insureRatioJson">
+									<span>{{ ratio.content }}</span>
+									<span class="pull-right">{{ ratio.ratio }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="bg_footer">
+					<!--<img src="img/footer.png" class="img-responsive" alt="">-->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--<script src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js" type="text/javascript"></script>-->
+<!--<script type="text/javascript">-->
+    <!--if ('addEventListener' in document) {-->
+        <!--document.addEventListener('DOMContentLoaded', function() {-->
+            <!--FastClick.attach(document.body);-->
+        <!--}, false);-->
+    <!--}-->
+<!--</script>-->
+<!--<script src="../js/filters/customFilter.js"></script>-->
+<!--<script src="../js/filters/fromNow.js"></script>-->
+<script type="text/javascript" src="js/submitProposal.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+ <div class="hbox hbox-auto-xs hbox-auto-sm">
+        <div class="col w-md bg-light dk b-r bg-auto"  ng-controller="MessageCtrl">
+            <div class="wrapper b-b bg">
+                消息列表 <button class="btn btn-primary" ng-click="add_message()">add message</button>
+            </div>
+            <div class="wrapper hidden-sm hidden-xs cell scrollable hover" id="message_list_wrapper">
+                <ul class="list-group no-bg no-borders pull-in">
+
+
+                    <li class="list-group-item" ng-repeat="item in message_list">
+                        <b class="badge bg-info pull-right">{{number}}</b>
+                        <a href="#/message/{{item.id}}" class="pull-left thumb-sm avatar m-r">
+                            <img ng-src="{{item.avatar}}" alt="..." class="img-circle">
+                            <i class="on b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>{{item.name}}</a></div>
+                            <small class="text-muted">{{item.last_message}}</small><br />
+                            <small class="text-muted">{{item.time| fromNow }}</small>
+                        </div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <a herf class="pull-left thumb-sm avatar m-r">
+                            <img src="img/a4.jpg" alt="..." class="img-circle">
+                            <i class="on b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>Chris Fox</a></div>
+                            <small class="text-muted">Designer, Blogger</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <a herf class="pull-left thumb-sm avatar m-r">
+                            <img src="img/a5.jpg" alt="..." class="img-circle">
+                            <i class="on b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>Mogen Polish</a></div>
+                            <small class="text-muted">Writter, Mag Editor</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <a herf class="pull-left thumb-sm avatar m-r">
+                            <img src="img/a6.jpg" alt="..." class="img-circle">
+                            <i class="busy b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>Joge Lucky</a></div>
+                            <small class="text-muted">Art director, Movie Cut</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <a herf class="pull-left thumb-sm avatar m-r">
+                            <img src="img/a7.jpg" alt="..." class="img-circle">
+                            <i class="away b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>Folisise Chosielie</a></div>
+                            <small class="text-muted">Musician, Player</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <a herf class="pull-left thumb-sm avatar m-r">
+                            <img src="img/a8.jpg" alt="..." class="img-circle">
+                            <i class="away b-white bottom"></i>
+                        </a>
+                        <div class="clear">
+                            <div><a href>Aron Gonzalez</a></div>
+                            <small class="text-muted">Designer</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <div ui-view ></div>
+        </div>
+        <div class="col">
+            <div ui-view="related_entity"></div>
+        </div>   
+    </div>

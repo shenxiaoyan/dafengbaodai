@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+	<link rel="stylesheet" type="text/css" href="css/invite.css"/>
+	<link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css" />
+	<script src="https://cdn.bootcss.com/angular.js/1.5.8/angular.min.js"></script>
+	<script type="text/javascript" src="js/questions.js"></script>
+	<script src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+        if ('addEventListener' in document) {
+            document.addEventListener('DOMContentLoaded', function() {
+                FastClick.attach(document.body);
+            }, false);
+        }
+	</script>
+
+</head>
+<body ng-app="questApp">
+<!--width=device-width,,user-scalable=no-->
+<div class="quest"  id="quest" ng-controller="questContentCtrl">
+	<div>
+		<div class="questContent">
+			<div>
+				<div class="b-b text-sm wrapper bg_white"  ng-click="show1()">
+					<span>
+						非浙A车牌可以算价吗？
+					</span>
+					<div class="inline pull-right" ng-show="downShow1">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow1">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray disabled" ng-show="detailShow1">
+				<span>
+					可以。
+				</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show2()" >
+				<span>
+					过户车、营运车、货车、企业车可以核保吗？
+				</span>
+					<div class="inline pull-right" ng-show="downShow2">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow2">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow2">
+					<span>
+						由于营运车、货车、企业车核价比较复杂，大蜂保险APP目前暂不支持，后续的版本会陆续完善上线。
+						现大蜂保险APP仅支持非过户、非营运客车。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show3()">
+				<span>
+					为什么有些车算价的时候，提示匹配不到车型？
+				</span>
+					<div class="inline pull-right"  ng-show="downShow3">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow3">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow3">
+					<span>
+						这个问题确实存在，主要是进口车，由于进口车型号比较特殊。
+						目前现实情况人保、太保系统进口车型不支持核价，需要借助第三方的工具才可以，
+						国寿财可以核价。这个在后续的版本中，会改善解决。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show4()">
+				<span>
+					现在大蜂保险APP上，有几家可以实现录单、核价、保费支付？
+				</span>
+					<div class="inline pull-right"  ng-show="downShow4">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow4">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow4">
+					<span>
+						目前大蜂保险APP上可以四家保险人保、太保、平安、国寿财支持录单、核价、保费支付。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show5()">
+				<span>
+					现在大蜂保险险种会有“续保型”“热销型”“自定义”这几个分别什么意思？
+				</span>
+					<div class="inline pull-right"  ng-show="downShow5">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right"  ng-show="detailShow5">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow5">
+					<span>
+						现大蜂保险APP可以自动查询，投保车辆的上年的续保情况。
+						如果查询到默认核保的是按去年的险种核保的，如果查询不到
+						，就按我们比较常见的险种即“热销型”。同时提供了“自定义”，使用自己选择。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show6()">
+				<span>
+					费改后，车辆损失险的保额已经按照实际价值来计算了，那么这个实际价值是如何来的？
+				</span>
+					<div class="inline pull-right"  ng-show="downShow6">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow6">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow6">
+					<span>
+						保险行业的实际价值计算标准是按照每年该款车市场上新车购置价（不含购置税）为基数，
+						自注册之日起，每月千分之六进行贬值计算得来的！
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white"  ng-click="show7()">
+				<span>
+					目前APP投保地区可以选浙江省的别的城市么？
+				</span>
+					<div class="inline pull-right" ng-show="downShow7">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow7">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow7">
+					<span>
+						目前不可以，投保地区只能选杭州市。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white"  ng-click="show8()">
+				<span>
+					为什么有的单子可以直接核保，有的单子一直在核保中，或者核不过？
+				</span>
+					<div class="inline pull-right" ng-show="downShow8">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow8">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow8">
+					<span>
+						保险公司的核保一般是自动核保和人工核保两种。自动核保的单子不需要人工干预，
+						整个核保由计算机系统自动完成。针对有些特殊的单子，如车龄过长或者赔付金额大、折扣高、特殊车型、稀有车型、
+						管控车型等等原因，保险公司系统一般就不会自动核保，就需要核保老师进行人工核保，
+						所以人工核保的单子就会出现核保慢或者承保不通过被拒保。
+					</span>
+				</div>
+			</div>
+			<div>
+				<div class="b-b text-sm wrapper bg_white" ng-click="show9()">
+				<span>
+					7座的面包车，为什么乘客险报价是显示是4座？
+				</span>
+					<div class="inline pull-right" ng-show="downShow9">
+						<a>
+							<img src="img/icon_down.png" alt="">
+						</a>
+					</div>
+					<div class="inline pull-right" ng-show="detailShow9">
+						<a>
+							<img src="img/icon_up.png" alt="">
+						</a>
+					</div>
+				</div>
+				<div class="b-b text-xs wrapper bg_gray" ng-show="detailShow9">
+					<span>
+						上传行驶证的时候需要手动把乘客座位改成6座，不然默认4座。
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

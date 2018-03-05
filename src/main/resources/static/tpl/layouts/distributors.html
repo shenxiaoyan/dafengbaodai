@@ -1,0 +1,52 @@
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">分销商</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="distributors.create"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新建门店" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新建 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="distributors.distributor.page({distributor_id:10,entity_type:'distributors',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;保税区平行进口车店
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="distributors.distributor.page({distributor_id:1,entity_type:'distributors',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;汽车城某4S店
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="distributors.distributor.page({distributor_id:3,entity_type:'distributors',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;元通别克4S店
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="distributors.distributor.page({distributor_id:5,entity_type:'distributors',view_type:'dashboard'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;国际汽车城五菱店
+							</a></li>
+
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

@@ -1,0 +1,12 @@
+<div class="vbox bg-white">
+    <div class="wrapper b-b b-light">
+        <button class="btn m-b-xs btn-sm btn-primary btn-addon m-r-sm"  ng-click="excute(act)" tooltip="{{act.help}}" tooltip-placement="bottom" ng-repeat="act in canActs"><i class="fa fa-plus"></i> {{act.label}} </button> 
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view=''></div>
+            </div>
+        </div>
+    </div>
+</div>

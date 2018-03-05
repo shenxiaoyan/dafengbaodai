@@ -1,0 +1,21 @@
+<ul class="nav" ng-repeat="menu in menus">
+    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+        <span>{{ menu.label }}</span>
+    </li>
+    <li ui-sref-active="active" ng-repeat="child in menu.children">
+        <a ui-sref="{{ child.router }}">
+            <i ng-class="child.iconClass"></i>
+            <span class="font-bold">{{ child.label }}</span>
+        </a>
+    </li>
+    <!--<li ng-if="menu.label==='工作台'" ng-click="selectMessage($event)">-->
+        <!--<a class="auto">-->
+            <!--<b class="badge bg-danger pull-right font-bold" id="message_un_read" style="display: none;">!</b>-->
+            <!--<i class="fa fa-comments text-primary-dker"></i>-->
+            <!--<span class="font-bold">消息</span>-->
+        <!--</a>-->
+    <!--</li>-->
+    <li class="line dk"></li>
+</ul>
+
+

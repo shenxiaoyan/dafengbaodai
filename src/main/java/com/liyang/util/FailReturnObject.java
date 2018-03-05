@@ -1,0 +1,133 @@
+package com.liyang.util;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.liyang.enums.ExceptionResultEnum;
+
+/**
+ * @author Administrator
+ *
+ */
+public class FailReturnObject extends RuntimeException implements ReturnObject {
+
+	private String errorInfo;
+	private Integer errorCode;
+	@JsonIgnore
+	private Level level;
+	private Integer msgTime;
+
+	public FailReturnObject(Integer errorCode, String errorInfo) {
+		super(errorCode + " : " + errorInfo);
+		this.errorInfo = errorInfo;
+		this.errorCode = errorCode;
+		level = Level.LOG;
+
+	}
+
+	public FailReturnObject(Integer errorCode, String errorInfo, Level level) {
+		super(errorCode + " : " + errorInfo);
+		this.errorInfo = errorInfo;
+		this.errorCode = errorCode;
+		this.level = level;
+
+	}
+
+	public FailReturnObject(Integer errorCode, Object errorInfo) {
+		super(errorCode + " : " + errorInfo.toString());
+		this.errorInfo = errorInfo.toString();
+		this.errorCode = errorCode;
+		level = Level.LOG;
+
+	}
+
+	public FailReturnObject(Integer errorCode, Object errorInfo, Level level) {
+		super(errorCode + " : " + errorInfo.toString());
+		this.errorInfo = errorInfo.toString();
+		this.errorCode = errorCode;
+		this.level = level;
+
+	}
+
+	public FailReturnObject(ExceptionResultEnum exResEnum) {
+		super(exResEnum.getCode() + " : " + exResEnum.getMessage());
+		errorInfo = exResEnum.getMessage();
+		errorCode = exResEnum.getCode();
+		level = Level.LOG;
+	}
+
+	public FailReturnObject(ExceptionResultEnum exResEnum, String detailInfo) {
+		super(exResEnum.getCode() + " : " + exResEnum.getMessage() + detailInfo);
+		errorInfo = exResEnum.getMessage() + detailInfo;
+		errorCode = exResEnum.getCode();
+		level = Level.LOG;
+	}
+
+	public FailReturnObject(ExceptionResultEnum exResEnum, Level level) {
+		super(exResEnum.getCode() + " : " + exResEnum.getMessage());
+		errorInfo = exResEnum.getMessage();
+		errorCode = exResEnum.getCode();
+		this.level = level;
+	}
+
+	public FailReturnObject(ExceptionResultEnum exResEnum, Level level, String detailInfo) {
+		super(exResEnum.getCode() + " : " + exResEnum.getMessage() + detailInfo);
+		errorInfo = exResEnum.getMessage() + detailInfo;
+		errorCode = exResEnum.getCode();
+		this.level = level;
+
+	}
+
+	@Override
+	public Integer getMsgTime() {
+		return msgTime;
+	}
+
+	@Override
+	public void setErrorInfo(String errorInfo) {
+		this.errorInfo = errorInfo;
+	}
+
+	@Override
+	public void setErrorCode(Integer errorCode) {
+		this.errorCode = errorCode;
+	}
+
+	@Override
+	public void setMsgTime(Integer msgTime) {
+		this.msgTime = msgTime;
+	}
+
+	@Override
+	public String getActionStatus() {
+		// TODO Auto-generated method stub
+		return "FAIL";
+	}
+
+	@Override
+	public String getErrorInfo() {
+		return errorInfo;
+	}
+
+	@Override
+	public Integer getErrorCode() {
+		return errorCode;
+	}
+
+	@Override
+	public void setActionStatus(String s) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public Level getLevel() {
+		// TODO Auto-generated method stub
+		return level;
+	}
+
+	@Override
+	public void setLevel(Level level) {
+		this.level = level;
+
+	}
+
+}

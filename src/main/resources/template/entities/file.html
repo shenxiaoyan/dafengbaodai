@@ -1,0 +1,183 @@
+<div class="wrapper-md" ng-controller="workflowEntityFileController">
+    <div class="m-b-md clearfix" ng-if="canFileActs.length > 0">
+        <button class="pull-left btn btn-sm btn-primary btn-addon m-r-sm m-b-sm"
+                ng-click="excute[act.actCode]()"
+                tooltip="{{act.help}}"
+                tooltip-placement="bottom"
+                ng-repeat="act in canFileActs">
+            <i class="fa fa-plus"></i> {{act.label}}
+        </button>
+    </div>
+    <div class="m-b-md clearfix" ng-if="!firstFolder.opened">
+        <span class="pull-left" ng-click="backFolder()">
+            <span class="text-info file_back_btn">上一级</span>&ensp;|&ensp;
+        </span>
+        <span class="pull-left">{{ firstFolder.folderName }}&ensp;</span>
+        <span class="pull-left" ng-if="secondFolder.folderName">>&ensp;{{ secondFolder.folderName }}</span>
+    </div>
+
+    <div class="m-b-md" ng-if="firstFolder.opened">
+        全部文件夹
+    </div>
+    <div class="m-b-md" ng-if="!fileTree">
+        暂无文件
+    </div>
+
+    <div class="clearfix" ng-if="firstFolder.opened">
+        <div ng-repeat="(key,level1) in fileTree"
+             ng-click="jumpToLevel2(key,level1)"
+             class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+            <div class="wrapper-xs b-b text-center">
+                <i class="fa fa-paperclip"></i> {{ key }}
+            </div>
+            <div class="wrapper-xs w-sm lt">
+                <img class="img-full" src="img/open-folder-full.png">
+            </div>
+        </div>
+    </div>
+
+    <div class="clearfix" ng-if="secondFolder.opened">
+        <div ng-repeat="(key,level2) in level2Tree"
+             ng-click="jumpToLevel3(key)"
+             class="pull-left panel b-a inline m-r-sm m-b-sm bg-light">
+            <div class="wrapper-xs b-b text-center">
+                <i class="fa fa-paperclip"></i> {{ key }}
+            </div>
+            <div class="wrapper-xs w-sm lt">
+                <img class="img-full" src="img/open-folder-full.png">
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="thirdFolder.opened">
+        <div class="panel panel-default">
+            <table class="table table-striped m-b-none">
+                <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>大小</th>
+                    <th>创建日期</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="(index,level3) in level3Tree">
+                    <td>
+                        <a class="file_icon_container text-ellipsis" ng-class="'file_' + level3.fileType" href="http://files.xiaojinpingtai.com/{{ level3.newFileName }}" target="_blank">{{ level3.originalFileName }}</a>
+                    </td>
+                    <td>
+                        {{ level3.fileSize/1024/1024 | number:2 }} MB
+                    </td>
+                    <td>
+                        {{ level3.createdAt | datetime }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="upload_file_modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="uploader.clearQueue();" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    上传{{ subcategory }}
+                </div>
+                <div class="modal-body">
+                    <div class="hbox hbox-auto-xs hbox-auto-sm" nv-file-drop="" uploader="uploader"
+                         filters="queueLimit, customFilter">
+                        <div class="col w-lg bg-light b-r bg-auto">
+                            <div class="wrapper-md dker b-b">
+                                <h4 class="m-n font-thin">选择文件（可多选）</h4>
+                            </div>
+                            <div class="wrapper-md">
+                                <div ng-show="uploader.isHTML5" class="m-b-md">
+                                    <!-- 3. nv-file-over uploader="link" over-class="className" -->
+                                    <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b"
+                                         nv-file-over="" over-class="b-info" uploader="uploader">
+                                        拖动文件放到此处
+                                    </div>
+                                </div>
+                                <input type="file" nv-file-select="" uploader="uploader" multiple/>
+                            </div>
+                        </div>
+                        <div class="col bg-light bg-auto">
+                            <div class="wrapper-md bg-light dk b-b">
+                                    <span class="pull-right">文件数：<b
+                                            class="badge bg-info">{{ uploader.queue.length }}</b></span>
+                                <h4 class="m-n font-thin">上传队列</h4>
+                            </div>
+                            <div class="wrapper-md">
+                                <table class="table bg-white-only b-a">
+                                    <thead>
+                                    <tr>
+                                        <th>文件名</th>
+                                        <th ng-show="uploader.isHTML5">大小</th>
+                                        <th ng-show="uploader.isHTML5">进度</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="item in uploader.queue">
+                                        <td>
+                                            <div class="text-ellipsis w-sm">{{ item.file.name }}</div>
+                                        </td>
+                                        <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2
+                                            }} MB
+                                        </td>
+                                        <td ng-show="uploader.isHTML5">
+                                            <div class="progress progress-sm m-b-none m-t-xs">
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     ng-style="{ 'width': item.progress + '%' }"></div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                                <span ng-show="item.isSuccess" class="text-success">
+                                                    <i class="fa fa-check"></i>
+                                                </span>
+                                            <span ng-show="item.isCancel" class="text-warning">
+                                                    <i class="fa fa-ban"></i>
+                                                </span>
+                                            <span ng-show="item.isError" class="text-danger">
+                                                    <i class="fa fa-cancel"></i>
+                                                </span>
+                                        </td>
+                                        <td nowrap>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    ng-click="item.upload()"
+                                                    ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                                上传
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    ng-click="item.remove()">
+                                                清除
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div>
+                                    <div>
+                                        <p>总进度</p>
+                                        <div class="progress bg-light dker" style="">
+                                            <div class="progress-bar progress-bar-striped bg-info"
+                                                 role="progressbar"
+                                                 ng-style="{ 'width': uploader.progress + '%' }"></div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-addon btn-success"
+                                            ng-click="uploader.uploadAll()"
+                                            ng-disabled="!uploader.getNotUploadedItems().length">
+                                        <i class="fa fa-arrow-circle-o-up"></i> 上传全部
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

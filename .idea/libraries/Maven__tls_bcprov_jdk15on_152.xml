@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: tls:bcprov-jdk15on:152">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/tls/bcprov-jdk15on/152/bcprov-jdk15on-152.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/tls/bcprov-jdk15on/152/bcprov-jdk15on-152-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/tls/bcprov-jdk15on/152/bcprov-jdk15on-152-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

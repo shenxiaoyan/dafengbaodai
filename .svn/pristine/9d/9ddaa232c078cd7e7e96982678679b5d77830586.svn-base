@@ -1,0 +1,219 @@
+<script>
+
+    "use strict";
+    app.controller("unInsuranceCusCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+                //获取当前接口
+//                $scope.entity_key = $stateparams.entity_key;
+
+                //搜索框信息
+                $scope.searchInfo = {};
+                $scope.list = [];
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "GET",
+                        url : "/rest/otherInsureInterestPersons/search/query?projection=oiip&size=15&page=" + page
+                    }).success(function(resResult){
+
+                        $scope.list = resResult._embedded.otherInsureInterestPersons;
+//                        console.log($scope.list);
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number === 0 ? 0 : resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#otherInsureInterestPersons_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+                
+                //搜索功能
+                $scope.search = function () {
+                    if(!$scope.searchInfo){
+                        $rootScope.toasterWarning("请输入查询条件!");
+                    }else{
+                        //按条件搜索
+
+                        $http({
+                            method:"POST",
+                            url:"/dafeng/searchOtherInsure",
+                            data: $scope.searchInfo
+                        }).success(function(resResult){
+
+                            //获取到返回的所有数据
+                            $scope.list = resResult.otherInsureInterestPersons;
+
+//                            console.log(resResult)
+
+                            $scope.pageList = {
+                                size: resResult.data.page.size,
+                                total_elements: resResult.data.page.totalElements,
+                                current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                                num_page: resResult.data.page.totalPages,
+                                total_page: resResult.data.page.totalPages
+                            };
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#searchOtherInsure_list_paginator", $scope.pageList, $scope.search);
+                            }
+                        })
+                    }
+                };
+
+                //清除搜索框
+                $scope.clearSearch = function () {
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                }
+
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="unInsuranceCusCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="font-thin h4">
+                    非车险客户
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="wrapper">
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入询价人手机号"
+                                               ng-model="searchInfo.phoneNumber"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入产品名称"
+                                               ng-model="searchInfo.title"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search()">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                            <tr>
+                                                <th>用户ID</th>
+                                                <th>昵称</th>
+                                                <th>手机号</th>
+                                                <th>关注时间</th>
+                                                <th>产品名称</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <div class="table-responsive" ng-if="list.length > 0" style="height: 580px;overflow: hidden">
+                                        <table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.customer.id }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.customer.nickname }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.customer.phone }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.clickTime|datetime }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.title }}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper b-t b-light clearfix">
+                        <ul id="otherInsureInterestPersons_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+

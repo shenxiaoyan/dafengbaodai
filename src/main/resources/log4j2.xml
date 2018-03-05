@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+	 <!--定义日志储存文件目录-->
+	<properties>
+		<property name="LOG_HOME">logs</property>
+	</properties>
+	
+	<Appenders>
+		<!--控制台输出所有日志-->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss} [%t] [%p] %l - %msg%n" />
+		</Console>
+	
+		<!--Info级别日志输出   filepattern中的日期格式精确位数决定了生成日志的日期单位-->
+		<RollingRandomAccessFile name="InfoFile" fileName="${LOG_HOME}/info/info.log" filePattern="${LOG_HOME}/info/info-%d{yyyy-MM-dd}-%i.log">
+			<Filters>
+			<!-- 临界值过滤器     onMatch：DENY/ACCEPT 禁止或者接受（是否接受匹配）;onMismatch:DENY/NEUTRAL （是否接受其他高于level的级别）-->
+				<ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<!-- 输出格式 --> 
+			<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %ms%n"/>
+			<policies>
+				<!-- 按时间分割日志文件，目前是按天分，与filePattern后的日期格式相结合，日期格式精确到什么单位，interval也精确到哪一位 -->
+				<TimeBasedTriggeringPolicy interval="1"/>
+				<!-- 设定每个日志文件的大小 -->
+				<SizeBasedTriggeringPolicy size="10 MB"/>
+			</policies>
+			<!-- 设置同一类型日志文件个数 ,若超过这个数量，新产生的日志文件会覆盖旧的日志文件-->
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile>
+		
+		<!--Warn级别日志输出-->
+		<RollingRandomAccessFile name="WarnFile" fileName="${LOG_HOME}/warn/warn.log" filePattern="${LOG_HOME}/warn/warn-%d{yyyy-MM-dd}-%i.log">
+			<Filters>
+				<ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %ms%n"/>
+			<policies>
+				<TimeBasedTriggeringPolicy interval="1"/>
+				<SizeBasedTriggeringPolicy size="10 MB"/>
+			</policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile>
+		
+		<!--Error级别日志输出-->
+		<RollingRandomAccessFile name="ErrorFile" fileName="${LOG_HOME}/error/error.log" filePattern="${LOG_HOME}/error/error-%d{yyyy-MM-dd}-%i.log">
+			<Filters>
+				<ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<PatternLayout pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %ms%n"/>
+			<policies>
+				<TimeBasedTriggeringPolicy interval="1"/>
+				<SizeBasedTriggeringPolicy size="10 MB"/>
+			</policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile>
+		
+		
+	</Appenders>
+	
+	<Loggers>
+		<Root level="INFO">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="InfoFile" />
+			<AppenderRef ref="WarnFile" />
+			<AppenderRef ref="ErrorFile" />
+		</Root>
+	</Loggers>
+</Configuration>

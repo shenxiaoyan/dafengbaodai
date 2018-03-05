@@ -1,0 +1,90 @@
+<script>
+
+    app.controller("logsInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, $state) {
+
+                console.log($stateParams.entityName,$stateParams.entityId)
+
+                $scope.enName = $stateParams.entityName;
+
+                $scope.getList = function () {
+
+                    $http({
+                        method: "GET",
+                        url : "/dafeng/log/search?entityName=" + $stateParams.entityName + "&entityId=" + $stateParams.entityId
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.content;
+                        console.log($scope.list)
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+
+                };
+                $scope.getList();
+
+
+            }
+        ]
+    );
+</script>
+
+<div class="wrapper-md" ng-controller="logsInfoCtrl">
+    <div class="panel panel-default">
+        <div class="m-t-md" ng-if="list.length < 1">
+            没有更多记录！
+        </div>
+        <div class="streamline b-l b-info m-l-lg m-b padder-v" ng-if="list.length > 0">
+            <div ng-repeat="log in list" ng-click="jumpToLog(log)">
+                <a class="pull-left thumb-sm avatar m-l-n-md">
+                    <img ng-src="{{ log.avatar }}" class="img-circle">
+                </a>
+                <div class="m-l-lg m-b-lg panel b-a bg-light lt">
+                    <div class="panel-heading pos-rlt b-light clearfix">
+                        <span class="arrow arrow-light left"></span>
+                        <span class="text-muted m-r pull-left">{{ log.createdBy }}</span>
+                        <span class="text-muted pull-right">
+                        {{ log.createdAt | dateSecondTime }}
+                    </span>
+                    </div>
+                    <div class="panel-body">
+                        <div>
+                            <!--在{{ enName }}&ensp;菜单下-->
+                            <div>{{ log.createdBy }}&ensp;进行了&ensp;{{ log.label }}&ensp;操作
+                            </div>
+                            <div class="m-l">
+                                <div ng-repeat="info in log.difference">
+                                    <span>将</span>
+                                    &ensp;{{ info.column ? info.column : "--" }}
+                                    <span>从</span>
+                                    {{ info.old ? info.old : "--" }}&ensp;
+                                    <span>改成了</span>
+                                    &ensp;{{ info.new ? info.new : "--" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

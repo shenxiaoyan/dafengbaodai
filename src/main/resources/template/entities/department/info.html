@@ -1,0 +1,63 @@
+<script>
+    app.controller('departmentInfoCtrl',
+		[
+            "$rootScope",
+		    "$scope",
+            "$http",
+            "$stateParams",
+            function($rootScope,$stateParams,$scope,$http) {
+            }
+
+		]
+
+
+    );
+</script>
+
+<div ng-controller="departmentInfoCtrl">
+	<div style="background:url(img/c4.jpg) center center; background-size:cover">
+	      <div class="wrapper-lg bg-white-opacity">
+	        <div class="row m-t">
+	          <div class="col-sm-7">
+	            <div class="clear m-b">
+	              <div class="m-b m-t-sm">
+		              	<span class="h3 text-black">{{depart.label}}</span>
+	                <div class="text-black" style="margin: 10px 0 0 20px;">
+		                <small class="m-l">联系人：{{depart.attactPerson}}</small>
+		                <small class="m-l">联系方式：{{depart.attactPhone}}</small>
+		                <small class="m-l">联系地址：{{depart.address}}</small>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	    <div class="wrapper-md"  style="padding-bottom: 0">
+	            <table class="table" style="margin-bottom: 0">
+	            	<caption style="font-weight:900;font-size:20px;">本部门下的所有用户</caption>
+	            	<thead>
+	            		<tr>
+	            			<th>姓名</th>
+	            			<th>电话</th>
+	            			<th>部门</th>
+	            			<th>角色</th>
+	            			<th>状态</th>
+	            		</tr>
+	            	</thead>
+	            	<tbody>
+	            		<tr ng-repeat="item in list">
+	            			<td class="v-middle">{{item.nickname}}</td>
+	            			<td class="v-middle">{{item.username}}</td>
+	            			<td class="v-middle">{{item.departmentLabel}}</td>
+	            			<td class="v-middle">{{item.roleLabel}}</td>
+	            			<td class="v-middle">{{item.stateLabel}}</td>
+	    				</tr>
+	    		</tbody>
+	    	</table>
+		</div>
+	<div class="b-t b-light clearfix">
+		<ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+		<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+	</div>
+</div>

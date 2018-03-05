@@ -1,0 +1,56 @@
+<div class="vbox" ng-controller="workflowEntityLogController">
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div ng-if="logs.length < 1">
+                        没有更多记录！
+                    </div>
+                    <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs" ng-if="logs.length > 0">
+                        <a ng-repeat="log in logs" ng-click="jumpToLog(log)"
+                           class="list-group-item b-l-success clearfix b-l-3x">
+                            <div class="pull-left">
+                                <div class="clearfix">
+                                    <span class="pull-left">操作人：{{ log.createdBy }}&ensp;在</span>
+                                    <span class="pull-left">&ensp;{{ log.lastModifiedAt | datetime }}&ensp;进行了</span>
+                                    <span class="pull-left">&ensp;{{ log.label }}&ensp;操作</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="modal fade" id="log_modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                                <h4 class="modal-title">记录详情</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="clearfix">
+                                    <span class="pull-left">创建人：</span>
+                                    <span class="pull-left">{{ log.createdBy }}</span>
+                                </div>
+                                <div class="line line-dashed b-b line-lg pull-in"></div>
+                                <div class="clearfix">
+                                    <span class="pull-left">时间：</span>
+                                    <span class="pull-left">{{ log.lastModifiedAt | datetime }}</span>
+                                </div>
+                                <div class="line line-dashed b-b line-lg pull-in"></div>
+                                <div>
+
+                                </div>
+                                <div class="line line-dashed b-b line-lg pull-in"></div>
+                                <div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,315 @@
+<script>
+    app.controller("welcomeCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            function ($rootScope, $scope, $http) {
+
+                $scope.insuranceCompanyName = [];
+                $scope.funnelPloatDataName = [];
+
+                $scope.getOutline = function (time) {
+                    $http({
+                        method: "GET",
+                        url: "dafeng/outline/show?timeNode=" + time
+                    }).success(function (resResult) {
+
+                        $scope.outlineList = resResult.data;
+
+                        //饼图数据
+                        $scope.pieChartData = $scope.outlineList.insureCompanyInfo;
+
+                        angular.forEach($scope.pieChartData, function(value, index){
+                            $scope.insuranceCompanyName.push(value.name);
+                        });
+
+                        $scope.setPieChart($scope.pieChartData, $scope.insuranceCompanyName);
+
+
+                        //漏斗图数据
+                        $scope.funnelPloatData = $scope.outlineList.funnelInfo;
+
+                        angular.forEach($scope.funnelPloatData, function (value, index) {
+                            $scope.funnelPloatDataName.push(value.name);
+                        });
+
+                        $scope.setFunnelPloat($scope.funnelPloatData, $scope.funnelPloatDataName);
+
+                    })
+                };
+
+                $scope.getOutline("day");
+
+                //保险公司比例饼图
+
+                $scope.setPieChart = function(pieChartData, insuranceCompanyName){
+
+                    var pieChart = echarts.init(document.getElementById('accept_insurance_chart'));
+
+                    var option = {
+                        tooltip : {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: insuranceCompanyName
+                        },
+                        series : [
+                            {
+                                name: '承保保险公司比例',
+                                type: 'pie',
+                                radius : '55%',
+                                center: ['50%', '60%'],
+                                data: pieChartData,
+                                color:['#009d62','#fd5d07','#e8340b','#1665c0','#f6d147','#459a67','#d64526'],
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    };
+
+                    pieChart.setOption(option);
+
+                    $(window).resize(function () {
+                        pieChart.resize();
+                    });
+                };
+
+                //询价出单比例漏斗图
+                $scope.setFunnelPloat = function(funnelPloatData, funnelPloatDataName){
+
+                    var funnelPloat = echarts.init(document.getElementById('inquiry_list_chart'));
+
+                    var option = {
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c}%"
+                        },
+                        legend: {
+                            data: funnelPloatDataName
+                        },
+                        calculable: true,
+                        series: [
+                            {
+                                name:'询价出单漏斗图',
+                                type:'funnel',
+                                left: '10%',
+                                top: 60,
+                                //x2: 80,
+                                bottom: 60,
+                                width: '80%',
+                                // height: {totalHeight} - y - y2,
+                                min: 0,
+                                max: 100,
+                                minSize: '0%',
+                                maxSize: '100%',
+                                sort: 'descending',
+                                gap: 2,
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'outside'
+                                    },
+                                    emphasis: {
+                                        textStyle: {
+                                            fontSize: 20
+                                        }
+                                    }
+                                },
+                                labelLine: {
+                                    normal: {
+                                        show: false,
+                                        length: 10,
+                                        lineStyle: {
+                                            width: 1,
+                                            type: 'solid'
+                                        }
+                                    }
+                                },
+                                color:['#f8471c','#f9c11e','#66c354','#3489ff'],
+                                itemStyle: {
+                                    normal: {
+                                        borderColor: '#fff',
+                                        borderWidth: 1
+                                    }
+                                },
+                                data: funnelPloatData
+                            }
+                        ]
+                    };
+
+                    funnelPloat.setOption(option);
+
+                    $(window).resize(function () {
+                        funnelPloat.resize();
+                    });
+                };
+
+            }
+        ]
+    )
+</script>
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="welcomeCtrl">
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="bg-light lter b-b wrapper-md">
+                <div class="btn-group inline pull-right">
+                    <button type="button" class="btn btn-default" ng-click="getOutline('day')">昨天</button>
+                    <button type="button" class="btn btn-default" ng-click="getOutline('week')">最近一周</button>
+                    <button type="button" class="btn btn-default" ng-click="getOutline('month')">最近三个月</button>
+                </div>
+                <h1 class="m-n h3">情况概览</h1>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="wrapper-md">
+                                <!--用户数据统计-->
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">用户数据统计</div>
+                                    <div class="panel-body bg-light">
+                                        <div class="col-lg-3">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-user-plus fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">新增用户数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.newCustomerCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-user-circle fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">用户总数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.customerCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--车险数据统计-->
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">车险数据统计</div>
+                                    <div class="panel-body bg-light">
+                                        <div class="col-lg-2 col-md-6 col-sm-6 col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-hand-paper-o fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">发起询价数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.createEnquiryCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-6 col-sm-6 col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-list-ul fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">预约出单数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.submitProposalCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-6 col-sm-6 col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-check-square fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">核保通过数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.hebaoSuccessPaymentCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-check-square-o fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">承保成功数量</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.chengbaoSuccessCount }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-6 col-sm-12">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <div>
+                                                        <i class="pull-left thumb-md fa fa-jpy fa-4x"></i>
+                                                    </div>
+                                                    <div class="clear">
+                                                        <div style="font-size: large">承保成功总金额</div>
+                                                        <div style="font-size: xx-large; color: #00b0ff">{{ outlineList.chengbaoPriceSum | number : 2}}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--承保成功饼图-->
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">承保保险公司比例</div>
+                                            <div class=" bg-light">
+                                                <div style="padding-top: 0;">
+                                                    <div class="panel wrapper">
+                                                        <div id="accept_insurance_chart" style="height:500px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">询价出单比例</div>
+                                            <div class="bg-light">
+                                                <div style="padding-top: 0;">
+                                                    <div class="panel wrapper">
+                                                        <div id="inquiry_list_chart" style="height:500px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,31 @@
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light h-full">
+    <div class="col w-lg select_branch b-r ">
+        <div class="vbox">
+            <div class="wrapper-md b-b clearfix">
+                <div class="font-thin h4 pull-left m-t-xs">
+                    菜单管理
+                </div>
+                <a ui-sref="menuConfig.create" class="pull-right btn btn-sm btn-danger w-xs">新建</a>
+            </div>
+            <div class="row-row">
+                <div class="cell scrollable">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <span ng-if="doing_async">...loading...</span>
+                            <abn-tree tree-data="menus"
+                                      on-select="select_branch(branch)"
+                                      expand-level="3"
+                                      icon-leaf="fa fa-file-o"
+                                      icon-expand="fa fa-plus"
+                                      icon-collapse="fa fa-minus">
+                            </abn-tree>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

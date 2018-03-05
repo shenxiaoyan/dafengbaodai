@@ -1,0 +1,173 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/01
+     *验证入网时长信息
+     * */
+    app.controller('phoneOnlineCheck', ['$scope', function ($scope) {
+
+        var regDianXinPhone = /^1(33|53|49|8[019]|7[37])\d{8}$/;
+
+        //没有接口 自己模拟的数据
+        $scope.mockData = [
+            {
+                phone: "18860469551",
+                idCard: "341623199405284821",
+                name: "沈",
+                onlineTime: "23个月"
+            },
+            {
+                phone: "18960469551",
+                idCard: "341623199405284822",
+                name: "小艳",
+                onlineTime: "33个月"
+            },
+            {
+                phone: "18860469552",
+                idCard: "341623199405284822",
+                name: "沈小艳",
+                onlineTime: "43个月"
+            }];
+        //数据初始化
+        $scope.info = {
+            idCard: '',
+            phone: '18860469551',
+            name: ''
+
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.name = '';
+            $scope.info.phone = '';
+            $scope.info.idCard = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            $scope.resultSwitch = false;
+
+            //数据信息格式错误时阻止表单提交
+            angular.forEach($scope.mockData,function (obj,index) {
+                if(!regDianXinPhone.test($scope.info.phone)){
+
+                    if($scope.info.phone===obj.phone){
+                        $scope.resultMsg = obj.onlineTime;
+                        $scope.resultSwitch = true;
+                    }
+                }
+                if(regDianXinPhone.test($scope.info.phone)){
+
+                    if($scope.info.phone===obj.phone && $scope.info.name===obj.name && $scope.info.idCard===obj.idCard){
+                        $scope.resultMsg = obj.onlineTime;
+                        console.log(obj.onlineTime);
+                        $scope.resultSwitch = true;
+                    }
+                    if($scope.info.name==='' || $scope.info.idCard===''){
+
+                        myForm.name.$dirty=true;
+                        myForm.idCard.$dirty = true;
+                    }
+                }
+
+
+            })
+        }
+
+
+
+    }]);
+</script>
+<div class="vbox" ng-controller="phoneOnlineCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">入网时长核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" method="post" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span style="color: #ff0000">*</span>手机号：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.phone" name="phone"  class="form-control" ng-required="true" pattern="^1[3|4|5|7|8][0-9]{9}$">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.phone.$dirty && myForm.phone.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.required">手机号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.pattern">手机号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">身份证号（电信用户此项为必填项）：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" ng-model="info.idCard" name="idCard" ng-required="true" pattern="(^\d{15}$)|(^\d{17}([0-9]|X)$)">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.idCard.$dirty && myForm.idCard.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.required">身份证号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.pattern">身份证号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">姓名（电信用户此项为必填项）：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" ng-model="info.name" name="name" ng-required="true" pattern="[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.name.$dirty && myForm.name.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.pattern">姓名格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-3 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--样例-->
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr ><td width="50%">手机入网年限</td><td width="50%">36个月</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--结果-->
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td width="50%">手机入网年限</td><td width="50%" ng-bind="resultMsg"></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

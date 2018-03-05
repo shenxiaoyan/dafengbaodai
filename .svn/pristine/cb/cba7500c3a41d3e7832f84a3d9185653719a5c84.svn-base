@@ -1,0 +1,434 @@
+<script type="text/javascript">
+	app.controller("advertiseListCtrl",
+	    [
+	        "$rootScope",
+	        "$scope",
+	        "$http",
+	        "$stateParams",
+	        function ($rootScope, $scope, $http, $stateParams) {
+	        	//状态栏
+	        	$scope.states    = [];
+                $scope.byState = 'all';
+                $scope.state_code = null;
+
+                $scope.getStates = function () {
+                    $http.get("/rest/advertiseStates")
+                        .success(function (resResult) {
+
+                            $scope.states = resResult._embedded.advertiseStates;
+
+                            console.log($scope.states)
+                        });
+                };
+
+                $scope.getStates();
+				$scope.entity_key = $stateParams.entity_key;
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+                //获取全部
+                $scope.getAll=function(){
+                    $scope.state_code=null,
+                    $scope.byState='all';
+                    $scope.clearSearch();
+                    $scope.getList(0);
+                };
+
+                //状态栏搜索
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.byState = 'state';
+                        $scope.state_code = stateCode;
+                        $scope.clearSearch();
+                        $scope.getList(0);
+                    }
+                };
+                $scope.state_code = $stateParams.state_code;
+                console.log($stateParams.state_code);
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                $scope.endOpen = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.endOpened = true;
+                };
+                $scope.endDateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+	            //单数 例user
+
+	            $scope.list = [];
+
+	            $scope.getList = function (page) {
+	            	$scope.searchInfo={type:1};
+	            	$scope.link='/dafeng/advertise/advertiseSearch?size=15&page='+page;
+                    if($scope.byState==='ALL' || $scope.byState === 'all'){
+                    	$scope.searchInfo.lastModifiedBeginTime=$scope.beginTime;
+                        $scope.searchInfo.lastModifiedEndTime=$scope.endTime;
+                    }
+                    else if($scope.byState==='state'){
+                        $scope.searchInfo.stateCode=$scope.state_code;
+                        if($scope.state_code=='PUBLISHED'){
+                        	$scope.searchInfo.publishBeginTime=$scope.beginTime;
+                        	$scope.searchInfo.publishEndTime=$scope.endTime;
+                        }
+                        else{
+                        	$scope.searchInfo.lastModifiedBeginTime=$scope.beginTime;
+                        	$scope.searchInfo.lastModifiedEndTime=$scope.endTime;
+                        }
+                    }
+                    console.log($scope.searchInfo);
+                    $http({method: "POST", url: $scope.link,data:$scope.searchInfo}).success(function (resResult) {
+                    	//排序
+	                	var orderArray=resResult.data.content;
+	                	if($scope.byState==='state'&&$scope.state_code=='PUBLISHED'){
+							for(var i=0;i<orderArray.length;i++){
+								for(var j=i+1;j<orderArray.length;j++){
+									if(orderArray[j].publishTime>orderArray[i].publishTime){
+										var temp=orderArray[j];
+										orderArray[j]=orderArray[i];
+										orderArray[i]=temp;
+									}
+								}
+							}
+	                	}
+	                	else{
+							for(var i=0;i<orderArray.length;i++){
+								for(var j=i+1;j<orderArray.length;j++){
+									if(orderArray[j].lastModifiedAt>orderArray[i].lastModifiedAt){
+										var temp=orderArray[j];
+										orderArray[j]=orderArray[i];
+										orderArray[i]=temp;
+									}
+								}
+							}
+	                	}
+	                    $scope.list = orderArray;
+	                    $scope.pageList = {
+	                        size: resResult.data.size,
+	                        total_elements: resResult.data.totalElements,
+	                        current_page: resResult.data.number,
+	                        num_page: resResult.data.totalPages,
+	                        total_page: resResult.data.totalPages
+	                    };
+
+	                    if ($scope.list.length > 0) {
+	                        $rootScope.setPaginator("#advertise_list_paginator", $scope.pageList, $scope.getList);
+	                    }
+
+	                });
+	            };
+				$scope.state_code='PUBLISHED';
+	            $scope.getList(0);
+	            //创建
+				$scope.submit=function(){
+					if($scope.title&&$scope.content){
+						$http({
+							method:'POST',
+							url:'rest/advertises',
+							data:{
+								title:$scope.title,
+								content:$scope.content,
+								act:'create'
+							}
+						}).then(function(response){
+							$rootScope.toasterSuccess('成功','保存成功');
+							console.log(response);
+							$scope.getList(0);
+							$scope.title='';
+							$scope.content='';
+						});
+					}
+					else{
+						$rootScope.toasterError('失败','标题和内容必填');
+					}
+				};
+	            //发布
+				$scope.publish=function(id){
+	            	var publishFun=function(){
+	            		$http({
+							method:'PATCH',
+							url:'rest/advertises/'+id,
+							data:{
+								stateCode:'rest/advertiseStates/2'
+							}
+						}).then(function successCallback(response){
+							$rootScope.toasterSuccess("成功！", "操作成功！");
+							$scope.getList(0);
+						},function errorCallback(response){
+							$rootScope.toasterError("失败！", "操作失败！");
+						});
+	            	};
+	            	$rootScope.sweetConfirm('确认发布该公告吗？',publishFun);
+				};
+	            //删除
+	            $scope.todelete=function(id){
+	            	var deleteFun=function(){
+	            		$http({
+							method:'DELETE',
+							url:'rest/advertises/'+id
+						}).then(function successCallback(response){
+							if(/^2[0-9]{2}$/.test(response.status)){
+								$rootScope.toasterSuccess("成功！", "操作成功！");								
+							}
+							console.log(response);
+							$scope.getList(0);
+						},function errorCallback(){
+							$rootScope.toasterSuccess("失败！", "操作失败！");
+						});
+	            	};
+	            	$rootScope.sweetConfirm('确认删除该公告吗？',deleteFun);
+	            };
+	            //编辑
+//	            $scope.edit=function(id,title,content){
+//	            	$scope.editTitle=title;
+//	            	$scope.editContent=content;
+//	            	$scope.editId=id;
+//	            }
+	            //编辑保存
+//	            $scope.editSubmit=function(){
+//	            	$http({
+//	            		method:'PATCH',
+//	            		url:'rest/advertises/'+$scope.editId,
+//	            		data:{
+//	            			title:$scope.editTitle,
+//	            			content:$scope.editContent
+//	            		}
+//	            	}).then(function successCallback(response){
+//	            		
+//	            	},function errorCallback(){
+//	            		
+//	            	});
+//	            }
+				//转化时间
+				var format = function(time, format){
+				    var t = new Date(time);
+				    var tf = function(i){return (i < 10 ? '0' : '') + i};
+				    return format.replace(/yyyy|MM|dd|HH|mm|ss/g, function(a){
+				        switch(a){
+				            case 'yyyy':
+				                return tf(t.getFullYear());
+				                break;
+				            case 'MM':
+				                return tf(t.getMonth() + 1);
+				                break;
+				            case 'mm':
+				                return tf(t.getMinutes());
+				                break;
+				            case 'dd':
+				                return tf(t.getDate());
+				                break;
+				            case 'HH':
+				                return tf(t.getHours());
+				                break;
+				            case 'ss':
+				                return tf(t.getSeconds());
+				                break;
+				        }
+				    })
+				};
+				$scope.changeTime=function(firstTime){
+					return format(new Date(firstTime),'yyyy-MM-dd HH:mm:ss');
+				};
+
+                /*
+                * 清空按钮
+                * */
+                $scope.clearSearch = function () {
+                    $scope.searchInfo = {type:1};
+                    $scope.beginTime='';
+                    $scope.endTime='';
+                    $scope.getList(0);
+                };
+
+	        }
+	    ]
+	);
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="advertiseListCtrl">
+	
+	<div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+		<div class="inline pull-left m-r">
+			<label class="i-checks pull-left m-n">
+				<input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+			</label>
+		</div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"/><i></i> {{ state.label }}
+            </label>
+        </div>
+		<div class="pull-right m-r inline">
+			<button type="button" class="btn m-b-xs btn-sm btn-danger btn-addon" data-toggle="modal" data-target="#myModal">
+				<i class="fa fa-plus"></i>新增
+			</button>
+		</div>
+   </div>
+
+	<div class="row-row">
+		<div class="cell">
+			<div class="cell-inner">
+				<div class="wrapper b-b">
+					<div class="panel panel-default">
+						<div class="panel-heading" ng-if="list.length > 0">
+							查询结果
+						</div>
+						<div class="panel-heading" ng-if="list.length < 1">
+							暂无数据！
+						</div>
+						<div class="wrapper">
+							<p>已发布下按发布时间查询，其他按更新时间查询</p>
+							<div class="w-sm inline_tab input-group">
+								<input type="text"
+									   disabled
+									   class="form-control"
+									   style="float: none;"
+									   datepicker-popup="yyyy-MM-dd"
+									   placeholder="开始日期"
+									   ng-model="beginTime"
+									   is-open="opened"
+									   datepicker-options="dateOptions"
+									   close-text="关闭"
+									   clear-text="清空"
+									   current-text="今天"/>
+								<span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+							</div>
+							<div class="w-sm inline_tab input-group">
+								<input type="text"
+									   disabled
+									   class="form-control"
+									   style="float: none;"
+									   datepicker-popup="yyyy-MM-dd"
+									   placeholder="结束日期"
+									   ng-model="endTime"
+									   is-open="endOpened"
+									   datepicker-options="endDateOptions"
+									   close-text="关闭"
+									   clear-text="清空"
+									   current-text="今天"/>
+								<span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="endOpen($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+							</div>
+							<div class="inline">
+								<button type="button" class="btn btn-primary" ng-click="getList(0)">
+									<span>查询</span>
+								</button>
+								<button type="button" class="btn btn-default" ng-click="clearSearch()">
+									<span>清除</span>
+								</button>
+							</div>
+						</div>
+						<div ng-if="list.length>0">
+							<div class="card card-block" style="border:1px solid #DEE5E7;border-radius:10px;padding:10px;margin:10px;display:flex;background-color: #FFFFFF;" ng-repeat="item in list">
+								<div style="flex:4;">
+									<h4 class="card-title" style="word-break:break-all;">{{item.title}}</h4>
+									<p class="card-text" style="word-break:break-all;">{{item.content}}</p>
+									<button type="button" class="btn btn-primary" ng-click="publish(item.id)" ng-if="state_code==='CREATED'">
+										<span>发布</span>
+									</button>
+									<!--<button type="button" class="btn btn-primary" ng-click="edit(item.id,item.title,item.content)" ng-if="state_code==='CREATED'" data-toggle="modal" data-target="#edit">
+                                         <span>编辑</span>
+                                    </button>-->
+									<button type="button" class="btn btn-danger" ng-click="todelete(item.id)" ng-if="state_code==='CREATED'">
+										<span>删除</span>
+									</button>
+								</div>
+								<div style="flex:1;text-align: left;">
+									<p class="card-text">创建时间：{{changeTime(item.createdAt)}}</p>
+									<p class="card-text">更新时间：{{changeTime(item.lastModifiedAt)}}</p>
+									<p class="card-text" ng-if="state_code==='PUBLISHED'&&byState==='state'">发布时间：{{changeTime(item.publishTime)}}</p>
+									<p class="card-text" ng-if="byState==='all'">状态：{{item.state.label}}</p>
+								</div>
+							</div>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="wrapper b-t b-light clearfix" ng-show="list.length>0">
+	    <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"></ul>
+	    <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+	</div>
+
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<label>标题</label>
+					<input class="modal-title" id="myModalLabel" ng-model="title" maxlength="18" placeholder="请输入少于18个字符"/>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="content">文本框</label>
+						<textarea id="content" class="form-control" rows="10" ng-model="content"  maxlength="1000"></textarea>
+					</div>
+					<p style="text-align:right;margin:0;">{{content.length?content.length:0}}/1000</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="submit()">保存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--<div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<label>标题</label>
+					<input class="modal-title" id="myModalLabel" ng-model="editTitle" maxlength="18" placeholder="请输入少于18个字符"/>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="content">文本框</label>
+						<textarea id="content" class="form-control" rows="10" ng-model="editContent"  maxlength="1000"></textarea>
+					</div>
+					<p style="text-align:right;margin:0;">{{editContent.length?editContent.length:0}}/1000</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editSubmit()">保存</button>
+				</div>
+			</div>
+		</div>
+	</div>-->
+</div>

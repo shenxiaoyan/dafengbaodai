@@ -1,0 +1,180 @@
+<script>
+    "use strict";
+    app.controller("createEnquiriesListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams,$filter) {
+
+                if ($stateParams.entity_key === "createEnquiry") {
+
+                    var len = $stateParams.entity_key.length;
+                    $scope.entity_key = $stateParams.entity_key.substring(0,len-1) + "ies";
+                    console.log($scope.entity_key)
+
+                } else {
+                    $scope.entity_key = $stateParams.entity_key;
+                }
+
+
+            	//设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+
+				//获取当前状态
+                $scope.state_code = $stateParams.state_code;
+
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                	$http({
+                	    method: "GET",
+                        url : "/rest/" + $scope.entity_key + "/search/getByStateCode?stateCode=" + $scope.state_code + "&size=15&page=" + page
+                    }).success(function(resResult){
+
+                        $scope.list = resResult._embedded.createEnquiries;
+                        console.log($scope.list)
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number === 0 ? 0 : resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                	})
+                };
+                $scope.getList(0);
+
+                $scope.search = function(page){
+                    console.log($scope.mobilePhone);
+                    $http({
+                        method:"GET",
+                        url:"rest/createEnquiries/search/getByMobilePhone?mobilePhone=" + $scope.mobilePhone +"&size=15&page=" +page
+                    }).then(function(resResult){
+                        console.log(resResult);
+                        $scope.list = resResult.data._embedded.createEnquiries;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.search);
+                        }
+                    });
+                };
+
+                $scope.clearSearch = function(){
+                    $scope.mobilePhone = "";
+                    $scope.getList(0);
+                }
+            }
+        ]
+    )
+</script>
+
+<div class="vbox" ng-controller="createEnquiriesListCtrl">
+    <div class="wrapper-md b-b clearfix">
+        <div class="font-thin h4">
+            <div>
+                <form class="clearfix">
+                    <div class="pull-left m-r w inline">
+                        <input type="text" class="form-control"
+                               placeholder="请输入保险公司"
+                               ng-model="mobilePhone"
+                               autocomplete="off">
+                    </div>
+                    <div class="pull-left m-r w m-b-md inline">
+                        <label class="sr-only" for="list_created_at">按日期搜索</label>
+                        <input type="text" class="form-control" placeholder="按日期搜索" id="list_created_at">
+                    </div>
+                    <div class="pull-left m-r inline">
+                        <button type="button" class="btn btn-primary" ng-click="search(0)">
+                            <span>查询</span>
+                        </button>
+                        <button type="button" class="btn btn-primary" ng-click="clearSearch()">
+                            <span>清除</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-default" ng-if="list.length > 0">
+                        <table st-table="rowCollectionPage" class="table table-striped">
+                            <thead>
+                            <tr class="center bg-info bg">
+                                <th>询价单号</th>
+                                <th>车主姓名</th>
+                                <th>联系方式</th>
+                                <th>号牌号码</th>
+                                <th>询价时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in list" >
+                                    <td class="v-middle">
+                                        {{ item.offerUnique?item.offerUnique:"暂无"}}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.createEnquiryParams.ownerName? item.createEnquiryParams.ownerName: "暂无"}}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.mobilePhone?item.mobilePhone:"暂无" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{item.createEnquiryParams.licenseNumber?item.createEnquiryParams.licenseNumber:"暂无" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.createdAt|datetime }}
+                                    </td>
+                                    <td class="v-middle">
+                                       <button class="btn btn-xs btn-info">
+                                           <a ui-sref="workflowEntity.home.profile.info({id:item.id,state_code:state.stateCode})">
+                                               详情
+                                           </a>
+                                       </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-if="list.length < 1">
+                        暂无数据！
+                    </div>
+                </div>
+                <div class="m-l-md">
+                    <ul id="{{ entity_key }}_list_paginator"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

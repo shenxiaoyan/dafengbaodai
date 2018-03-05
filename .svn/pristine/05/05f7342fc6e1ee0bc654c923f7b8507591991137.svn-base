@@ -1,0 +1,155 @@
+
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *企业法院失信详情
+     * */
+    app.controller('businessDetailCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            {
+                code: "18860469551",
+                timeStyle:'2018-3-3'
+            };
+        //数据初始化
+        $scope.info =
+            {
+                code: "18860469551"
+            };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.code = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //提交空表单时提示格式错误
+            if (myForm.code) {
+                myForm.code.$dirty = true;
+
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = false;
+
+            if($scope.info.code === $scope.mockData.code){
+                console.log('ddd');
+                $scope.resultSwitch = true;
+            }
+
+
+        }
+
+
+
+    }]);
+</script>
+
+
+<div class="vbox" ng-controller="businessDetailCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">企业法院失信详情</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <input type="hidden" class="url" value="/transaction/baseInfo">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>失信公告编号:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.code" name="code"  class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.code.$dirty && myForm.code.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.code.$error.required">编码不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td  width="50%">立案时间</td><td width="50%">2017-05-11</td></tr>
+                                <tr><td>性别</td><td>男</td></tr>
+                                <tr><td>被执行人的履行情况</td><td>全部未履行</td></tr>
+                                <tr><td>执行依据文号</td><td>( 2016)豫 1282 民初 3398 号</td></tr>
+                                <tr><td>相关当事人</td><td>张三</td></tr>
+                                <tr><td>执行法院名称</td><td>灵宝市人民法院</td></tr>
+                                <tr><td>身份证/组织机构代码</td><td>096937745</td></tr>
+                                <tr><td>做出执行依据单位</td><td>灵宝市人民法院</td></tr>
+                                <tr><td>失信被执行人行为具体情形</td><td>其他有履行能力而拒不履行生效法律文书确定义务的</td></tr>
+                                <tr><td>生效法律文书确定的义务</td><td>二、被告xxxx有限公司、亢xx、刘xx自愿从 2017 年 3 月 1 日起每月清偿欠款 100122 元，每月 15 日为还款日，被告承诺最迟 于 2017 年 7 月 30 日全部清偿完毕；案件受理费 11767 元，减半收取 5883.5 元， 由被告xxxx有限 公司、亢xx、刘xx承担。</td></tr>
+                                <tr><td>年龄</td><td>20</td></tr>
+                                <tr><td>被执行人姓名</td><td>xxxx有限公司</td></tr>
+                                <tr><td>省份</td><td>河南</td></tr>
+                                <tr><td>案号</td><td>（2017）豫 1282 执 493 号</td></tr>
+                                <tr><td>发布时间</td><td>2017-05-11</td></tr>
+                                <tr><td>数据类型</td><td>shixin</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td  width="50%">立案时间</td><td width="50%">{{mockData.timeStyle}}</td></tr>
+                                <tr><td>性别</td><td>男</td></tr>
+                                <tr><td>被执行人的履行情况</td><td>全部未履行</td></tr>
+                                <tr><td>执行依据文号</td><td>( 2016)豫 1282 民初 3398 号</td></tr>
+                                <tr><td>相关当事人</td><td>张三</td></tr>
+                                <tr><td>执行法院名称</td><td>灵宝市人民法院</td></tr>
+                                <tr><td>身份证/组织机构代码</td><td>096937745</td></tr>
+                                <tr><td>做出执行依据单位</td><td>灵宝市人民法院</td></tr>
+                                <tr><td>失信被执行人行为具体情形</td><td>其他有履行能力而拒不履行生效法律文书确定义务的</td></tr>
+                                <tr><td>生效法律文书确定的义务</td><td>二、被告xxxx有限公司、亢xx、刘xx自愿从 2017 年 3 月 1 日起每月清偿欠款 100122 元，每月 15 日为还款日，被告承诺最迟 于 2017 年 7 月 30 日全部清偿完毕；案件受理费 11767 元，减半收取 5883.5 元， 由被告xxxx有限 公司、亢xx、刘xx承担。</td></tr>
+                                <tr><td>年龄</td><td>20</td></tr>
+                                <tr><td>被执行人姓名</td><td>xxxx有限公司</td></tr>
+                                <tr><td>省份</td><td>河南</td></tr>
+                                <tr><td>案号</td><td>（2017）豫 1282 执 493 号</td></tr>
+                                <tr><td>发布时间</td><td>2017-05-11</td></tr>
+                                <tr><td>数据类型</td><td>shixin</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

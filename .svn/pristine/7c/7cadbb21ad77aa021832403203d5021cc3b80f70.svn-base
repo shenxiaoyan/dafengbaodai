@@ -1,0 +1,361 @@
+<script>
+
+    /*
+    *   LYQ
+    *   2017/02/04
+    *   发布人管理
+    * */
+
+    app.controller("friendsInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams, $state, $filter) {
+
+                $scope.teamId = $stateParams.id;
+
+                $scope.team = {};
+                $scope.list = {};
+                $scope.searchInfo = {};
+                $scope.addInfo = {};
+                $scope.eduitInfo = {};
+
+
+                //当前列表
+                $scope.getList = function (page) {
+
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method : "POST",
+                        url : "/dafeng/moments/personInfoList?size=15&page=" + page,
+                        data : $scope.searchInfo
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                /*
+                * 新增发布人
+                * */
+                $scope.addProCom = function(){
+
+                    var add = function(){
+                        $http({
+                            method : "POST",
+                            url : "/dafeng/moments/addPersonInfo",
+                            data : $scope.addInfo
+                        }).then(function(resResult){
+                            if(resResult.errorCode){
+                                $rootScope.toasterError("失败！", resResult.ErrorInfo)
+                            }else{
+                                $rootScope.toasterSuccess("成功！", "新增成功！");
+                                $scope.addInfo = {};
+                                $("#autoObjective").val("");
+                                $("#add_company").modal("hide");
+                                $scope.getList(0);
+                            }
+                        })
+                    };
+
+                    if($scope.addInfo.nickName){
+                        var fd = new FormData();
+                        $scope.successLength = 0;
+                        //图片上传
+                        var detailIcon = $('#autoObjective')[0].files[0];
+
+                        if (detailIcon) {
+                            fd.append("file", detailIcon);
+
+                            $http({
+                                method:"POST",
+                                url:"dafeng/fileUpload",
+                                headers:{
+                                    "Content-Type": undefined
+//                            "connection":open
+                                },
+                                timeout:0,
+                                transformRequest:angular.identity,
+                                data:fd
+                            }).success(function(resResult){
+                                $scope.addInfo.headImg = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+                                add();
+                            }).error(function(){
+                                $rootScope.toasterError("失败！","上传图片失败！");
+                            });
+                        }else{
+                            $rootScope.toasterWarning("失败！","请先上传图片");
+                        }
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写发布人姓名");
+                    }
+
+
+                };
+
+
+                /*
+                * 编辑发布人
+                * */
+                $scope.eduit = function(id, item){
+                    $scope.eduitInfo = item;
+
+                    var ed = function(){
+                        $http({
+                            method : "POST",
+                            url : "/dafeng/moments/updatePersonInfo",
+                            data : $scope.eduitInfo
+                        }).then(function(resResult){
+                            if(resResult.errorCode){
+                                $rootScope.toasterError("失败！", resResult.ErrorInfo)
+                            }else{
+                                $rootScope.toasterSuccess("成功！", "编辑成功！");
+                                $scope.eduitInfo = {};
+                                $("#newImg").val("");
+                                $("#eduit_company").modal("hide");
+                                $scope.getList(0);
+                            }
+                        })
+                    };
+
+                    $scope.ediutModal = function(){
+
+                        if($scope.eduitInfo.nickName){
+                            if($('#newImg')[0].files[0]){
+                                var fd = new FormData();
+                                $scope.successLength = 0;
+                                //图片上传
+                                var detailIcon = $('#newImg')[0].files[0];
+
+                                fd.append("file", detailIcon);
+
+                                $http({
+                                    method:"POST",
+                                    url:"dafeng/fileUpload",
+                                    headers:{
+                                        "Content-Type": undefined
+//                            "connection":open
+                                    },
+                                    timeout:0,
+                                    transformRequest:angular.identity,
+                                    data:fd
+                                }).success(function(resResult){
+                                    console.log(resResult);
+                                    $scope.eduitInfo.headImg = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.newFileName;
+                                    ed();
+                                }).error(function(){
+                                    $rootScope.toasterError("失败！","上传图片失败！");
+                                });
+                            }else{
+                                ed();
+                            }
+
+                        }else{
+                            $rootScope.toasterWarning("失败！","请填写发布人姓名");
+                        }
+                    }
+
+                };
+
+                /*
+                * 禁用和启用
+                * */
+                $scope.disabled = function(id, type){
+                    if(type === "dis"){
+                        $scope.isShow = 0;
+                    }else if (type === "enab"){
+                        $scope.isShow = 1;
+                    }
+
+                    $http({
+                        method : "POST",
+                        url : "/dafeng/moments/update/isShow",
+                        data : {
+                            id : id,
+                            isShow : $scope.isShow
+                        }
+                    }).then(function(resResult){
+                        if(resResult.ErrorCode){
+                            $rootScope.toasterError("失败！", resResult.ErrorInfo)
+                        }else{
+                            $rootScope.toasterSuccess("成功！", "修改状态成功！");
+                            $scope.getList(0);
+                        }
+                    })
+
+                };
+
+
+                /*
+                * 清除填写的信息
+                * */
+                $scope.clearSearch = function(){
+                    $scope.addInfo = {};
+                    $scope.eduitInfo = {};
+                    $("#add_company").modal("hide");
+                    $scope.searchInfo = {
+                        teamId : $scope.teamId
+                    };
+                    $scope.getList(0);
+                };
+
+            }
+        ]
+    );
+</script>
+
+
+<div ng-controller="friendsInfoCtrl">
+    <div class="wrapper b-b clearfix b-light">
+        <div class="pull-left inline">
+            <h4>发布人管理</h4>
+        </div>
+        <div class="pull-right inline">
+            <button class="btn btn-danger"
+                    data-target="#add_company"
+                    data-toggle="modal">
+                新增发布人
+            </button>
+        </div>
+    </div>
+    <div class="wrapper-md"  style="padding-bottom: 0">
+        <table class="table" style="margin-bottom: 0">
+            <thead>
+            <tr>
+                <th>发布人名称</th>
+                <th>发布人头像</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in list">
+                <td class="v-middle">{{item.nickName ? item.nickName : "暂无"}}</td>
+                <td class="v-middle"><img ng-src="{{ item.headImg }}" alt="" style="height: 30px; width: 30px; -webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%;"></td>
+                <td class="v-middle">{{item.createdTime ? (item.createdTime | dateSecondTime) : "暂无"}}</td>
+                <td class="v-middle">
+                    <button class="btn btn-xs btn-info"
+                            id="disabledBtn"
+                            data-target="#eduit_company"
+                            data-toggle="modal"
+                            ng-click="eduit(item.id,item)">
+                        编辑
+                    </button>
+                    <button class="btn btn-xs btn-danger"
+                            id="disabBtn"
+                            ng-if="item.isShow === 1"
+                            ng-click="disabled(item.id, 'dis')">
+                        禁用
+                    </button>
+                    <button class="btn btn-xs btn-success"
+                            id="enabledBtn"
+                            ng-if="item.isShow === 0"
+                            ng-click="disabled(item.id, 'enab')">
+                        启用
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="b-t b-light clearfix">
+        <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+    </div>
+
+    <div class="modal fade" id="add_company" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearSearch()" data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">新增发布人</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="get">
+                        <div class="form-group">
+                            <label for="tax_date">发布人名称</label>
+                            <input type="text"
+                                   id="tax_date"
+                                   class="form-control col-sm-8"
+                                   placeholder="请输入发布人名称"
+                                   ng-model="addInfo.nickName">
+                        </div>
+                        <div class="form-group">
+                            <label for="autoObjective">发布人头像</label>
+                            <input type="file"
+                                   id="autoObjective">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                    <button class="btn btn-primary" type="button" id="addMember" ng-click="addProCom()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="eduit_company" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="clearSearch()"  data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">编辑发布人</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="get">
+                        <div class="form-group">
+                            <label for="tax_date">发布人名称</label>
+                            <input type="text"
+                                   id="name"
+                                   class="form-control"
+                                   placeholder="请输入发布人名称"
+                                   ng-model="eduitInfo.nickName">
+                        </div>
+                        <div class="form-group">
+                            <label for="autoObjective" class="col-sm-3">发布人原头像</label>
+                            <img src="{{ eduitInfo.headImg }}" style="height: 30px; width: 30px; border-radius: 50%" alt="">
+                        </div>
+                        <div class="form-group">
+                            <label for="newImg">发布人新头像</label>
+                            <input type="file"
+                                   id="newImg">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                    <button class="btn btn-primary" type="button" id="eduitMember" ng-click="ediutModal()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

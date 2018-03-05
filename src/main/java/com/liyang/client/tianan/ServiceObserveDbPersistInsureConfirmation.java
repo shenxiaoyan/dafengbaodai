@@ -1,0 +1,236 @@
+package com.liyang.client.tianan;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.liyang.client.BaseServiceObserveNode;
+import com.liyang.client.IMessage;
+import com.liyang.client.IResult;
+import com.liyang.client.IServiceObserve;
+import com.liyang.domain.advertise.Advertise;
+import com.liyang.domain.advertise.AdvertiseRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.platform.Platform;
+import com.liyang.domain.submitproposal.SubmitProposal;
+import com.liyang.domain.submitproposal.SubmitProposalRepository;
+import com.liyang.domain.submitproposal.SubmitProposalState;
+import com.liyang.domain.submitproposal.SubmitProposalStateRepository;
+import com.liyang.domain.underwritingresult.UnderwritingErrorMsg;
+import com.liyang.domain.underwritingresult.UnderwritingResult;
+import com.liyang.domain.underwritingresult.UnderwritingResultData;
+import com.liyang.domain.underwritingresult.UnderwritingResultRepository;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.service.XinGeService;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.Log4jUtil;
+import com.liyang.util.PushAdvertiseUtil;
+
+/**
+ * 投保单保存观察者类
+ * 
+ * @author huanghengkun
+ * @create 2017年12月17日
+ */
+public class ServiceObserveDbPersistInsureConfirmation extends BaseServiceObserveNode implements IServiceObserve {
+	private final static Logger logger = LoggerFactory.getLogger(ServiceObserveDbPersistInsureConfirmation.class);
+
+	private SubmitProposalRepository submitProposalRepository;
+	private UnderwritingResultRepository underwritingResultRepository;
+	private AdvertiseRepository advertiseRepository;
+	private XinGeService xinGeService;
+	private SubmitProposalStateRepository submitProposalStateRepository;
+
+	public ServiceObserveDbPersistInsureConfirmation(SubmitProposalRepository submitProposalRepository,
+			UnderwritingResultRepository underwritingResultRepository, AdvertiseRepository advertiseRepository,
+			XinGeService xinGeService, SubmitProposalStateRepository submitProposalStateRepository) {
+		super();
+		this.submitProposalRepository = submitProposalRepository;
+		this.underwritingResultRepository = underwritingResultRepository;
+		this.advertiseRepository = advertiseRepository;
+		this.xinGeService = xinGeService;
+		this.submitProposalStateRepository = submitProposalStateRepository;
+	}
+
+	@Override
+	public IMessage notifyBeforeCall(IMessage message) {
+		logger.info("天安投保单保存提交报文：" + JSON.toJSONString(message));
+		return null;
+	}
+
+	@Override
+	public IResult notifyAfterCall(IMessage message, IResult result) {
+		logger.info("天安投保单保存返回报文：" + JSON.toJSONString(result));
+		ResultInsureConfirmation detailResult = (ResultInsureConfirmation) result;
+		MessageInsureConfirmation detailMessage = (MessageInsureConfirmation) message;
+		// tradeNo即orderId
+		String orderId = detailMessage.getRequestHead().getTradeNo();
+		UnderwritingResult underwritingResult = parseResult(detailResult);
+		UnderwritingResultData data = underwritingResult.getData();
+		// 设置orderId
+		data.setOrderId(orderId);
+		List<SubmitProposal> submitProposalList = submitProposalRepository.findByParamsOrderId(orderId);
+		if (null == submitProposalList || submitProposalList.isEmpty()) {
+			throw new FailReturnObject(ExceptionResultEnum.UNDERWRITING_SUBPROPOSAL_DATA_MIS_ERROR);
+		}
+		// 根据orderId，关联平台
+		SubmitProposal submitProposal = submitProposalList.get(0);
+		Platform platform = submitProposal.getPlatform();
+		underwritingResult.setPlatform(platform);
+		underwritingResult.setCreatedAt(new Date());
+		// submitProposal.setUnderwritingResult(underwritingResult);
+		submitProposal.setResponseResult(JSON.toJSONString(result));
+		// 原来有记录的则是更新
+		List<UnderwritingResult> undwritingResultList = underwritingResultRepository.findByDataOrderId(orderId);
+		if (null != undwritingResultList && !undwritingResultList.isEmpty()) {
+			underwritingResult.setId(undwritingResultList.get(0).getId());
+			underwritingResult.getErrorMsg().setId(undwritingResultList.get(0).getErrorMsg().getId());
+			data.setId(undwritingResultList.get(0).getData().getId());
+		}
+		// 设置车牌
+		String licenseNumber = submitProposal.getOfferResult().getCreateEnquiry().getLicenseNumber();
+		data.setLicenseNumber(licenseNumber);
+		// 商业险核保状态
+		String busUnderWriteFlag = data.getBusUnderWriteFlag();
+		// 交强险核保状态
+		String bzUnderWriteFlag = data.getBzUnderWriteFlag();
+		SubmitProposalState subProposalState = checkState(busUnderWriteFlag, bzUnderWriteFlag);
+		submitProposal.setState(subProposalState);
+		// underwritingResult.setSubmitProposal(submitProposal);
+		// underwritingResult =
+		// underwritingResultRepository.save(underwritingResult);
+		submitProposal.setUnderwritingResult(underwritingResult);
+		submitProposal = submitProposalRepository.save(submitProposal);
+
+		// 推送安卓和ios
+		Map<String, Object> handerDataMap = new HashMap<String, Object>();
+		handerDataMap.put("Id", submitProposal.getUnderwritingResult().getId());
+		handerDataMap.put("name", "underwritingResult");
+		handerDataMap.put("orderId", orderId);
+
+		List<Advertise> advertiseList = advertiseRepository.findByOfferIdAndZnxType(orderId, 2);
+		if (null == advertiseList || advertiseList.isEmpty()) {
+			Advertise advertis = generateUnderWritingAdvertise(submitProposal, orderId);
+			// 报价结果推送到指定平台
+			Customer customer = submitProposal.getCustomer();
+			PushAdvertiseUtil.pushAdvertToAppPlatform(xinGeService, customer, handerDataMap, advertis.getTitle());
+		}
+		return null;
+	}
+
+	/**
+	 * 1：核保通过 2：核保不通过 3：自动核保通过 6：承保确认 9：待人工审核
+	 * 
+	 * @param busUnderWriteFlag
+	 * @param bzUnderWriteFlag
+	 * @return
+	 */
+	private SubmitProposalState checkState(String busUnderWriteFlag, String bzUnderWriteFlag) {
+		// 两个都为空则返回核保失败
+		if (StringUtils.isEmpty(busUnderWriteFlag) && StringUtils.isEmpty(bzUnderWriteFlag)) {
+			return submitProposalStateRepository.findByStateCode("HENBAO_FAILED");
+		}
+		// 为空的初始化为1，认为核保通过
+		busUnderWriteFlag = StringUtils.isEmpty(busUnderWriteFlag) ? "1" : busUnderWriteFlag;
+		bzUnderWriteFlag = StringUtils.isEmpty(bzUnderWriteFlag) ? "1" : bzUnderWriteFlag;
+		// 1和3都是核保通过,两个都通过才算通过
+		if (("1".equals(busUnderWriteFlag) || "3".equals(busUnderWriteFlag))
+				&& ("1".equals(bzUnderWriteFlag) || "3".equals(bzUnderWriteFlag))) {
+			return submitProposalStateRepository.findByStateCode("HENBAO_SUCCESS_PAYMENT");
+
+		}
+		// 有1个在人工审核中都算人工审核
+		else if ("9".equals(busUnderWriteFlag) || "9".equals(bzUnderWriteFlag)) {
+			return submitProposalStateRepository.findByStateCode("HENBAO_PERSON");
+		}
+		// 其他情况都算核保不通过
+		else {
+			return submitProposalStateRepository.findByStateCode("HENBAO_FAILED");
+		}
+	}
+
+	@Override
+	public void notifyException(IMessage message, IResult result, Exception exception) {
+		logger.info("天安投保单保存异常：" + Log4jUtil.formatException(exception));
+	}
+
+	private UnderwritingResult parseResult(ResultInsureConfirmation result) {
+		UnderwritingResult underwritingResult = new UnderwritingResult();
+		UnderwritingErrorMsg errorMsg = new UnderwritingErrorMsg();
+		errorMsg.setCode(result.getResultDTO().getResultCode());
+		errorMsg.setMessage(result.getResultDTO().getResultMess());
+		underwritingResult.setErrorMsg(errorMsg);
+		underwritingResult.setSuccessful("1".equals(result.getDealFlag()));
+		UnderwritingResultData data = new UnderwritingResultData();
+		data.setPolicyNo(result.getPolicyNo());
+		data.setProposalNo(result.getProposalNo());
+		data.setUnderwritingJson(parseUnderwritingJson(result).toJSONString());
+		data.setBusUnderWriteFlag(result.getBusUnderWriteFlag());
+		data.setBzUnderWriteFlag(result.getBzUnderWriteFlag());
+		data.setEvalLevel(result.getEvalLevel());
+		underwritingResult.setData(data);
+		return underwritingResult;
+	}
+
+	private JSONObject parseUnderwritingJson(ResultInsureConfirmation result) {
+		JSONObject underwritingJson = new JSONObject();
+		if (!result.isSuccess()) {
+			underwritingJson.put("errorMsg", result.getErrorMess());
+		} else {
+			if (!StringUtils.isEmpty(result.getBusProposalNo())) {
+				JSONObject biNo = new JSONObject();
+				biNo.put("name", "商业险保单号");
+				biNo.put("value", result.getBusProposalNo());
+				underwritingJson.put("biNo", biNo);
+			}
+			if (!StringUtils.isEmpty(result.getBzProposalNo())) {
+				JSONObject ciNo = new JSONObject();
+				ciNo.put("name", "交强险保单号");
+				ciNo.put("value", result.getBzProposalNo());
+				underwritingJson.put("ciNo", ciNo);
+			}
+			JSONObject payNo = new JSONObject();
+			payNo.put("name", "平台交易号");
+			// 天安的交易流水号就是tradeNo，即orderId
+			payNo.put("value", result.getOrderId());
+		}
+		return underwritingJson;
+	}
+
+	private Advertise generateUnderWritingAdvertise(SubmitProposal submitProposal, String orderId) {
+		OfferResult offerResult = submitProposal.getOfferResult();
+		String token = submitProposal.getCustomer().getToken();
+		String licenseNumber = submitProposal.getUnderwritingResult().getData().getLicenseNumber();
+		String insuredName = submitProposal.getParams().getInsuredName();
+		String statLabel = submitProposal.getState().getLabel();
+		// titile
+		StringBuffer titileBuf = new StringBuffer();
+		titileBuf.append("【核保通知】").append(licenseNumber).append("有新的核保结果");
+
+		// content
+		StringBuffer contentBuf = new StringBuffer();
+		contentBuf.append("车牌：").append(licenseNumber).append("\n被保人：").append(insuredName);
+		contentBuf.append("\n保险公司：").append(offerResult.getData().getResult().getInsuranceCompanyName());
+		contentBuf.append("\n核保状态:").append(statLabel);
+
+		Advertise advertise = new Advertise();
+		advertise.setTitle(titileBuf.toString());
+		advertise.setContent(contentBuf.toString());
+		advertise.setIsRead(0);
+		advertise.setZnxType(2);
+		advertise.setType(2);
+		advertise.setToken(token);
+		advertise.setOfferId(orderId);
+		advertise = advertiseRepository.save(advertise);
+
+		return advertise;
+	}
+}

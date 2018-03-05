@@ -1,0 +1,22 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 19px 15px 0px 15px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'acts'})">行为</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'act_roles'})">行为：角色</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'states'})" >状态</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'state_acts'})" >状态：行为</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'workflows'})" >工作流</a></li>
+                            <li ui-sref-active="active"><a ui-sref="entities.entity.page({view_type:'workflow_states'})" >工作流：状态</a></li>
+                    </ul>
+                </div>
+                <h4 class="pull-left  m-t-none">用户配置</h4>
+            </div>
+            <div class="row-row bg-white" ui-view="">
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/login.css">
+    <script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+    <title>登录大蜂平台</title>
+</head>
+<body>
+<div class="w-full h-full clearfix background-container">
+    <div id="account-login" class="login-form-container">
+        <div class="other-login-handle qr-code-login-img"></div>
+        <div class="login-title-container clearfix">
+            <h3 class="login-title text-center">大蜂平台登录</h3>
+            <p class="login-tip text-center">填写您的登录账号</p>
+        </div>
+        <div class="login-error-info">
+        	<p th:if="${param.expired}" class="error-info-danger">登录超时,请重新登录</p>
+            <p th:if="${param.error}" class="error-info-danger">帐号密码错误,请重试!</p>
+            <p th:if="${param.disabled}" class="error-info-danger">该帐号未启用</p>
+            <p th:if="${param.logout}" class="error-info-warning">已登出</p>
+        </div>
+        <form class="login-form" id="login-form" th:action="@{/login}" method="post">
+            <div class="input-box">
+                <input type="text" class="w-full" name="username" value="" placeholder="账号"/>
+            </div>
+            <div class="input-box">
+                <input type="password" class="w-full" name="password" placeholder="密码"/>
+            </div>
+            <!--<div class="input-box">-->
+                <!--<label for="remember" class="clearfix">-->
+                    <!--<input type="checkbox" name="remember-me" class="pull-left" id="remember">-->
+                    <!--<span class="pull-left">记住我</span>-->
+                <!--</label>-->
+            <!--</div>-->
+            <button type="submit" class="submit-button w-full">登录</button>
+        </form>
+        <div class="register-forget-container text-center clearfix">
+            <!--<a href="" class="pull-left">忘记密码？</a>-->
+            <!--<a href="https://demo.xiaojinpingtai.com/employeeApply" target="_blank" class="pull-right">注册账号</a>-->
+        </div>
+        <div class="login-form-line"></div>
+    </div>
+    <div id="qr-code-login" class="login-form-container">
+        <div class="other-login-handle account-login-img"></div>
+        <div id="login_container"></div>
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.js"></script>
+<script th:inline="javascript">
+
+    var obj = new WxLogin({
+        id: "login_container",
+        appid: [[${appid}]],
+        scope: [[${scope}]],
+        redirect_uri: [[${redirect_uri}]],
+        state: [[${state}]],
+        style: "",
+        href: ""
+    });
+
+</script>
+<script>
+    (function(){
+
+        $("body").css("height",window.innerHeight);
+        $("body").css("width",window.innerWidth);
+
+        window.onresize = function(){
+            $("body").css("height",window.innerHeight);
+            $("body").css("width",window.innerWidth);
+        };
+
+        if(window.location.pathname === "/employeeApply"){
+
+            $("#qr-code-login").show();
+            $("#account-login").hide();
+
+            $(".account-login-img").hide();
+            $(".qr-code-login-img").hide();
+
+        }else{
+
+            $(".account-login-img").on("click",function(){
+                $("#account-login").fadeIn();
+                $("#qr-code-login").hide();
+            });
+
+            $(".qr-code-login-img").on("click",function(){
+                $("#account-login").hide();
+                $("#qr-code-login").fadeIn();
+            });
+
+        }
+
+        $(document).on("keypress",function (event) {
+            if(event.keyCode===13){
+                $("#login-form").submit();
+            }
+        })
+
+    }());
+
+</script>
+</body>
+</html>

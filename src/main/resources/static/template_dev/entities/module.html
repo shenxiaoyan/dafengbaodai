@@ -1,0 +1,24 @@
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light h-full">
+	<div class="col w-md b-r " ng-controller='workflowEntityStatesController'>
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">{{module_entity_type}}</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<div class="wrapper-md">
+							<ul class="nav nav-pills nav-stacked nav-sm">
+                                                            <li ui-sref-active="active" ng-repeat="state in states"><a ui-sref="workflowEntity.list({state_code:state.state_code,state_id:state.id})">{{state.label}}</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

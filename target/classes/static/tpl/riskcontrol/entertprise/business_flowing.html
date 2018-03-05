@@ -1,0 +1,386 @@
+
+<script>
+    /*
+     * 创建人：沈小艳
+     * 创建时间：2017/07/28
+     * 企业查询之商户银联流水画像
+     * */
+
+    "use strict";
+    app.controller('businessFlowingCtrl', ['$scope',function($scope) {
+        $scope.groupOne =false;
+
+        $scope.btnOne=function () {
+            $scope.groupOne=!$scope.groupOne
+        }
+
+
+
+
+    }]);
+</script>
+
+
+
+<div class="vbox" ng-controller="businessFlowingCtrl">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading" style="font-size: 16px">商户银联流水画像</div>
+                        <div class="panel-body">
+                            <form name="newfenye" action="" method="post" class="form-horizontal newfenye">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>商户注册号：</label>
+
+                                    <div class="col-sm-4">
+                                        <input type="text" name="mid" class="form-control" value="">
+                                    </div>
+                                    <label class="col-sm-6 control-label" style="text-align: left">提示：输入数字注册号或银联加密注册号均可</label>
+                                </div>
+                                <div class="form-group validate validate-card">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>名称字段：</label>
+                                    <div class="col-sm-8">
+                                        <button type="button"  class="btn btn-default m-xs">全部</button>
+                                        <button type="button"  class="btn btn-default m-xs" ng-click="btnOne()">组1</button>
+                                        <button type="button"  class="btn btn-default m-xs">组2</button>
+                                        <button type="button"  class="btn btn-default m-xs">组3</button>
+                                        <button type="button"  class="btn btn-default m-xs">组4</button>
+                                        <button type="button"  class="btn btn-default m-xs">组5</button>
+                                        <button type="button"  class="btn btn-default m-xs">组6</button>
+                                        <button type="button"  class="btn btn-default m-xs">组7</button>
+                                        <button type="button"  class="btn btn-default m-xs">组8</button>
+                                        <button type="button"  class="btn btn-default m-xs">组9</button>
+                                        <button type="button"  class="btn btn-default m-xs">组10</button>
+                                        <button type="button"  class="btn btn-default m-xs">组11</button>
+                                        <button type="button"  class="btn btn-default m-xs">组12</button>
+                                    </div>
+                                    <div class="col-sm-8 col-sm-offset-2">
+                                        <div class="collapse in" ng-show="groupOne">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5266"> 商户经营城市（按消费人群来 源确定）<br>
+                                                <input type="checkbox" value="S5132"> 每月还贷能力估计<br>
+                                                <input type="checkbox" value="S5102"> 商户编号（MID）<br>
+                                                <input type="checkbox" value="S5104"> 对应类别：（例如批发类）<br>
+                                                <input type="checkbox" value="S5105"> 手续费率： %<br>
+                                                <input type="checkbox" value="S5108"> 收单机构<br>
+                                                <input type="checkbox" value="S5246"> 终端台数（如POS机数量）<br>
+                                                <input type="checkbox" value="S5247"> 商户名称_商户地址_商户类型_ 商户所在城市<br>
+                                                <input type="checkbox" value="S5196"> 2011年1月1日起，首次交易日 期<br>
+                                                <input type="checkbox" value="S5197"> 2011年1月1日起，有交易月份 枚举<br>
+                                                <input type="checkbox" value="S5198"> 截至上月，连续有交易的月份 数量<br>
+                                                <input type="checkbox" value="S5200"> 最近一日交易金额<br>
+                                                <input type="checkbox" value="S5201"> 最近一日交易笔数<br>
+                                                <input type="checkbox" value="S5202"> 最近一日交易人数<br>
+                                                <input type="checkbox" value="S5199"> 最近一日交易日期<br>
+                                                <input type="checkbox" value="S5203"> 累计交易总金额<br>
+                                                <input type="checkbox" value="S5204"> 累计交易总笔数<br>
+                                                <input type="checkbox" value="S5205"> 累计交易总人数<br>
+                                                <input type="checkbox" value="S5000"> 近12月，每月交易总金额枚举<br>
+                                                <input type="checkbox" value="S5109"> 近24月，每月交易总金额枚举<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5001"> 近12月，每月交易总金额枚举（大于10元）<br>
+                                                <input type="checkbox" value="S5110"> 近24月，每月交易总金额枚举（大于10元）<br>
+                                                <input type="checkbox" value="S5081"> 近12月，每月最大交易金额<br>
+                                                <input type="checkbox" value="S5111"> 近24月，每月最大交易金额<br>
+                                                <input type="checkbox" value="S5112"> 每月最小交易金额<br>
+                                                <input type="checkbox" value="S5113"> 每月交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5003"> 每月交易总笔数枚举（大于10 元）<br>
+                                                <input type="checkbox" value="S5004"> 近12月，每月交易总天数枚举<br>
+                                                <input type="checkbox" value="S5114"> 近24月，每月交易总天数枚举<br>
+                                                <input type="checkbox" value="S5115"> 每月交易总人数枚举<br>
+                                                <input type="checkbox" value="S5011"> 每月交易总人数枚举（大于10 元）<br>
+                                                <input type="checkbox" value="S5116"> 每月客单价枚举<br>
+                                                <input type="checkbox" value="S5117"> 每月笔单价枚举<br>
+                                                <input type="checkbox" value="S5006"> 每月笔单价枚举（大于10元）<br>
+                                                <input type="checkbox" value="S5165"> 每周交易总金额枚举<br>
+                                                <input type="checkbox" value="S5166"> 每周交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5167"> 每周交易总天数枚举<br>
+                                                <input type="checkbox" value="S5168"> 每周交易总人数枚举<br>
+                                                <input type="checkbox" value="S5169"> 周均交易金额<br>
+                                                <input type="checkbox" value="S5170"> 周均交易笔数<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5171"> 周均交易天数<br>
+                                                <input type="checkbox" value="S5172"> 周交易金额中值<br>
+                                                <input type="checkbox" value="S5173"> 周交易金额最高值<br>
+                                                <input type="checkbox" value="S5174"> 周交易金额最低值<br>
+                                                <input type="checkbox" value="S5175"> 低于周均交易金额的周数<br>
+                                                <input type="checkbox" value="S5176"> 低于周均交易金额的月份分布<br>
+                                                <input type="checkbox" value="S5177"> 周交易金额变异系数<br>
+                                                <input type="checkbox" value="S5178"> 周交易笔数变异系数<br>
+                                                <input type="checkbox" value="S5206"> 每小时交易金额枚举<br>
+                                                <input type="checkbox" value="S5207"> 每小时交易笔数枚举<br>
+                                                <input type="checkbox" value="S5210"> 每月工作日工作时间交易总金 额<br>
+                                                <input type="checkbox" value="S5212"> 每月工作日非工作时间交易总 金额<br>
+                                                <input type="checkbox" value="S5211"> 每月工作日工作时间交易总笔 数<br>
+                                                <input type="checkbox" value="S5213"> 每月工作日非工作时间交易总 笔数<br>
+                                                <input type="checkbox" value="S5214"> 每月双休日交易总金额<br>
+                                                <input type="checkbox" value="S5215"> 每月双休日交易总笔数<br>
+                                                <input type="checkbox" value="S5076"> 近6月，各月四区间交易总人数<br>
+                                                <input type="checkbox" value="S5077"> 近6月，各月四区间最大单笔交 易金额<br>
+                                                <input type="checkbox" value="S5078"> 近6月，各月四区间最小单笔交 易金额<br>
+                                                <input type="checkbox" value="S5129"> 近6月月均交易金额<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5046"> 近6月金额标准差<br>
+                                                <input type="checkbox" value="S5047"> 近6月金额标准差 在本市同行 排名<br>
+                                                <input type="checkbox" value="S5048"> 近6月金额差异系数<br>
+                                                <input type="checkbox" value="S5049"> 近6月金额差异系数在本市同行 排名<br>
+                                                <input type="checkbox" value="S5118"> 近12月交易金额环比增长枚举<br>
+                                                <input type="checkbox" value="S5070"> 标准差-交易额环比增长率<br>
+                                                <input type="checkbox" value="S5071"> 标准差-交易额环比增长率 在 本市同行排名<br>
+                                                <input type="checkbox" value="S5072"> 差异系数－交易额环比增长率<br>
+                                                <input type="checkbox" value="S5073"> 差异系数-交易额环比增长率 在本市同行排名<br>
+                                                <input type="checkbox" value="S5010"> 每月交易金额环比增长枚举（10元以上）<br>
+                                                <input type="checkbox" value="S5068"> 每月交易额环比增长率均值（10元以上）<br>
+                                                <input type="checkbox" value="S5126"> 年度交易额峰值月份<br>
+                                                <input type="checkbox" value="S5130"> 近6月月均交易笔数<br>
+                                                <input type="checkbox" value="S5052"> 近6月交易笔数标准差<br>
+                                                <input type="checkbox" value="S5053"> 近6月交易笔数标准差 在本市 同行排名<br>
+                                                <input type="checkbox" value="S5054"> 近6月交易笔数差异系数<br>
+                                                <input type="checkbox" value="S5055"> 近6月交易笔数差异系数 在本 市同行排名<br>
+                                                <input type="checkbox" value="S5119"> 近12月交易笔数环比增长枚举<br>
+                                                <input type="checkbox" value="S5120"> 近12月客单价环比增长枚举<br>
+                                                <input type="checkbox" value="S5121"> 近12月笔单价环比增长枚举<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5122"> 每月交易金额同比增长枚举<br>
+                                                <input type="checkbox" value="S5123"> 每月交易金额同比增长率均值<br>
+                                                <input type="checkbox" value="S5142"> 每月交易金额同比增长率均值 在本市同行排名<br>
+                                                <input type="checkbox" value="S5064"> 标准差-交易额同比增长率<br>
+                                                <input type="checkbox" value="S5065"> 标准差-交易额同比增长率 在 本市同行排名<br>
+                                                <input type="checkbox" value="S5066"> 差异系数－交易额同比增长率<br>
+                                                <input type="checkbox" value="S5067"> 差异系数 - 交易金额同比增长 率 在本市同行排名<br>
+                                                <input type="checkbox" value="S5009"> 每月交易额同比增长枚举（10 元以上）<br>
+                                                <input type="checkbox" value="S5062"> 每月交易额同比增长均值（10 元以上）<br>
+                                                <input type="checkbox" value="S5063"> 每月交易额同比增长率均值在 本市同行排名（10元以上）<br>
+                                                <input type="checkbox" value="S5124"> 每月交易笔数同比增长枚举<br>
+                                                <input type="checkbox" value="S5125"> 每月客单价同比增长枚举<br>
+                                                <input type="checkbox" value="S5127"> 近6月月均交易天数<br>
+                                                <input type="checkbox" value="S5057"> 月均交易天数在本市同行排名<br>
+                                                <input type="checkbox" value="S5131"> 近6月交易天数变异系数<br>
+                                                <input type="checkbox" value="S5139"> 月交易天数变异系数在本市同 行排名<br>
+                                                <input type="checkbox" value="S5058"> 近6月天数标准差<br>
+                                                <input type="checkbox" value="S5059"> 近6月天数标准差 本市同行排 名<br>
+                                                <input type="checkbox" value="S5060"> 近6月天数差异系数<br>
+                                                <input type="checkbox" value="S5061"> 近6月天数差异系数 在本市同 行排名<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5128"> 近6月月均交易人数<br>
+                                                <input type="checkbox" value="S5133"> 每月交易金额在本市同行排名<br>
+                                                <input type="checkbox" value="S5134"> 每月交易笔数在本市同行排名<br>
+                                                <input type="checkbox" value="S5137"> 月均交易金额在本市同行排名<br>
+                                                <input type="checkbox" value="S5138"> 月均交易笔数在本市同行排名<br>
+                                                <input type="checkbox" value="S5135"> 客单价在本市同行排名<br>
+                                                <input type="checkbox" value="S5136"> 笔单价在本市同行排名<br>
+                                                <input type="checkbox" value="S5143"> 同行每月交易额环比增长<br>
+                                                <input type="checkbox" value="S5069"> 近6月交易额环比增长率在本市 同行排名<br>
+                                                <input type="checkbox" value="S5144"> 同行每月客单价环比增长<br>
+                                                <input type="checkbox" value="S5145"> 同行每月交易笔数环比增长<br>
+                                                <input type="checkbox" value="S5146"> 同行每月交易金额同比增长<br>
+                                                <input type="checkbox" value="S5147"> 同行每月交易笔数同比增长<br>
+                                                <input type="checkbox" value="S5148"> 同行每月客单价同比增长<br>
+                                                <input type="checkbox" value="S5181"> 周均交易金额在本市同行排名<br>
+                                                <input type="checkbox" value="S5182"> 周均交易笔数在本市同行排名<br>
+                                                <input type="checkbox" value="S5183"> 周均交易天数在本市同行排名<br>
+                                                <input type="checkbox" value="S5184"> 周交易笔数变异系数在本市同 行排名<br>
+                                                <input type="checkbox" value="S5185"> 周交易金额变异系数在本市同 行排名<br>
+                                                <input type="checkbox" value="S5140"> 市场份额<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse ">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5141"> 市场增长率<br>
+                                                <input type="checkbox" value="S5257"> 各忠诚度客户交易金额占比（普通、中等、忠实）<br>
+                                                <input type="checkbox" value="S5258"> 各忠诚度客户交易笔数占比（普通、中等、忠实）<br>
+                                                <input type="checkbox" value="S5259"> 各忠诚度客户交易人数占比（普通、中等、忠实）<br>
+                                                <input type="checkbox" value="S5260"> 普卡客户人数占比<br>
+                                                <input type="checkbox" value="S5261"> 银卡及金卡客户人数占比<br>
+                                                <input type="checkbox" value="S5262"> 白金卡及以上等级客户人数占 比<br>
+                                                <input type="checkbox" value="S5254"> 各地客户交易金额占比（同省同城、同省非同城、外省、其<br>
+                                                <input type="checkbox" value="S5255"> 他各）地客户交易笔数占比（同省同城、同省非同城、外省、其<br>
+                                                <input type="checkbox" value="S5256"> 他各）地客户交易人数占比（同省同城、同省非同城、外省、其 他）<br>
+                                                <input type="checkbox" value="S5265"> 前5大异地城市客户分布<br>
+                                                <input type="checkbox" value="S5216"> 近12月，每月单笔(0,200]:交 易总金额枚举<br>
+                                                <input type="checkbox" value="S5217"> 近12月，单笔(0,200]:交易总 笔数枚举<br>
+                                                <input type="checkbox" value="S5218"> 近12月，单笔(0,200]:交易总 人数枚举<br>
+                                                <input type="checkbox" value="S5219"> 近12月，单笔(200,600]:交易 总金额枚举<br>
+                                                <input type="checkbox" value="S5220"> 近12月，单笔(200,600]:交易 总笔数枚举<br>
+                                                <input type="checkbox" value="S5221"> 近12月，单笔(200,600]:交易 总人数枚举<br>
+                                                <input type="checkbox" value="S5222"> 近12月，单笔(600,1000]:交易 总金额枚举<br>
+                                                <input type="checkbox" value="S5223"> 近12月，单笔(600,1000]:交易 总笔数枚举<br>
+                                                <input type="checkbox" value="S5224"> 近12月，单笔(600,1000]:交易 总人数枚举<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5225"> 近12月，单笔(1000,5000]:交 易总金额枚举<br>
+                                                <input type="checkbox" value="S5226"> 近12月，单笔(1000,5000]:交 易总笔数枚举<br>
+                                                <input type="checkbox" value="S5227"> 近12月，单笔(1000,5000]:交 易总人数枚举<br>
+                                                <input type="checkbox" value="S5228"> 近12月，单笔(5000,20000]:交易总金额枚举<br>
+                                                <input type="checkbox" value="S5229"> 近12月，单笔(5000,20000]:交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5230"> 近12月，单笔(5000,20000]:交易总人数枚举<br>
+                                                <input type="checkbox" value="S5231"> 近12月，单笔(20000,+]:交易 总金额枚举<br>
+                                                <input type="checkbox" value="S5232"> 近12月，单笔(20000,+]:交易 总笔数枚举<br>
+                                                <input type="checkbox" value="S5233"> 近12月，单笔(20000,+]:交易 总人数枚举<br>
+                                                <input type="checkbox" value="S5234"> 近6月，单笔(0,200]:借记卡交 易总笔数枚举<br>
+                                                <input type="checkbox" value="S5235"> 近6月，单笔(200,600]:借记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5236"> 近6月，单笔(600,1000]:借记 卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5237"> 近6月，单笔(1000,5000]:借记 卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5238"> 近6月，单笔(5000,20000]:借 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5239"> 近6月，单笔(20000,+]:借记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5086"> 近12月，单笔（0，10]:借记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5087"> 近12月，单笔（10，500]:借 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5088"> 近12月，单笔（500，1000]: 借记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5089"> 近12月，单笔（1000，2000]: 借记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5090"> 近12月，单笔（2000，5000]: 借记卡交易总笔数枚举<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse ">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5091"> 近12月，单笔（5000， 10000]:借记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5092"> 近12月，单笔（10000，+]:借 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5240"> 近6月，单笔(0,200]:贷记卡交 易总笔数枚举<br>
+                                                <input type="checkbox" value="S5241"> 近6月，单笔(200,600]:贷记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5242"> 近6月，单笔(600,1000]:贷记 卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5243"> 近6月，单笔(1000,5000]:贷记 卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5244"> 近6月，单笔(5000,20000]:贷 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5245"> 近6月，单笔(20000,+]:贷记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5093"> 近12月，单笔（0，10]:贷记卡 交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5094"> 近12月，单笔（10，500]:贷 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5095"> 近12月，单笔（500，1000]: 贷记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5096"> 近12月，单笔（1000，2000]: 贷记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5097"> 近12月，单笔（2000,5000]: 贷记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5098"> 近12月，单笔（5000， 10000]:贷记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5099"> 近12月，单笔（10000，+]:贷 记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5282"> 每月出账交易总金额枚举<br>
+                                                <input type="checkbox" value="S5284"> 近6月出账交易总金额<br>
+                                                <input type="checkbox" value="S5283"> 每月出账交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5285"> 近6月出账交易总笔数<br>
+                                                <input type="checkbox" value="S5263"> 交易金额前五的客户的金额占 比<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse">
+                                            <div class="well">
+                                                <input type="checkbox" value="S5264"> 交易金额前五的客户的笔数占 比<br>
+                                                <input type="checkbox" value="S5179"> 近1周交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5186"> 近1月交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5187"> 近3月交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5188"> 近6月交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5189"> 近12月交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5190"> 近2年交易金额TOP10客户， 各客户交易总金额枚举<br>
+                                                <input type="checkbox" value="S5180"> 近1周交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5191"> 近1月交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5192"> 近3月交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5193"> 近6月交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5194"> 近12月交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5195"> 近两年交易整数金额的次数<br>
+                                                <input type="checkbox" value="S5079"> 近12月，非正常大额（单笔金 额大于本市同行排名前10%）交易金额<br>
+                                                <input type="checkbox" value="S5080"> 近12月，非正常大额（单笔金 额大于本市同行排名前10%）交易笔数<br>
+                                                <input type="checkbox" value="S5155"> 近1月单日同卡多笔等额消费金 额<br>
+                                                <input type="checkbox" value="S5156"> 近6月单日同卡多笔等额消费金 额<br>
+                                                <input type="checkbox" value="S5157"> 近12月单日同卡多笔等额消费 金额<br>
+                                                <input type="checkbox" value="S5158"> 近1月单日同卡多笔等额消费笔 数<br>
+                                                <input type="checkbox" value="S5159"> 近6月单日同卡多笔等额消费笔 数<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse " >
+                                            <div class="well" >
+                                                <input type="checkbox" value="S5160"> 近12月单日同卡多笔等额消费 笔数<br>
+                                                <input type="checkbox" value="S5161"> 近12月单月同卡大额交易金额 枚举<br>
+                                                <input type="checkbox" value="S5162"> 近12月单月同卡大额交易笔数 枚举<br>
+                                                <input type="checkbox" value="S5163"> 近12月单月非同卡大额交易金 额枚举<br>
+                                                <input type="checkbox" value="S5164"> 近12月单月非同卡大额交易笔 数枚举<br>
+                                                <input type="checkbox" value="S5149"> 近1月单日同卡多笔消费次数<br>
+                                                <input type="checkbox" value="S5150"> 近6月单日同商户多笔消费次数<br>
+                                                <input type="checkbox" value="S5151"> 近12月单日同商户多笔消费次 数<br>
+                                                <input type="checkbox" value="S5152"> 近1月同商户多笔消费最小时间 间隔<br>
+                                                <input type="checkbox" value="S5153"> 近6月同商户多笔消费最小时间 间隔<br>
+                                                <input type="checkbox" value="S5154"> 近12月同商户多笔消费最小时 间间隔<br>
+                                                <input type="checkbox" value="S5248"> 每月交易失败总金额枚举<br>
+                                                <input type="checkbox" value="S5249"> 每月交易失败总笔数枚举<br>
+                                                <input type="checkbox" value="S5250"> 每月交易失败原因枚举<br>
+                                                <input type="checkbox" value="S5251"> 近12月，交易失败总金额<br>
+                                                <input type="checkbox" value="S5252"> 近12月，交易失败总笔数<br>
+                                                <input type="checkbox" value="S5269"> 每月贷记卡交易总金额枚举<br>
+                                                <input type="checkbox" value="S5270"> 每月贷记卡交易总笔数枚举<br>
+                                                <input type="checkbox" value="S5007"> 每月贷记卡笔单价枚举（10元 以上）<br>
+                                                <input type="checkbox" value="S5274"> 贷记卡交易总金额<br>
+                                            </div>
+                                        </div>
+                                        <div class="collapse " >
+                                            <div class="well">
+                                                <input type="checkbox" value="S5275"> 贷记卡交易总笔数<br>
+                                                <input type="checkbox" value="S5279"> 贷记卡交易总卡数<br>
+                                                <input type="checkbox" value="S5276"> 贷记卡交易金额占比<br>
+                                                <input type="checkbox" value="S5287"> 贷记卡交易笔数占比<br>
+                                                <input type="checkbox" value="S5267"> 借记卡交易金额枚举<br>
+                                                <input type="checkbox" value="S5268"> 借记卡交易笔数枚举<br>
+                                                <input type="checkbox" value="S5008"> 每月借记卡笔单价枚举（10元 以上）<br>
+                                                <input type="checkbox" value="S5271"> 借记卡的交易总金额<br>
+                                                <input type="checkbox" value="S5272"> 借记卡的交易总笔数<br>
+                                                <input type="checkbox" value="S5280"> 借记卡交易总卡数<br>
+                                                <input type="checkbox" value="S5273"> 借记卡交易金额占比<br>
+                                                <input type="checkbox" value="S5286"> 借记卡交易笔数占比<br>
+                                                <input type="checkbox" value="S5278"> 贷记卡借记卡客单价比例<br>
+                                                <input type="checkbox" value="S5277"> 贷记卡借记卡交易笔数比例<br>
+                                                <input type="checkbox" value="S5012"> 每月贷记卡借记卡交易笔数比 例枚举（10元以上）<br>
+                                                <input type="checkbox" value="S5253"> 贷记卡交易失败比例<br>
+                                                <input type="checkbox" value="S5208"> 夜消费交易总金额<br>
+                                                <input type="checkbox" value="S5209"> 夜消费交易总笔数<br>
+                                                <input type="checkbox" value="S5281"> 疑似信用卡套现甄别<br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button"  class="btn btn-info">提交</button>
+                                        <button type="button"  class="btn btn-info">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" style="width:100%; padding:20px 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr style="background-color: #f6f8f8"><th>查询项名称</th><th>时间范围</th><th>说明</th><th>查询结果</th></tr>
+                                <tr><td>商户编号（MID）</td><td>近12月</td><td>商户编号（MID）信息</td><td>BD9845F8C38A50F53CCE61AD297498EBEE208ADC4AA9AA60865CAC9142CD6A80</td></tr>
+                                <tr><td>对应类别：（例如批发类）</td><td>近12月</td><td>商户对应类别信息</td><td>8</td></tr>
+                                <tr><td>手续费率： %</td><td>近12月</td><td>商户手续费率信息</td><td>555%</td></tr>
+                                <tr><td>最常用的交易渠道类型</td><td>近1月</td><td>最常用的交易发起方式，如：电脑、手机、POS 机、ATM （参见“交易渠道--数据字典3.0”）， 从高到低列出所有的交易渠道</td><td>8</td></tr>
+                                <tr><td>最常用的交易渠道类型</td><td>近1月</td><td>最常用的交易发起方式，如：电脑、手机、POS 机、ATM （参见“交易渠道--数据字典3.0”）， 从高到低列出所有的交易渠道</td><td>8</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

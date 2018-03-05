@@ -1,0 +1,147 @@
+<script>
+   //询价管理
+    "use strict";
+    app.controller("bankCtrl",
+        [
+            "$scope",
+            function ($scope) {
+//                  测试用的
+
+                $scope.List = [
+                    {
+                        odd : "23434567867789",
+                        name : "张艺兴",
+                        tele : "2346869238945",
+                        time : "2017-08-20",
+                        all : "张艺兴",
+                        number : "456",
+                        state : "询价中",
+                        huifang : "无"
+                    },
+                    {
+                        odd : "23434567867789",
+                        name : "张艺兴",
+                        tele : "2346869238945",
+                        time : "2017-08-20",
+                        all : "张艺兴",
+                        number : "456",
+                        state : "询价中",
+                        huifang : "无"
+                }
+                ]
+            }
+        ]
+    );
+</script>
+
+<div class="hbox hbox-auto-xs lter" ng-controller="bankCtrl">
+    <!-- column -->
+    <div class="col">
+        <div class="vbox">
+            <div class="wrapper-md b-b" style="padding-bottom:0;">
+                <div>
+                    <form class="clearfix">
+                        <div class="pull-left m-r w m-b-md inline" ng-if="merchantChe">
+                            <select class="form-control" ng-model="merchant"
+                                    ng-options="y.full_name for (x,y) in merchantsList"
+                                    ng-change="merchantsSelect(merchant)">
+                                <option value="">--杭州大蜂保险有限公司--</option>
+                            </select>
+                        </div>
+                        <div class="pull-left m-r w m-b-md inline">
+                            <label class="sr-only" for="release_waybill_number">车主姓名</label>
+                            <input type="text" class="form-control" id="release_waybill_number"
+                                   placeholder="请输入车主姓名">
+                        </div>
+                        <div class="pull-left m-r w m-b-md inline">
+                            <label class="sr-only" for="release_waybill_order_sn">车牌号</label>
+                            <input type="text" class="form-control" id="release_waybill_order_sn"
+                                   placeholder="请输入车牌号">
+                        </div>
+                        <div class="pull-left m-r w m-b-md inline">
+                            <label class="sr-only" for="release_waybill_order_sn">询价姓名</label>
+                            <input type="text" class="form-control"
+                                   placeholder="请输入询价人姓名">
+                        </div>
+                        <div class="pull-left m-r w m-b-md inline">
+                            <label class="sr-only" for="release_waybill_order_sn">询价手机号</label>
+                            <input type="text" class="form-control"
+                                   placeholder="请输入询价人手机号">
+                        </div>
+                        <div class="pull-left m-r w m-b-md inline">
+                            <label class="sr-only" for="release_waybill_order_sn">询价单号</label>
+                            <input type="text" class="form-control"
+                                   placeholder="请输入询价人单号">
+                        </div>
+
+                        <div class="pull-left m-r w m-b-md inline" ng-if="logisticsCompanyShow">
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="searchInfo.ex_waybill"
+                                   autocomplete="off"
+                                   placeholder="请输入外部运单号" >
+                        </div>
+                        <label class="pull-left m-r m-b-md inline" style="padding: 7px 0;">
+                            <label class="pull-left m-r-xxs checkbox-inline i-checks" style="margin-top: -1px;" ng-click="searchToday($event)">
+                                <input type="checkbox" ng-model="searchInfo.today"><i></i>
+                            </label>
+                            <span class="pull-left" translate="content.button.today"></span>
+                        </label>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner wrapper-xs">
+                        <div class="wrapper-md">
+                            <div ng-if="list.length < 1">
+                                暂无数据！
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">询价记录</div>
+                                <table st-table="rowCollectionPage" class="table table-striped">
+                                    <thead>
+                                        <tr class="center">
+                                            <th>询价单号</th>
+                                            <th>询价人</th>
+                                            <th>联系方式</th>
+                                            <th>所有人</th>
+                                            <th>号牌号码</th>
+                                            <th>询价时间</th>
+                                            <th>询价状态</th>
+                                            <th>回访状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="item in List">
+                                        <td >{{ item.odd }}</td>
+                                        <td >{{ item.name }}</td>
+                                        <td >{{ item.tele }}</td>
+                                        <td >{{ item.time }}</td>
+                                        <td >{{ item.all }}</td>
+                                        <td >{{ item.number }}</td>
+                                        <td >{{ item.state }}</td>
+                                        <td >{{ item.huifang }}</td>
+                                        <td ><button class="btn btn-info">详情</button></td>
+                                    </tr>
+                                    </tbody>
+                                    <!--<tfoot>-->
+                                        <!--<tr>-->
+                                            <!--<td colspan="5" class="text-center">-->
+                                                <!--<div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7" class="no-margin"></div>-->
+                                            <!--</td>-->
+                                        <!--</tr>-->
+                                    <!--</tfoot>-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,136 @@
+package com.liyang.domain.upgradeapply;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+/**
+ * 
+ * @author Administrator
+ *
+ */
+@Entity
+public class UpgradeApply {
+	
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Id
+	private int id;
+	/**
+	 * 真实姓名
+	 */
+	@NotNull(message="请填写真实姓名")
+	private String realName;
+	/**
+	 * 身份证号
+	 */
+	@NotNull(message="身份证号码不能为空")
+	@Pattern(regexp="^\\d{15}$|^\\d{17}[0-9Xx]$",message="请输入正确的身份证号")
+	private String identify;
+//	@NotNull(message="手机号码不能为空")
+//	@Pattern(regexp="^1\\d{10}$",message="手机号码格式不正确")
+	private String phone;
+	/**
+	 * 打款账号
+	 */
+//	@NotNull(message="支付账号不能为空")
+	private String payAccountId;
+	/**
+	 * 打款平台
+	 */
+//	@NotNull(message="支付平台不能为空")
+//	@Pattern(regexp="支付宝",message="现在支持的平台有支付宝")
+	private String payAccountPlatform;
+	/**
+	 * 0待审核  1审核通过 2未通过审核
+	 */
+//	@Max(value=2,message="状态只能在0,1,2中")
+//	@Min(value=0,message="状态只能在0,1,2中")
+	private int status;
+	/**
+	 * 申请时间
+	 */
+	private Date applyTime;
+	/**
+	 * 审核时间
+	 */
+	private Date auditTime;
+	
+
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+//	@Column(length=11)
+	public String getRealName() {
+		return realName;
+	}
+	public void setRealName(String realName) {
+		this.realName = realName;
+	}
+	
+//	@Column(length=20)
+	public String getIdentify() {
+		return identify;
+	}
+	public void setIdentify(String identify) {
+		this.identify = identify;
+	}
+	
+//	@Column(length=13)
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
+//	@Column(length=30)
+	public String getPayAccountId() {
+		return payAccountId;
+	}
+	public void setPayAccountId(String payAccountId) {
+		this.payAccountId = payAccountId;
+	}
+	
+//	@Column(length=20)
+	public String getPayAccountPlatform() {
+		return payAccountPlatform;
+	}
+	public void setPayAccountPlatform(String payAccountPlatform) {
+		this.payAccountPlatform = payAccountPlatform;
+	}
+	
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
+	public Date getApplyTime() {
+		return applyTime;
+	}
+	public void setApplyTime(Date applyTime) {
+		this.applyTime = applyTime;
+	}
+	
+	public Date getAuditTime() {
+		return auditTime;
+	}
+	public void setAuditTime(Date auditTime) {
+		this.auditTime = auditTime;
+	}
+
+	
+}

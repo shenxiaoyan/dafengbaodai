@@ -1,0 +1,328 @@
+package com.liyang.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import com.alibaba.druid.util.StringUtils;
+import com.liyang.domain.advertise.Advertise;
+import com.liyang.domain.advertise.AdvertiseAct;
+import com.liyang.domain.advertise.AdvertiseActRepository;
+import com.liyang.domain.advertise.AdvertiseForSearch;
+import com.liyang.domain.advertise.AdvertiseLog;
+import com.liyang.domain.advertise.AdvertiseLogRepository;
+import com.liyang.domain.advertise.AdvertiseRepository;
+import com.liyang.domain.advertise.AdvertiseState;
+import com.liyang.domain.advertise.AdvertiseStateRepository;
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.createenquiry.CreateEnquiry;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.offerresult.OfferResultRepository;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.user.User;
+import com.liyang.helper.ResponseBody;
+
+/**
+ * 通知业务层
+ * 
+ * @author huanghengkun
+ * @create 2017年12月17日
+ */
+@Service
+@Order(1)
+public class AdvertiseService extends AbstractAuditorService<Advertise, AdvertiseState, AdvertiseAct, AdvertiseLog> {
+
+	@Autowired
+	AdvertiseActRepository advertiseActRepository;
+
+	@Autowired
+	AdvertiseStateRepository advertiseStateRepository;
+
+	@Autowired
+	AdvertiseRepository advertiseRepository;
+
+	@Autowired
+	AdvertiseLogRepository advertiseLogRepository;
+
+	@Autowired
+	RoleRepository roleRepository;
+
+	@Autowired
+	XinGeService xingeService;
+
+	@Autowired
+	OfferResultRepository offResRepository;
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+		// List<AdvertiseAct> findAll = advertiseActRepository.findAll();
+		// if(findAll == null || findAll.isEmpty()){
+		if (advertiseActRepository.count() <= 0) {
+			advertiseActRepository.save(new AdvertiseAct("创建", "create", 10, ActGroup.UPDATE));
+			advertiseActRepository.save(new AdvertiseAct("读取", "read", 20, ActGroup.READ));
+			advertiseActRepository.save(new AdvertiseAct("更新", "update", 30, ActGroup.UPDATE));
+			advertiseActRepository.save(new AdvertiseAct("删除", "delete", 40, ActGroup.UPDATE));
+		}
+	}
+
+	@Override
+	public LogRepository<AdvertiseLog> getLogRepository() {
+		return advertiseLogRepository;
+	}
+
+	@Override
+	public AuditorEntityRepository<Advertise> getAuditorEntityRepository() {
+		return advertiseRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new Advertise().setLogRepository(advertiseLogRepository);
+	}
+
+	@Override
+	public AdvertiseLog getLogInstance() {
+		return new AdvertiseLog();
+	}
+
+	@Override
+	public ActRepository<AdvertiseAct> getActRepository() {
+		return advertiseActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new Advertise().setService(this);
+	}
+
+	public ResponseBody doUpdate(Advertise advertise) {
+
+		Integer id = advertise.getId();
+		System.out.println(id);
+		Advertise ad = advertiseRepository.getById(id);
+		AdvertiseState as = advertiseStateRepository.getByStateCode("PUBLISHED");
+		ad.setState(as);
+		ad.setPublishTime(new Date());
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("name", "advertise");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("title", advertise.getTitle());
+		map.put("content", advertise.getContent());
+		map.put("publish_time", advertise.getPublishTime());
+		map.put("is_read", advertise.getIsRead());
+		data.put("advertise", map);
+
+		xingeService.pushAdvertiseAllAndriodAndIOS(data);
+		return new ResponseBody(0, "ok");
+	}
+
+	public ResponseBody doCreate(Advertise advertise) {
+		AdvertiseState state = advertiseStateRepository.getByStateCode("CREATED");
+		advertise.setState(state);
+		advertise.setType(1);
+		advertise.setIsRead(0);
+		advertiseRepository.save(advertise);
+
+		return new ResponseBody(0, "ok");
+	}
+
+	public Page<Advertise> multiConditionSearch(AdvertiseForSearch advertiseForSearch, Pageable pageable) {
+		return advertiseRepository.findAll(new Specification<Advertise>() {
+
+			@Override
+			public Predicate toPredicate(Root<Advertise> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+
+				if (advertiseForSearch != null) {
+					List<Predicate> predicateList = new ArrayList<Predicate>();
+					if (!StringUtils.isEmpty(advertiseForSearch.getStateCode())) {
+						Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"),
+								advertiseForSearch.getStateCode());
+						predicateList.add(stateCodeEqual);
+					}
+					if (null != advertiseForSearch.getLastModifiedBeginTime()) {
+						Predicate beginTimeGreaterThen = cb.greaterThanOrEqualTo(root.<Date>get("lastModifiedAt"),
+								advertiseForSearch.getLastModifiedBeginTime());
+						predicateList.add(beginTimeGreaterThen);
+					}
+					if (null != advertiseForSearch.getLastModifiedEndTime()) {
+						Predicate endTimeLessThen = cb.lessThanOrEqualTo(root.<Date>get("lastModifiedAt"),
+								advertiseForSearch.getLastModifiedEndTime());
+						predicateList.add(endTimeLessThen);
+					}
+					if (null != advertiseForSearch.getPublishBeginTime()) {
+						Predicate beginTimeGreaterThen = cb.greaterThanOrEqualTo(root.<Date>get("publishTime"),
+								advertiseForSearch.getPublishBeginTime());
+						predicateList.add(beginTimeGreaterThen);
+					}
+					if (null != advertiseForSearch.getPublishEndTime()) {
+						Predicate endTimeLessThen = cb.lessThanOrEqualTo(root.<Date>get("publishTime"),
+								advertiseForSearch.getPublishEndTime());
+						predicateList.add(endTimeLessThen);
+					}
+					if (!StringUtils.isEmpty(advertiseForSearch.getType())) {
+						Predicate typeEqual = cb.equal(root.get("type"), advertiseForSearch.getType());
+						predicateList.add(typeEqual);
+					}
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+				}
+				return null;
+			}
+		}, pageable);
+	}
+
+	public Page<Advertise> findZnxListByToken(String token, Pageable pageable) {
+		Page<Advertise> advertisePage = advertiseRepository.getZnx(token, pageable);
+		for (Advertise advertise : advertisePage) {
+			advertise.setCreatedByDepartment(null);
+			advertise.setState(null);
+			if (null != advertise.getOfferResult()) {
+				advertise.getOfferResult().setCreateEnquiry(null);
+			}
+		}
+		return advertisePage;
+	}
+
+	public Page<Advertise> findPublished(Pageable pageable) {
+		Page<Advertise> advertisePage = advertiseRepository.getAdvertise(pageable);
+		for (Advertise advertise : advertisePage) {
+			advertise.setCreatedByDepartment(null);
+			advertise.setState(null);
+			if (null != advertise.getOfferResult()) {
+				advertise.getOfferResult().setCreateEnquiry(null);
+			}
+		}
+		return advertisePage;
+	}
+
+	public void updateReadStateByToken(String token) {
+		advertiseRepository.setZnxState(token);
+	}
+
+	public boolean checkIsAnyNotRead(String token) {
+		int num = advertiseRepository.queryNotReadNum(token);
+		return (num > 0);
+	}
+
+	public List<Advertise> getAdvertiseListOrderByTime() {
+		return advertiseRepository.getLatestAdvertise();
+	}
+
+	// /*
+	// * 临时方法，手动更新数据方法
+	// */
+	// @Transactional
+	// public int updateAdvertiseCreEnqId(List<Advertise> advertiseList) {
+	// int num = 0;
+	// for (Advertise advertise : advertiseList) {
+	// if (!StringUtils.isEmpty(advertise.getOfferId())) {
+	// List<OfferResult> offerResultList =
+	// offResRepository.findByDataResultOfferId(advertise.getOfferId());
+	// if (!(offerResultList == null || offerResultList.isEmpty())) {
+	// CreateEnquiry createEnquiry = offerResultList.get(0).getCreateEnquiry();
+	// if (null != createEnquiry) {
+	// advertise.setCreateEnqId(createEnquiry.getId().toString());
+	// num++;
+	// }
+	// }
+	// }
+	// }
+	// advertiseRepository.save(advertiseList);
+	// return num;
+	// }
+
+	/*
+	 * 获取web用户未读消息，并全部设为已读
+	 */
+	@Transactional
+	public Map<String, Object> getCurrengUserNotread(User user, Pageable pageable) {
+		Map<String, Object> returnMap = new HashMap<>();
+		Page<Advertise> notReadPage = advertiseRepository.findByUserAndIsReadAndUserNotNull(user, 0, pageable);
+		List<Advertise> allNotRead = advertiseRepository.findByUserAndIsReadAndUserNotNull(user, 0);
+		List<Map<String, Object>> advertises = new ArrayList<>();
+		for (Advertise advertise : notReadPage) {
+			Map<String, Object> contentMap = new HashMap<>();
+			contentMap.put("id", advertise.getId());
+			contentMap.put("title", advertise.getTitle());
+			contentMap.put("content", advertise.getContent());
+			contentMap.put("createdAt", advertise.getCreatedAt());
+			// contentMap.put("createEnqId", advertise.getCreateEnqId());
+			// contentMap.put("offerId", advertise.getOfferId());
+			contentMap.put("linkUrl", advertise.getLinkUrl());
+			advertises.add(contentMap);
+			// advertise.setIsRead(1);
+		}
+		for (Advertise advertise : allNotRead) {
+			advertise.setIsRead(1);
+		}
+		advertiseRepository.save(notReadPage);
+		returnMap.put("notReadNum", notReadPage.getTotalElements());
+		returnMap.put("contents", advertises);
+		return returnMap;
+	}
+
+	/*
+	 * 获取当前web用户未读消息数量
+	 */
+	public Integer getCurrentUserNotReadNum(User user) {
+		return advertiseRepository.countByUserAndIsReadAndUserNotNull(user, 0);
+	}
+
+	/*
+	 * 获取web用户全部消息
+	 */
+	public Map<String, Object> getCurrengUserAllAdvertise(User user, Pageable pageable) {
+		Map<String, Object> returnMap = new HashMap<>();
+		Page<Advertise> notReadPage = advertiseRepository.findByUserAndUserNotNull(user, pageable);
+		List<Map<String, Object>> advertises = new ArrayList<>();
+		for (Advertise advertise : notReadPage) {
+			Map<String, Object> contentMap = new HashMap<>();
+			contentMap.put("id", advertise.getId());
+			contentMap.put("title", advertise.getTitle());
+			contentMap.put("content", advertise.getContent());
+			contentMap.put("createdAt", advertise.getCreatedAt());
+			// contentMap.put("createEnqId", advertise.getCreateEnqId());
+			// contentMap.put("offerId", advertise.getOfferId());
+			contentMap.put("linkUrl", advertise.getLinkUrl());
+			advertises.add(contentMap);
+		}
+		returnMap.put("contents", advertises);
+		returnMap.put("page", getPageData(notReadPage));
+		return returnMap;
+	}
+
+	/*
+	 * 获取page分页信息
+	 */
+	private Map<String, Integer> getPageData(Page<?> page) {
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", page.getSize());
+		pageDataMap.put("totalElements", (int) page.getTotalElements());
+		pageDataMap.put("totalPages", page.getTotalPages());
+		pageDataMap.put("number", page.getNumber());
+		return pageDataMap;
+	}
+
+}

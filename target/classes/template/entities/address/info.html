@@ -1,0 +1,97 @@
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script>
+
+    app.controller("addressInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "FileUploader",
+            function ($rootScope, $scope, $http, $stateParams, $state, FileUploader) {
+                console.log($stateParams);
+                $scope.companyInfo = {
+                    state: "/rest/insureCompanyState/1"
+                };
+                $scope.id = $stateParams.id;
+                console.log($scope.id);
+
+//                if($scope.id){
+//                    $http.get("/rest/insureCompanies/" + $scope.id).success(function(resResult){
+//                        $scope.companyInfo = resResult;
+//                        console.log($scope.companyInfo)
+//                    })
+//                }
+
+
+                /*
+               * 保险公司基本信息保存
+               * */
+                $scope.saveBaseInfo = function(){
+
+                    if(!($scope.companyInfo.listIcon && $scope.companyInfo.detailIcon)) {
+                        $rootScope.toasterWarning("失败！","请先保存图片！");
+                        return;
+                    } else if($scope.companyInfo.name && $scope.companyInfo.insurerCompanyId){
+                        $http({
+                            "method":"POST",
+                            url: "/rest/insureCompanies",
+                            data: $scope.companyInfo
+                        }).success(function(resResult){
+
+                            $rootScope.toasterSuccess("成功！","新增成功！");
+
+                            $state.go("workflowEntity.list",{entity_key:"insureCompany"},{reload:true});
+                        }).error(function(resResult){
+                            $rootScope.toasterError("失败！","新增失败！");
+                        })
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写正确信息！");
+                    }
+
+                };
+
+                /*
+                * 取消按钮
+                * */
+                $scope.clear = function(){
+                    $scope.companyInfo = {};
+                    $state.go("workflowEntity.list",{entity_key:"insureCompany"},{reload:true});
+                }
+
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="wrapper-md" ng-controller="addressInfoCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading font-bold">投保地址详情</div>
+        <div class="panel-body">
+            <form role="form" class="ng-pristine ng-valid">
+                <div class="form-group">
+                    <label>投保地点</label>
+                    <input type="text" class="form-control"
+                        ng-model="companyInfo.insurerCompanyId"
+                        id="insure_company_ID"
+                        placeholder="保险公司ID"
+                        autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <input type="text" class="form-control"
+                        ng-model="companyInfo.name"
+                        id="insure_company_name"
+                        placeholder="保险公司名称"
+                        autocomplete="off">
+                </div>
+     <button  class="btn btn-sm btn-default" ng-click="clear()">取消</button>
+     <button type="submit" class="btn btn-sm btn-primary" ng-click="saveBaseInfo()">确认提交</button>
+ </form>
+</div>
+</div>
+</div>

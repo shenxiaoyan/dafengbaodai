@@ -1,0 +1,38 @@
+<div class="vbox bg-white">
+    <div class="wrapper b-b b-light">
+        <button  class=" btn btn-sm btn-info" ng-click="SweetComfirm()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-subscript"></i> 编辑 </button>
+        <button  class="btn btn-sm btn-success" ng-click="SweetSuccess()"  tooltip="说明" tooltip-placement="bottom"><i class="fa fa-comment"></i> 换店长 </button>
+        <button  class=" btn btn-sm btn-danger" ng-click="SweetError()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-remove"></i> 关闭 </button>
+        <button  class=" btn btn-sm btn-primary" ng-click="SweetInfo()" tooltip="说明" tooltip-placement="bottom"><i class="fa fa-money"></i> 其它 </button>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md b-r ">
+
+                    容儿：应该要关注分店什么呢？
+                    <br />
+                    <img src="img/barcode.png" />
+                    <br />
+                    <br />
+
+                    <div class="text-center pull-left wrapper-md">
+                        <a ui-sref="app.page.profile">
+                            <span class="thumb-lg w-auto-folded avatar m-t-sm">
+                                <img src="img/barcode.png" class="img-full" alt="...">
+                            </span>
+                        </a>
+                        <a href class="dropdown-toggle hidden-folded" dropdown-toggle>
+                            <span class="clear">
+                                <span class="block m-t-sm">
+                                    <strong class="font-bold text-lt">李小明</strong> 
+                                </span>
+                                <span class="text-muted text-xs block">店长</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 19px 15px 0px 15px;">
+                <div class="pull-right">
+                    <ul class="nav nav-tabs" style="margin-bottom: -1px;">
+                            <li ui-sref-active="active"><a ui-sref="distributors.distributor.page({entity_type:'distributors',view_type:'dashboard'})">首页</a></li>
+                            <li ui-sref-active="active"><a ui-sref="distributors.distributor.page({entity_type:'orders',view_type:'list'})" >最新推荐</a></li>
+                            <li ui-sref-active="active"><a ui-sref="distributors.distributor.page({entity_type:'finance',view_type:'list'})" >财务流水</a></li>
+                    </ul>
+                </div>
+                <h4 class="pull-left m-t-none">国际汽车城平行进口店</h4>
+            </div>
+            <div class="row-row bg-white"  ui-view>
+            </div>
+        </div>
+    </div>
+</div>

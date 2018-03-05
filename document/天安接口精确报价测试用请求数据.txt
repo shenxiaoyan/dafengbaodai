@@ -1,0 +1,143 @@
+﻿{
+    "quotationType": "3",
+    "rateMark": "2",
+    "cityCode": "3440200",
+    "startDate": "2017-11-22",
+    "endDate": "2018-11-21",
+    "startDateBus": "2017-11-22",
+    "endDateBus": "2018-11-21",
+    "carInfoDto": {
+        "licenseNo": "粤F41341",
+        "engineNo": "4123412341234123",
+        "frameNo": "L12345678G4314132",
+        "brandName": "红旗CA7184MT4轿车",
+        "rbCode": "HQD1184YQJ",
+        "enrollDate": "2017-11-17",
+        "ecdemicFlag": "0",
+        "transferFlag": "0",
+        "seatCount": 5,
+        "carOwner": "杨薇娜",
+        "areaCode": "0",
+        "purchasePrice": 123800,
+        "actualValue": 123800,
+        "importFlag": "B",
+        "runMileRate": 3000,
+        "exhaustScale": 1798,
+        "wholeWeight": 1450,
+        "hyModelCode": "BYQCBRUB0009",
+        "carName": "红旗CA7184MT4 时尚型",
+        "noticeType": "CA7184MT4",
+        "isHaveGps": false,
+        "familyCarCount": 0,
+        "carOwnerIdentifyNumber": "360281199211115054",
+        "vehicleJingyouDto": {
+            "vehicleCode": "HQD1184YQJ",
+            "vehicleName": "红旗CA7184MT4轿车",
+            "brandName": "红旗CA7184MT4 时尚型",
+            "price": 123800,
+            "familyName": "奔腾"
+        }
+    },
+    "combosList": [
+        {
+            "comboNo": "TIANANCAR01",
+            "itemKindList": [
+                {
+                    "kindCode": "63",
+                    "kindName": "机动车损失险",
+                    "amount": 123800,
+                    "deductableFlag": "1",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "A63",
+                    "kindName": "机动车损失险不计免赔",
+                    "unitAmount": 0,
+                    "amount": 0,
+                    "deductableFlag": "0",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "68",
+                    "kindName": "第三者责任险",
+                    "amount": 500000,
+                    "deductableFlag": "1",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "A68",
+                    "kindName": "第三者责任险不计免赔",
+                    "unitAmount": 0,
+                    "amount": 0,
+                    "deductableFlag": "0",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "73",
+                    "kindName": "司机责任险",
+                    "unitAmount": 10000,
+                    "amount": 10000,
+                    "deductableFlag": "1",
+                    "quantity": 1,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "A73",
+                    "kindName": "司机责任险不计免赔",
+                    "unitAmount": 0,
+                    "amount": 0,
+                    "deductableFlag": "0",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "89",
+                    "kindName": "乘客责任险",
+                    "unitAmount": 10000,
+                    "amount": 40000,
+                    "deductableFlag": "1",
+                    "quantity": 4,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "A89",
+                    "kindName": "乘客责任险不计免赔",
+                    "unitAmount": 0,
+                    "amount": 0,
+                    "deductableFlag": "0",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "74",
+                    "kindName": "机动车盗抢险",
+                    "amount": 123800,
+                    "deductableFlag": "1",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                },
+                {
+                    "kindCode": "A74",
+                    "kindName": "机动车盗抢险不计免赔",
+                    "unitAmount": 0,
+                    "amount": 0,
+                    "deductableFlag": "0",
+                    "quantity": 0,
+                    "deductibleRate": 0
+                }
+            ]
+        }
+    ],
+    "requestHead": {
+        "openID": "taby",
+        "sign": "7CUKL93EOOe1EijCN7fx9KJnCs/aSMD9OAAZbZidU2cDeG0YsWKy96N8VQ3E3/SGU6TMOqjjx6dEWbLfdFN95mufqgLZg9BoVfqMsn2kaqyZdTzWW1FARNI9L99hbBTj",
+        "token": "taby11",
+        "tradeNo": "chHUnOrz",
+        "tradeType": "car",
+        "tradeDate": "2017-11-21 18:32:43"
+    }
+}

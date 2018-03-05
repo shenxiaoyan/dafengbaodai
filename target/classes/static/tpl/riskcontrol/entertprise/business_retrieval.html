@@ -1,0 +1,231 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *银联注册信息检索
+     * */
+    app.controller('businessRetrievalCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            {
+                code: "18860469551",
+                enterpriseName:"商道科技",
+                time: "2011-1-1"
+            };
+
+        //select
+        $scope.enterprise=[
+            {
+                type:'按企业名称查'
+            },
+            {
+                type:'按企业工商注册号查'
+            }
+        ];
+        $scope.YourOption =$scope.enterprise[0];
+        $scope.$watch("YourOption", function(n){
+            $scope.type = n.type;
+        });
+
+
+        //数据初始化
+        $scope.info =
+            {
+                code: "18860469551",
+                enterpriseName:"商道科技"
+            };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.code = '';
+            $scope.resultSwitch = false;
+        };
+        //重置数据2
+        $scope.resetInfo2 = function () {
+            $scope.info.enterpriseName = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //提交空表单时提示格式错误
+            if (myForm.code) {
+                myForm.code.$dirty = true;
+
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = false;
+
+            if($scope.info.code === $scope.mockData.code){
+                console.log('ccc');
+                $scope.resultSwitch = true;
+            }
+        };
+
+        //提交2
+        $scope.submitInfo2 = function (myForm) {
+
+            //提交空表单时提示格式错误
+            if (myForm.enterpriseName) {
+                myForm.enterpriseName.$dirty = true;
+
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            $scope.resultSwitch = false;
+
+            if($scope.info.enterpriseName === $scope.mockData.enterpriseName){
+                console.log('ddd');
+                $scope.resultSwitch = true;
+            }
+
+
+        };
+
+
+
+
+
+    }]);
+</script>
+<div class="vbox" ng-controller="businessRetrievalCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading" style="font-size: 16px">银联注册信息检索</div>
+                        <div class="panel-body">
+                            <form name="myForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>商户名称：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.code" name="code"  class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.code.$dirty && myForm.code.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.code.$error.required">编码不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table table-bordered table-hover table-condensed" style="table-layout:fixed;font-size:12px;margin-bottom: 0;">
+                                <tr><td>1</td><td>XX电器</td></tr>
+                                <tr><td>2</td><td>XX超市</td></tr>
+                                <tr><td>3</td><td>XX店XX配送</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table table-bordered table-hover table-condensed" style="table-layout:fixed;font-size:12px;margin-bottom: 0;">
+                                <tr><td>1</td><td>{{mockData.time}}</td></tr>
+                                <tr><td>2</td><td>XX超市</td></tr>
+                                <tr><td>3</td><td>XX店XX配送</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-body">
+                            <form name="myForm" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>{{type}}:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.enterpriseName" name="enterpriseName" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.enterpriseName.$dirty && myForm.enterpriseName.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.enterpriseName.$error.required">所填内容不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>查询方式:</label>
+                                    <div class="col-sm-4">
+                                        <select  ng-model="YourOption" class="form-control" ng-options="enterpriseType.type for enterpriseType in enterprise">
+                                            <!--<option value="name">按商户名称查</option>-->
+                                            <!--<option value="regNo">按商户注册号查</option>-->
+                                        </select>
+                                        <input id="queryMidValue" type="hidden" class="type">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo2(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo2()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>1</td><td>ma6aa8049117c854b2611cb976d9c47a205aaaaf348306d6c</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>1</td><td>{{mockData.time}}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

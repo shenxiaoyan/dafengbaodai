@@ -1,0 +1,95 @@
+<script>
+    app.controller("submitProposalProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state,$filter) {
+
+                //获取当前id
+                $scope.id = $stateParams.id;
+
+                $scope.orderId = $stateParams.orderId;
+
+                $scope.profile = {};
+                $scope.canActs = [];
+                var insuranceAmount = 0;
+                $scope.comInsuranceAmount = 0;
+
+                $scope.getProfile = function () {
+
+
+                   $http.get("/rest/submitProposals/" + $scope.id).success(function (resResult){
+                       $scope.underWriting = resResult.data;
+                   });
+
+                    $http.get("/rest/submitProposals/" + $scope.id + "/underwritingResult").success(function (resResult){
+                        $scope.submitUnderWriting = resResult.data;
+                    });
+
+                    //核保返回的详情
+                    $http.get("/dafeng/getUnderWritingResult?orderId=" + $scope.orderId).success(function (resResult){
+//                        $scope.submitUnderWriting = resResult.data;
+
+                        angular.forEach(resResult.data,function(value,index){
+                            $scope.subTime = value;
+
+                            $scope.subProList = value.params;
+
+                            $scope.custorm = value.customer;
+
+                            $scope.subCreate = value.createEnquiry;
+
+                            $scope.subStateList = value.state;
+
+                            $scope.subOfferList = value.offerResult;
+
+                            $scope.insuranceResult = value.insuranceResult;
+
+                            $scope.subResultList = value.offerResult.data.result.offerDetail.insurances;
+                        });
+
+
+                        if($scope.custorm.grade === "1"){
+
+                            $scope.custormGrade = "粉丝";
+                        }else{
+                            $scope.custormGrade = " 普通用户";
+                        }
+                    });
+
+//                    /dafeng/getUnderWritingResult?orderId=109-20171101102836-4f7df
+
+
+                    //询价返回详情
+                    $http.get("/rest/submitProposals/" + $scope.id + "/?projection=submitProposalProjection").success(function (resResult){
+
+                    })
+
+                };
+                $scope.getProfile();
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="submitProposalProfileCtrl">
+    <div class="wrapper-md b-b b-light clearfix">
+        <!--<button class="pull-left btn btn-md btn-primary">-->
+            <!--<i class="fa fa-plus">重新核保</i>-->
+        <!--</button>-->
+        <div class="font-thin h4 pull-left" style="padding: 8.5px 0">核保详情</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

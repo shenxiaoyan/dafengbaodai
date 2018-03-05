@@ -1,0 +1,16 @@
+{
+  "busProposalNo": "0823100080820180000015",
+  "busUnderWriteFlag": "3",
+  "bzUnderWriteFlag": "3",
+  "cityCode": "3130100",
+  "companyCode": "0182313021",
+  "dealFlag": "1",
+  "dealMassage": "确认投保成功！提交核保成功！。 核保返回具体信息：[ \"1\":\"私家车商业险，自核通过\"; ]",
+  "evalLevel": "3",
+  "proposalNo": "0823100080820180000015",
+  "resultDTO": {
+    "resultCode": "SUCCESS",
+    "resultMess": "统一平台调用成功"
+  }
+}
+

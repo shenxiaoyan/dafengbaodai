@@ -1,0 +1,29 @@
+<script>
+    app.controller("workflowEntityProfileController",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state, $filter) {
+
+                console.log($stateParams);
+
+            }
+        ]
+    );
+
+</script>
+<div class="vbox bg-white" ng-controller="workflowEntityProfileController">
+    
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

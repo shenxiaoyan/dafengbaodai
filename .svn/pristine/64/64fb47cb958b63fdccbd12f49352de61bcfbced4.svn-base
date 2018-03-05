@@ -1,0 +1,371 @@
+@charset "utf-8";
+html,body,div,p,span,input,label {
+	margin: 0;
+	padding: 0;
+	font-family: "Helvetica, Tahoma, Arial";
+}
+html,body{
+	width: 100%;
+	min-height: 100%;
+}
+html{
+	font-size: 20px;
+}
+
+.center {
+	text-align: center;
+}
+
+.left {
+	text-align: left;
+}
+
+.wrapper-sm {
+	padding : 10px;
+}
+
+.wrapper {
+	padding : 15px;
+}
+
+.wrapper-md {
+	padding : 20px;
+}
+
+.wrapper-l {
+	padding : 7% 7%;
+}
+
+.wrapper-xl {
+	padding : 30px;
+}
+
+.wrapper-t-t {
+	padding-top: 0;
+}
+
+.wrapper-t-r {
+	padding-right: 0;
+}
+
+.wrapper-t-b {
+	padding-bottom: 0;
+}
+
+.text-xl {
+	font-size : 20px;
+}
+
+.text-md {
+	font-size : 18px;
+}
+
+.text {
+	font-size : 16px;
+}
+
+.text-sm {
+	font-size : 14px;
+}
+
+.b-b {
+	border-bottom: 1px solid #dee5e7;
+}
+
+.b-d {
+	border-bottom : 1px dashed #dee5e7;
+}
+
+.mar_auto {
+	margin: 0 auto;
+}
+
+.m-a {
+	margin : 15px;
+}
+
+.m {
+	margin: 15px 0 15px 0;
+}
+
+.m-l {
+	margin: 0 10px 0 0;
+}
+
+
+.m-xs {
+	margin: 5px 0 5px 0;
+}
+
+.m-sm {
+	margin: 10px 0 10px 0 ;
+}
+
+.m-sm-t {
+	margin: 10px 0 0 0 ;
+}
+
+.m-r-md {
+	margin: 0 30px 0 0;
+}
+
+.m-l-xs {
+	padding-left : 5px;
+}
+
+.m-b {
+	padding-bottom : 15px;
+}
+
+.m-t {
+	padding-top : 15px;
+}
+
+.text-gray {
+	color : #A3A3A3;
+}
+
+.text-gray span {
+	color : #41AAFF;
+}
+
+.text-red {
+	color : #EA0606;
+}
+
+.text-yellow {
+	color : #d1aa42;
+}
+
+.pull-right {
+	float: right !important;
+}
+
+.pull-left {
+	float: left !important;
+}
+.space-gray {
+	height : 20px;
+	width : 100%;
+	background-color : #F5F5F5;
+	padding : 0;
+	margin : 0;
+}
+
+.bg_white {
+	background-color: #FFFFFF;
+	border-radius: 2%;
+}
+
+.header {
+	width: 100%;
+	height: 15rem;
+}
+
+.teamImg {
+	width: 100%;
+	height: 100%;
+	background: url(../img/pic_invite_banner.png) center top no-repeat;
+	background-size: 100% 100%;
+
+}
+
+/*团队成员基本信息*/
+.team_container {
+	height: 150px;
+	width: 95%;
+	background-color: #FFF;
+	border: 1px solid #FFF;
+	border-radius: 4px;
+	margin: -33px 0px 0 9px;
+	box-shadow: 0px 3px 3px #F7F7F7;
+}
+
+.userInfo {
+
+}
+
+.basicInfo {
+	height: 110px;
+	border-bottom: 1px solid #F5F9FC;
+}
+
+.info_header {
+	font-size: 1.5rem;
+	font-weight: 700;
+}
+
+.teleInfo {
+	height: 40px;
+	width: 100%;
+	background-color: #F5F9FC;
+}
+
+.teleInfo > div {
+	line-height: 40px;
+	margin : 0 auto;
+	text-align: center;
+}
+
+.f_header {
+	margin-bottom: 4%;
+}
+
+.f_content {
+	width: 100%;
+	height: 130px;
+	border : 1px solid #F8F8F8;
+	border-radius : 10px;
+	box-shadow: -5px 0px 5px #F9F9F9,   /*左边阴影*/
+			0px -5px 5px #F9F9F9,  /*上边阴影*/
+			5px 0px 5px #F9F9F9,  /*右边阴影*/
+			0px 5px 5px #F9F9F9s; /*下边阴影*/
+}
+
+
+.join_btn button{
+	border: 1px solid #0D93FF;
+	border-radius: 5px;
+	background-color: #0D93FF;
+	color: #FFF;
+	height: 50px;
+	width: 100%;
+	margin-top: 8%;
+	font-size : 16px;
+	outline : none;
+}
+
+
+
+
+
+
+.inviteText{
+	width: 100%;
+	height: 2.1rem;
+	padding-top: 1.3rem;
+}
+.inviteText p{
+	font-size: 0.7rem;
+	color: #a6a6a6;
+	text-align: center;
+}
+.inviteText p span{
+	color: #d5b152;
+}
+
+.phone {
+	border-bottom: 1px solid #E6E6E6;
+}
+
+.input_Icon {
+	margin: 0 10px;
+}
+
+.inputDiv{
+	width: 100%;
+	height: 52%;
+	margin: 0 auto;
+}
+.inputDiv label{
+	font-size: 0.8rem;
+	color: #b3b3b3;
+}
+.inputDiv input{
+	border: none;
+	height: 92%;
+	width: 60%;
+	font-size: 1.4rem;
+	outline : none;
+}
+
+.inputDiv input::input-placeholder {
+	color : #CFCFCF;
+}
+
+.inputDiv span{
+	color: #969696;
+	font-size: 1.3rem;
+}
+.inputDiv .sent{
+	color: #b3b3b3;
+}
+.buttonDiv{
+	width: 90.7%;
+	height: 2.2rem;
+	margin: 2.2rem auto 0.5rem;
+	line-height: 2.2rem;
+	font-size: 0.8rem;
+	text-align: center;
+	background: -webkit-linear-gradient(left, #ecd88c , #d1aa42);
+	background: -o-linear-gradient(right, #ecd88c, #d1aa42);
+	background: -moz-linear-gradient(right, #ecd88c, #d1aa42);
+	background: linear-gradient(to right, #ecd88c , #d1aa42);
+	color: #FFFFFF;border-radius: 25px;
+}
+.agreementDiv{
+	text-align: center;
+	font-size: 0.6rem;
+	color: #8c8c8c;
+	padding-bottom: 2rem;
+}
+.agreement{
+	color: #cfa639;
+}
+.agreementIframe{
+	position: fixed;
+	left: 5%;
+	width: 90%;
+	top: 2rem;
+	background-color: #FAFAFA;
+	border: none;
+	box-sizing: border-box;
+	padding: 1rem 2%;
+	border-radius: 5px;
+	height: 25rem;
+	overflow: auto;
+	border: 1px solid #CFA639;
+}
+.closeAgreement{
+	position: fixed;
+	left: 90%;
+	top: 2rem;
+}
+.successImg{
+	width: 100%;
+	height: 8.6rem;
+	background: url(../img/success.png) no-repeat;
+	background-size: 100% 100%;
+}
+.successP{
+	width: 100%;
+	height: 0.9rem;
+	line-height: 0.9rem;
+	font-size: 0.9rem;
+	color: #d1a93e;
+	text-align: center;
+	margin: 1.5rem 0 1.1rem;
+}
+.downloadP{
+	width: 100%;
+	font-size: 0.7rem;
+	height: 0.7rem;
+	line-height: 0.7rem;
+	color: #A6A6A6;
+	text-align: center;
+}
+@media only screen and (max-width: 390px) {
+	html{font-size: 19px;}
+}
+@media only screen and (max-width: 370px) {
+	html{font-size: 18px;}
+}
+@media only screen and (max-width: 350px) {
+	html{font-size: 17px;}
+}
+@media only screen and (max-width: 330px) {
+	html{font-size: 16px;}
+}
+@media only screen and (max-width: 310px) {
+	html,body{width: 310px;}
+}

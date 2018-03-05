@@ -1,0 +1,259 @@
+<script type="text/javascript">
+app.controller("customerListCtrl",
+	    [
+	        "$rootScope",
+	        "$scope",
+	        "$http",
+	        "$stateParams",
+	        function ($rootScope, $scope, $http, $stateParams) {
+				//状态栏
+	        	$scope.states    = [];
+				$scope.byState='all';
+
+				$scope.searchInfo = {};
+
+                $scope.getStates = function () {
+                    $http.get("/rest/customerStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.customerStates;
+                            console.log($scope.states)
+                        });
+                };
+
+                $scope.getStates();
+				$scope.entity_key = $stateParams.entity_key;
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+	            //搜索全部
+	            $scope.getAll=function(){
+	            	$scope.searchInfo={};
+	            	$scope.byState='all';
+	            	$scope.getList(0);
+	            };
+				//状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                    	$scope.byState='state';
+                    	$scope.searchInfo={stateCode:stateCode};
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+
+	            //单数 例user
+	            $scope.state_code = $stateParams.state_code;
+
+	            $scope.list = [];
+
+	            $scope.getList = function (page) {
+	               	if($scope.byState==='state'){
+	               		$scope.link="/dafeng/user/searchCustomer?size=15&page="+page+ "&sort=lastModifiedAt,desc";
+	               		$scope.searchInfo.stateCode=$scope.state_code;
+	               	}
+	               	else if($scope.byState==='all'){
+	               		$scope.link='/dafeng/user/searchCustomer?size=15&page=' + page+ "&sort=lastModifiedAt,desc";
+	               	}
+	                $http({method: "POST", url: $scope.link,data:$scope.searchInfo}).success(function (resResult) {
+	                	console.log(resResult);
+	                    $scope.list = resResult.customers;
+	                    $scope.pageList = {
+	                        size: resResult.page.size,
+	                        total_elements: resResult.page.totalElements,
+	                        current_page: resResult.page.number,
+	                        num_page: resResult.page.totalPages,
+	                        total_page: resResult.page.totalPages
+	                    };
+
+	                    if ($scope.list.length > 0) {
+	                        $rootScope.setPaginator("#"+ $scope.entity_key+"_list_paginator", $scope.pageList, $scope.getList);
+	                    }
+	                });
+	            };
+
+	            $scope.getList(0);
+
+				$scope.gradeText=['普通用户','粉丝'];
+				$scope.changeStateRequest=function(id,text){
+					$scope.id=id;
+					var changeState=function(){
+						$http({
+							method:'PATCH',
+							url:'dafeng/user/changeState?id='+$scope.id,
+						}).then(function successCallback(response){
+							$rootScope.toasterSuccess("成功！", "操作成功！");
+							$scope.getList(0);
+						},function errorCallback(){
+							$rootScope.toasterError("失败！", "操作失败！");
+						});
+					};
+					$rootScope.sweetConfirm('确认修改该用户状态？',changeState);
+				};
+                /*
+               * 清空按钮
+               * */
+                $scope.clearSearch = function () {
+                	$scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+	        }
+	    ]
+	);
+	app.directive('onFinishRender', function ($timeout) {
+		return {
+			restrict: 'A',
+			link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+				if (true) {
+					$timeout(function() {
+						scope.$emit(attr.onFinishRender);
+					});
+				}
+			}
+		};
+	});
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="customerListCtrl">
+	
+	<div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+        <div class="inline pull-left m-r">
+            <label class="i-checks pull-left m-n" ng-click="getAll()">
+                <input type="radio" name="state" checked="checked"/><i></i> 全部
+            </label>
+        </div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"><i></i> {{ state.label }}
+            </label>
+        </div>
+    </div>
+	
+    <div class="row-row">
+        <div class="cell">
+            <div class="cell-inner">
+                <div class="wrapper b-b">
+                    <div class="panel panel-default">
+                        <div class="wrapper-md b-b clearfix" style="padding:11.5px 20px;">
+					        <div class="font-thin h4">
+					            <div>
+					                <form class="clearfix">
+					                 	<div class="pull-left m-r inline">
+					                 		<label class="form-label" style="padding:6px 0px;">用户等级：</label>
+					                 	</div>
+					                    <div class="pull-left m-r inline">
+											<select type="text"
+													class="form-control"
+													required
+													autocomplete="off"
+													ng-model="searchInfo.grade">
+												<option selected="selected" value="">全部</option>
+												<option value=1>普通用户</option>
+												<option value=2>粉丝</option>
+											</select>
+					                    </div>
+					                    <div class="pull-left m-r winline">
+					                        <input type="text"
+												   class="form-control"
+												   id="release_waybill_number"
+					                               placeholder="请输入手机号"
+												   ng-model="searchInfo.phone">
+					                    </div>
+					                    <div class="pull-left m-r inline">
+					                        <button type="button" class="btn btn-primary" ng-click="getList(0)">
+					                            <span>查询</span>
+					                        </button>
+											<button type="button" class="btn btn-default" ng-click="clearSearch()">
+												<span>清除</span>
+											</button>
+					                    </div>
+					                </form>
+					            </div>
+					        </div>
+					    </div>
+                        <div class="panel-heading" ng-if="list.length < 1">
+                            暂无数据！
+                        </div>
+						<div class="table-responsive" ng-if="list.length > 0">
+						<table ng-if="list.length>0" class="table table-hover b-t b-light">
+						<thead>
+						<tr>
+							<th class="v-middle">ID</th>
+							<th class="v-middle">邀请码</th>
+							<th class="v-middle">头像</th>
+							<th class="v-middle">昵称</th>
+							<th class="v-middle">手机号</th>
+							<th class="v-middle">等级</th>
+							<th class="v-middle">创建时间</th>
+							<th class="v-middle">更新时间</th>
+							<th class="v-middle">操作</th>
+						</tr>
+						</thead>
+						</table>
+                        <div class="table-responsive" ng-if="list.length > 0" style="max-height: 620px;overflow: auto">
+							<table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+								<tbody style="overflow: auto">
+									<tr ng-repeat="item in list">
+										<td class="v-middle">{{item.id}}</td>
+										<td class="v-middle">{{item.myInvite}}</td>
+										<td class="v-middle">
+											<span class="pull-left thumb avatar m-r">
+												<img ng-src="{{ item.headimgurl?item.headimgurl:'img/userHead.png' }}">
+											</span>
+										</td>
+										<td class="v-middle">{{item.nickname}}</td>
+										<td class="v-middle">{{item.phone}}</td>
+										<td class="v-middle">{{gradeText[item.grade-1]}}</td>
+										<td class="v-middle">{{item.createdAt | date:"yyyy-MM-dd HH:mm:ss" }}</td>
+										<td class="v-middle">{{item.lastModifiedAt| date:"yyyy-MM-dd HH:mm:ss"}}</td>
+										<td class="v-middle">
+											<button class="btn btn-xs btn-info"
+													ui-sref="workflowEntity.home.profile.info({myInvite:item.myInvite,id:item.id,headimgurl:item.headimgurl,phone:item.phone,nickname:item.nickname,state:item.stateCode,grade:gradeText[item.grade-1]})"
+											>
+												<a>
+													详情
+												</a>
+											</button>
+											<button class="btn btn-xs btn-danger" ng-click="changeStateRequest(item.id,item.stateCode)" ng-if="item.stateCode=='ENABLED'" >禁用</button>
+											<button class="btn btn-xs btn-success" ng-click="changeStateRequest(item.id,item.stateCode)" ng-if="item.stateCode=='DISABLED'" >启用</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+                    	</div>
+                    </div>
+                </div>
+                <div class="wrapper b-t b-light clearfix" ng-show="list.length>0">
+	                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"></ul>
+	                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+	            </div>
+            </div>
+        </div>
+    </div> 
+</div>

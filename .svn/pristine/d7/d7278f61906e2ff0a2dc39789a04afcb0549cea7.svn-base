@@ -1,0 +1,100 @@
+{
+    "label": "label",
+    "createdAt": "2017-07-26T05:56:14.000+0000",
+    "lastModifiedAt": "2017-07-26T09:55:43.000+0000",
+    "act": null,
+    "notice": null,
+    "extraMessage": null,
+    "stateActList": [],
+    "nickname": "李志坚",
+    "sex": 1,
+    "province": "",
+    "city": "",
+    "country": "",
+    "headimgurl": "http://wx.qlogo.cn/mmopen/yx07LlovM9lM4TkyvnqtLiaibmZgJjZjDDa1E2mdDelW825MGb9k1nDU8VrVHbKzAliaEDZzw0PylD47ia75NdwQzedIfFjmAgD2/0",
+    "openid": "oEgy-v74s7R9x66wbM9JnAobMTqs",
+    "unionid": "oK59wxGmP1LJaHAt7k_sIYktY",
+    "sig": "eJxFkFtPg0AQhf8Lrxq7XFbEpA*AhFutIDW9vGy27JZMENjCSi-G-y4SGl-m4XxnMnPOt7JaZA9UCGCESqK3THlWkHI-yvwsoOWEHiRvB1nFGGsI3WjP2w6aegAaUrGq6Qj9Q2C8lnCAcbGJsXU6*1WiLiIa2NIsSRduS7kNj-nk76AYjK9e6obeeh83IPWl5Vw3-c4*OXehn9ixtdx8lLa3j9Yv2u4Ymn5h2eDIojIdKFYszcQ7c9Iknb1Fgs36K*2Mx89LE2RucgqMwk3n89sxVpIx8l8oY3haH4Y*QQkVH8MiFRlP2DQmneZ581VLIi*Cjx39-AIT4l67",
+    "currentUserCanActList": [
+        {
+            "label": "创建",
+            "createdAt": "2017-07-26T05:44:37.000+0000",
+            "lastModifiedAt": "2017-07-28T06:18:04.000+0000",
+            "firstNotice": null,
+            "handNotice": false,
+            "noticeTemplate": null,
+            "actCode": "create",
+            "sort": 10,
+            "actGroup": "UPDATE",
+            "actType": "NORMAL",
+            "done": false,
+            "importance": false,
+            "messageType": null
+        },
+        {
+            "label": "读取",
+            "createdAt": "2017-07-26T05:44:37.000+0000",
+            "lastModifiedAt": "2017-07-26T05:44:37.000+0000",
+            "firstNotice": null,
+            "handNotice": false,
+            "noticeTemplate": null,
+            "actCode": "read",
+            "sort": 20,
+            "actGroup": "READ",
+            "actType": "NORMAL",
+            "done": false,
+            "importance": false,
+            "messageType": null
+        },
+        {
+            "label": "更新",
+            "createdAt": "2017-07-26T05:44:37.000+0000",
+            "lastModifiedAt": "2017-07-26T05:44:37.000+0000",
+            "firstNotice": null,
+            "handNotice": false,
+            "noticeTemplate": null,
+            "actCode": "update",
+            "sort": 30,
+            "actGroup": "UPDATE",
+            "actType": "NORMAL",
+            "done": false,
+            "importance": false,
+            "messageType": null
+        }
+    ],
+    "_links": {
+        "self": {
+            "href": "http://localhost/rest/users/1"
+        },
+        "user": {
+            "href": "http://localhost/rest/users/1"
+        },
+        "role": {
+            "href": "http://localhost/rest/users/1/role"
+        },
+        "lastAct": {
+            "href": "http://localhost/rest/users/1/lastAct"
+        },
+        "workflow": {
+            "href": "http://localhost/rest/users/1/workflow"
+        },
+        "createdByDepartment": {
+            "href": "http://localhost/rest/users/1/createdByDepartment"
+        },
+        "createdBy": {
+            "href": "http://localhost/rest/users/1/createdBy"
+        },
+        "department": {
+            "href": "http://localhost/rest/users/1/department"
+        },
+        "logs": {
+            "href": "http://localhost/rest/users/1/logs"
+        },
+        "state": {
+            "href": "http://localhost/rest/users/1/state"
+        },
+        "lastModifiedBy": {
+            "href": "http://localhost/rest/users/1/lastModifiedBy"
+        }
+    }
+}

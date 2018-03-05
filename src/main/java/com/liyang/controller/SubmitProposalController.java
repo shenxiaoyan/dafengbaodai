@@ -1,0 +1,588 @@
+package com.liyang.controller;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.liyang.client.CreateEnquiryJsonParseFactory;
+import com.liyang.client.ICreateEnquiryJsonParseAdapter;
+import com.liyang.domain.api.tianan.InsureConfirmationParams;
+import com.liyang.domain.createenquiry.CreateEnquiry;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.offerresult.OfferResultData;
+import com.liyang.domain.offerresult.OfferResultDataResult;
+import com.liyang.domain.platform.Platform;
+import com.liyang.domain.platform.PlatformRepository;
+import com.liyang.domain.submitproposal.SubmitProposal;
+import com.liyang.domain.submitproposal.SubmitProposalForSearch;
+import com.liyang.domain.submitproposal.SubmitProposalParams;
+import com.liyang.domain.submitproposal.SubmitProposalParamsTO;
+import com.liyang.domain.submitproposal.SubmitProposalRepository;
+import com.liyang.domain.submitproposal.SubmitProposalState;
+import com.liyang.domain.submitproposal.SubmitProposalStateRepository;
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.OfferResultService;
+import com.liyang.service.SubmitProposalService;
+import com.liyang.util.PageUtil;
+import com.liyang.util.RequestUtill;
+
+import net.sf.json.JSONObject;
+
+/**
+ * 提交核保接口，第三方平台需要带上标识：applicationId，自家平台在请求头
+ * 
+ * @author Administrator
+ */
+@RestController
+@RequestMapping("/dafeng")
+public class SubmitProposalController {
+
+	@Autowired
+	SubmitProposalService submitProposalService;
+	@Autowired
+	SubmitProposalRepository submitProposalRepository;
+	@Autowired
+	SubmitProposalStateRepository submitProposalStateRepository;
+	@Autowired
+	PlatformRepository platformRepository;
+	@Autowired
+	InsureConfirmationController insureConfirmationController;
+	@Value("${xmcxapi.apikey}")
+	private String xmcxApiKey;
+	// @Value("${xmcxapi.submitProposal.url}")
+	// private String xmSubPropsalUrl;
+
+	private final static Logger logger = LoggerFactory.getLogger(SubmitProposalController.class);
+
+	/**
+	 * 提交核保接口
+	 * 
+	 * @param subProMap
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/submitProposal", method = RequestMethod.POST)
+	public ResponseBody mobileSubmitProposal(@RequestBody Map<String, Object> subProMap, HttpServletRequest request)
+			throws Exception {
+		logger.info("【收到提交核保请求，传入参数如下】：" + subProMap);
+		Object tiananObject = subProMap.get("tianan");
+		if (tiananObject != null) {
+			String paramString = JSON.toJSONString(tiananObject);
+			InsureConfirmationParams tiananParams = JSON.parseObject(paramString,
+					new TypeReference<InsureConfirmationParams>() {
+					});
+			return insureConfirmationController.mobileInsureConfirmation(tiananParams, request);
+		} else {
+			logger.info("小马提交核保,params参数数据如下:" + JSONObject.fromObject(subProMap.get("params")).toString());
+			Platform platform = RequestUtill.getMobileAppPlatform(request, platformRepository);
+			ResponseBody responseBody = submitProposalService.saveSubProResultAndForward(platform, subProMap, request,
+					xmcxApiKey);
+			logger.info("提交小马核保完成");
+			return responseBody;
+		}
+	}
+
+	/**
+	 * 修改并显示相应的状态列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/showState")
+	public ResponseBody showState() {
+		List<SubmitProposalState> stateList = submitProposalStateRepository.getAllState();
+		Collections.sort(stateList);
+		return new ResponseBody(stateList);
+
+	}
+
+	/**
+	 * 前端嫌弃数据太多 ，我们后端做的处理 relaced with getSubmitProposalListForMobile
+	 */
+	// @RequestMapping(value="/getSubmitProposalList",method=RequestMethod.GET)
+	// public ResponseBody getSubmitProposalList(@RequestParam(value="status" ,
+	// required=false) String status , HttpServletRequest request) throws
+	// Exception {
+	// String token=request.getHeader("token");
+	// if(token==null) {
+	// throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_TOKEN_MIS_ERROR);
+	// }
+	//// String token = "5832e4ff-259e-4665-ad13-9897f0db14a9";
+	// /*String s = null ;
+	// if(null == status){
+	// s
+	// =HttpUtil.getBody("http://"+serverIpAddress+"/rest/submitProposals/search/findSubmitProposalByToken?token="+token+"&projection=submitProposalProjection");
+	// }else{
+	// if("HENBAO_SUCCESS_PAYMENT".equals(status)){
+	// s
+	// =HttpUtil.getBody("http://"+serverIpAddress+"/rest/submitProposals/search/findSubmitProposalByTokenAndStatus?token="+token
+	// + "&status=HENBAO_SUCCESS_PAYMENT&projection=submitProposalProjection");
+	// }else if("CHENGBAO_SUCCESS".equals(status)){
+	// s
+	// =HttpUtil.getBody("http://"+serverIpAddress+"/rest/submitProposals/search/getFinishedByToken?token="+token+"&projection=submitProposalProjection");
+	// }
+	// }
+	// //封装成指定格式的数据返回
+	//// String s =
+	// HttpUtil.getBody("http://"+serverIpAddress+"/rest/submitProposals");
+	//
+	// ObjectMapper objectMapper=new ObjectMapper();
+	// Map mapper = objectMapper.readValue(s, Map.class);
+	// Map submitProposals =(Map) mapper.get("_embedded");
+	// List<Map> list = (List)submitProposals.get("submitProposals");
+	// List<Map> result = new ArrayList<>();
+	// for(Map submit : list){
+	// Map map = new HashMap<>();
+	// map.put("id", submit.get("id"));
+	// map.put("createTime" , submit.get("createTime"));
+	// Map offerResult = (Map)submit.get("offerResult");
+	//
+	// Map params = (Map)submit.get("params");
+	// map.put("insuredName", params.get("insuredName"));
+	// if(null != offerResult) {
+	// Map data = (Map)offerResult.get("data");
+	// Map result1 = (Map)data.get("result");
+	// map.put("insuranceCompanyName", result1.get("insuranceCompanyName"));
+	// map.put("insuranceCompanyId", result1.get("insuranceCompanyId"));
+	// Map offerDetail = (Map)result1.get("offerDetail");
+	// double orginalPrice =
+	// Double.parseDouble(offerDetail.get("originalPrice").toString());
+	// Map forcePremium = (Map)offerDetail.get("forcePremium");
+	// double forcePremiumPrice =
+	// Double.parseDouble(forcePremium.get("quotesPrice").toString());
+	// Map taxPrice = (Map)offerDetail.get("taxPrice");
+	// double taxPricePrice =
+	// Double.parseDouble(taxPrice.get("quotesPrice").toString());
+	// map.put("sumPrice", orginalPrice+forcePremiumPrice+taxPricePrice);
+	// map.put("offerId", result1.get("offerId"));
+	// Integer offerResultId = (Integer)offerResult.get("id");
+	// OfferResult or = offerResultRepository.findById(offerResultId);
+	// CreateEnquiry creEnq = or.getCreateEnquiry();
+	// String carNum =
+	// (String)(creEnq.getCreateEnquiryParams().get("licenseNumber"));
+	// map.put("licenseNumber", carNum);
+	// }
+	// SubmitProposal submitProposal =
+	// submitProposalRepository.getById((Integer)submit.get("id"));
+	// UnderwritingResult underWritingResult =
+	// submitProposal.getUnderwritingResult();
+	// if(null != underWritingResult){
+	// map.put("underwrittingJson",
+	// underWritingResult.getData().getUnderwritingJson());
+	// }
+	// map.put("params",params);
+	// Map state = (Map)submit.get("state");
+	// if(null != state) {
+	// map.put("status", state.get("label"));
+	// }
+	// result.add(map);
+	// }
+	//
+	// ResponseBody responseBody=new ResponseBody();
+	// responseBody.setErrorCode(0);
+	// responseBody.setData(result);
+	// responseBody.setErrorInfo("OK");*/
+	//
+	// List<SubmitProposal> list = null;
+	// if (null == status) {
+	// list = submitProposalRepository.findSubmitProposalByToken(token);
+	// } else {
+	// if ("HENBAO_SUCCESS_PAYMENT".equals(status)) {
+	// list = submitProposalRepository.findSubmitProposalByTokenAndStatus(token,
+	// "HENBAO_SUCCESS_PAYMENT");
+	// } else if ("CHENGBAO_SUCCESS".equals(status)) {
+	// list = submitProposalRepository.getFinishedByToken(token);
+	// }
+	// }
+	// List<Object> resultList = new ArrayList<Object>();
+	// for (SubmitProposal proposal : list) {
+	// Map<String, Object> resultMap = new HashMap<String, Object>();
+	// SubmitProposalParams params = proposal.getParams();
+	// OfferResult offerResult = proposal.getOfferResult();
+	// resultMap.put("id", proposal.getId());
+	// resultMap.put("createTime", proposal.getCreateTime());
+	// resultMap.put("insuredName", params.getInsuredName());
+	// if (offerResult != null) {
+	// OfferResultData data = offerResult.getData();
+	// OfferResultDataResult result = data.getResult();
+	// resultMap.put("insuranceCompanyName", result.getInsuranceCompanyName());
+	// resultMap.put("insuranceCompanyId", result.getInsuranceCompanyId());
+	// double orginalPrice =
+	// Double.parseDouble(result.getOfferDetail().get("originalPrice").toString());
+	// Map forcePremium = (Map) result.getOfferDetail().get("forcePremium");
+	// double forcePremiumPrice =
+	// Double.parseDouble(forcePremium.get("quotesPrice").toString());
+	// Map taxPrice = (Map) result.getOfferDetail().get("taxPrice");
+	// double taxPricePrice =
+	// Double.parseDouble(taxPrice.get("quotesPrice").toString());
+	// resultMap.put("sumPrice", orginalPrice + forcePremiumPrice +
+	// taxPricePrice);
+	// resultMap.put("offerId", result.getOfferId());
+	// Integer offerResultId = offerResult.getId();
+	// OfferResult or = offerResultRepository.findById(offerResultId);
+	// CreateEnquiry creEnq = or.getCreateEnquiry();
+	// String carNum = (String)
+	// (creEnq.getCreateEnquiryParams().get("licenseNumber"));
+	// resultMap.put("licenseNumber", carNum);
+	// }
+	// SubmitProposal submitProposal =
+	// submitProposalRepository.getById(proposal.getId());
+	// UnderwritingResult underWritingResult =
+	// submitProposal.getUnderwritingResult();
+	// if (null != underWritingResult) {
+	// resultMap.put("underwrittingJson",
+	// underWritingResult.getData().getUnderwritingJson());
+	// }
+	// resultMap.put("params", params);
+	// resultMap.put("status", proposal.getState().getLabel());
+	// resultList.add(resultMap);
+	// }
+	// return new ResponseBody(resultList);
+	// }
+	/**
+	 * 分页显示承保成功的订单
+	 * 
+	 * @param submitProposalForSearch
+	 * @param request
+	 * @param pageable
+	 * @return
+	 */
+	@RequestMapping(value = "/getMobileSuccessSubmitProposalList")
+	public ResponseBody mobileGetSuccessSubmitProposalList(SubmitProposalForSearch submitProposalForSearch,
+			HttpServletRequest request, @PageableDefault(15) Pageable pageable) {
+		String token = request.getHeader("token");
+		Page<SubmitProposal> submitProposalPage = submitProposalService.getSuccess(submitProposalForSearch, token,
+				pageable);
+		List<Map<String, Object>> returnList = new ArrayList<>();
+		for (SubmitProposal submitProposal : submitProposalPage.getContent()) {
+			Map<String, Object> subProMap = new HashMap<>();
+			subProMap.put("id", submitProposal.getId());
+			subProMap.put("createTime", submitProposal.getCreateTime());
+			OfferResult offerResult = submitProposal.getOfferResult();
+			subProMap.put("params", submitProposal.getParams());
+			if (null != offerResult) {
+				OfferResultDataResult dataResult = offerResult.getData().getResult();
+				subProMap.put("insuranceCompanyName", dataResult.getInsuranceCompanyName());
+				subProMap.put("insuranceCompanyId", dataResult.getInsuranceCompanyId());
+//				Double originalPrice = dataResult.getOriginalPrice().doubleValue() / 100;
+//				Double forcePremium = dataResult.getForcePremium().doubleValue() / 100;
+//				Double taxPrice = dataResult.getTaxPrice().doubleValue() / 100;
+//				subProMap.put("sumPrice", originalPrice + forcePremium + taxPrice);
+				subProMap.put("sumPrice", OfferResultService.getSumPriceFromDataResult(dataResult));
+				subProMap.put("offerId", dataResult.getOfferId());
+				ICreateEnquiryJsonParseAdapter adapter = new CreateEnquiryJsonParseFactory(
+						offerResult.getCreateEnquiry()).createAdapter();
+				subProMap.put("licenseNumber", adapter == null ? null : adapter.getLicenseNumber());
+			}
+			if (null != submitProposal.getUnderwritingResult()) {
+				subProMap.put("underwrittingJson",
+						submitProposal.getUnderwritingResult().getData().getUnderwritingJson());
+			}
+			if (null != submitProposal.getState()) {
+				subProMap.put("status", submitProposal.getState().getLabel());
+			}
+			returnList.add(subProMap);
+		}
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", submitProposalPage.getSize());
+		pageDataMap.put("totalElements", (int) submitProposalPage.getTotalElements());
+		pageDataMap.put("totalPages", submitProposalPage.getTotalPages());
+		pageDataMap.put("number", submitProposalPage.getNumber());
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("page", pageDataMap);
+		map.put("submitProposals", returnList);
+		return new ResponseBody(map);
+
+	}
+
+	/**
+	 * 分页搜索显示订单
+	 * 
+	 * @param submitProposalForSearch
+	 * @param request
+	 * @param pageable
+	 * @return
+	 */
+	@RequestMapping(value = "/getSubmitProposalListForMobile", method = RequestMethod.POST)
+	public ResponseBody mobileGetSubmitProposalList(
+			@RequestBody(required = false) SubmitProposalForSearch submitProposalForSearch, HttpServletRequest request,
+			@PageableDefault(size = 15, sort = "lastModifiedAt", direction = Direction.DESC) Pageable pageable) {
+
+		// if(token==null) {
+		// throw new
+		// FailReturnObject(ExceptionResultEnum.CUSTOMER_TOKEN_MIS_ERROR);
+		// }
+		// String token = "5832e4ff-259e-4665-ad13-9897f0db14a9";
+		String token = request.getHeader("token");
+
+		Page<SubmitProposal> submitProposalPage = submitProposalService
+				.seniorMultiConditionSearch(submitProposalForSearch, token, pageable);
+		System.out.println(submitProposalForSearch);
+		System.out.println(submitProposalPage);
+		List<Map<String, Object>> returnList = new ArrayList<>();
+
+		for (SubmitProposal submitProposal : submitProposalPage.getContent()) {
+			Map<String, Object> subProMap = new HashMap<>();
+			subProMap.put("id", submitProposal.getId());
+			subProMap.put("createTime", submitProposal.getCreateTime());
+			OfferResult offerResult = submitProposal.getOfferResult();
+			subProMap.put("params", submitProposal.getParams());
+			if (null != offerResult) {
+				OfferResultDataResult dataResult = offerResult.getData().getResult();
+				subProMap.put("insuranceCompanyName", dataResult.getInsuranceCompanyName());
+				subProMap.put("insuranceCompanyId", dataResult.getInsuranceCompanyId());
+//				Double originalPrice = dataResult.getOriginalPrice().doubleValue() / 100;
+//				Double forcePremium = dataResult.getForcePremium().doubleValue() / 100;
+//				Double taxPrice = dataResult.getTaxPrice().doubleValue() / 100;
+//				subProMap.put("sumPrice", originalPrice + forcePremium + taxPrice);
+				subProMap.put("sumPrice", OfferResultService.getSumPriceFromDataResult(dataResult));
+				subProMap.put("offerId", dataResult.getOfferId());
+				ICreateEnquiryJsonParseAdapter adapter = new CreateEnquiryJsonParseFactory(
+						offerResult.getCreateEnquiry()).createAdapter();
+				subProMap.put("licenseNumber", adapter == null ? null : adapter.getLicenseNumber());
+			}
+			if (null != submitProposal.getUnderwritingResult()) {
+				subProMap.put("underwrittingJson",
+						submitProposal.getUnderwritingResult().getData().getUnderwritingJson());
+				Date createdAt = submitProposal.getUnderwritingResult().getCreatedAt();
+				OfferResultDataResult dataResultTwo = offerResult.getData().getResult();
+				Integer insurComId = dataResultTwo.getInsuranceCompanyId();
+				boolean payExpire = false;
+				Date beginTime24Hour = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+				Date beginTime2Hour = new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000);
+				if (null != createdAt) {
+					switch (insurComId) {
+					case 24:
+						if (createdAt.getTime() < beginTime24Hour.getTime()) {
+							payExpire = true;
+						}
+						break;
+
+					default:
+						if (createdAt.getTime() < beginTime2Hour.getTime()) {
+							payExpire = true;
+						}
+						break;
+					}
+				}
+				subProMap.put("payExpire", payExpire);
+			}
+			if (null != submitProposal.getState()) {
+				subProMap.put("status", submitProposal.getState().getLabel());
+				subProMap.put("stateCode", submitProposal.getState().getStateCode());
+			}
+			returnList.add(subProMap);
+		}
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", submitProposalPage.getSize());
+		pageDataMap.put("totalElements", (int) submitProposalPage.getTotalElements());
+		pageDataMap.put("totalPages", submitProposalPage.getTotalPages());
+		pageDataMap.put("number", submitProposalPage.getNumber());
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("page", pageDataMap);
+		map.put("submitProposals", returnList);
+		return new ResponseBody(map);
+	}
+
+	/**
+	 * 根据客户ID查询相关可复杂查询订单
+	 * 
+	 * @param submitProposalForSearch
+	 * @param request
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/searchSubmitProposalById")
+	public Map<String, Object> multiConditionSearchById(
+			@RequestBody(required = false) SubmitProposalForSearch submitProposalForSearch, HttpServletRequest request,
+			@PageableDefault(value = 15, sort = { "createTime" }, direction = Sort.Direction.DESC) Pageable pageable) {
+		Integer customerId = submitProposalForSearch.getCustomerId();
+		System.out.println(customerId + "---------------------------------------------");
+		Page<SubmitProposal> submitProposalPage = submitProposalService
+				.multiConditionSearchById(submitProposalForSearch, pageable);
+
+		List<Object> list = new ArrayList<Object>();
+
+		for (SubmitProposal submitProposal : submitProposalPage.getContent()) {
+			Map<String, Object> subProMap = new HashMap<>();
+			subProMap.put("id", submitProposal.getId());
+			subProMap.put("createTime", submitProposal.getCreateTime());
+			// subProMap.put("createdAt", submitProposal.getCreatedAt());
+			OfferResult offerResult = submitProposal.getOfferResult();
+			subProMap.put("params", submitProposal.getParams());
+			subProMap.put("insuredName", submitProposal.getParams().getInsuredName());
+
+			if (null != offerResult) {
+				OfferResultDataResult dataResult = offerResult.getData().getResult();
+				subProMap.put("insuranceCompanyName", dataResult.getInsuranceCompanyName());
+				subProMap.put("insuranceCompanyId", dataResult.getInsuranceCompanyId());
+				subProMap.put("cino", dataResult.getOfferDetail().get("ciBasePrice"));
+				subProMap.put("bino", dataResult.getOfferDetail().get("originalPrice"));
+				subProMap.put("insuranceCompanyId", dataResult.getInsuranceCompanyId());
+				
+//				Double originalPrice = dataResult.getOriginalPrice().doubleValue() / 100;
+//				Double forcePremium = dataResult.getForcePremium().doubleValue() / 100;
+//				Double taxPrice = dataResult.getTaxPrice().doubleValue() / 100;
+//				subProMap.put("sumPrice", originalPrice + forcePremium + taxPrice);
+				subProMap.put("sumPrice", OfferResultService.getSumPriceFromDataResult(dataResult));
+				subProMap.put("offerId", dataResult.getOfferId());
+				ICreateEnquiryJsonParseAdapter adapter = new CreateEnquiryJsonParseFactory(
+						offerResult.getCreateEnquiry()).createAdapter();
+				subProMap.put("licenseNumber", adapter == null ? null : adapter.getLicenseNumber());
+				subProMap.put("ownerName", adapter == null ? null : adapter.getOwnerName());
+			}
+			if (null != submitProposal.getUnderwritingResult()) {
+				subProMap.put("underwrittingJson",
+						submitProposal.getUnderwritingResult().getData().getUnderwritingJson());
+				subProMap.put("biprice", submitProposal.getUnderwritingResult().getData().getUnderwritingPriceCent());
+				Date createdAt = submitProposal.getUnderwritingResult().getCreatedAt();
+				OfferResultDataResult dataResultTwo = offerResult.getData().getResult();
+				Integer insurComId = dataResultTwo.getInsuranceCompanyId();
+				boolean payExpire = false;
+				Date beginTime24Hour = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+				Date beginTime2Hour = new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000);
+				if (null != createdAt) {
+					switch (insurComId) {
+					case 24:
+						if (createdAt.getTime() < beginTime24Hour.getTime()) {
+							payExpire = true;
+						}
+						break;
+
+					default:
+						if (createdAt.getTime() < beginTime2Hour.getTime()) {
+							payExpire = true;
+						}
+						break;
+					}
+				}
+				subProMap.put("payExpire", payExpire);
+			}
+			if (null != submitProposal.getState()) {
+				subProMap.put("status", submitProposal.getState().getLabel());
+			}
+			list.add(subProMap);
+		}
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", submitProposalPage.getSize());
+		pageDataMap.put("totalElements", (int) submitProposalPage.getTotalElements());
+		pageDataMap.put("totalPages", submitProposalPage.getTotalPages());
+		pageDataMap.put("number", submitProposalPage.getNumber());
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("page", pageDataMap);
+		map.put("submitProposals", list);
+		return map;
+		// }
+		// return null;
+	}
+
+	/**
+	 * 订单管理列表、查询
+	 * 
+	 * @param spfs
+	 * @param
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/searchSubmitProposal")
+	public ResponseBody multiConditionSearch(@RequestBody(required = false) SubmitProposalForSearch spfs,
+			@PageableDefault(value = 15, sort = "createTime", direction = Direction.DESC) Pageable pageable) {
+		if (spfs==null){
+			spfs=new SubmitProposalForSearch();
+		}
+		Page<SubmitProposal> submitProposalPage = submitProposalService.multiConditionSearch(spfs, pageable);
+		List<Object> submitProposalTOList = new ArrayList<Object>();
+		for (SubmitProposal sp : submitProposalPage.getContent()) {
+			Map<String, Object> submitProposalMap = new HashMap<String, Object>();
+			submitProposalMap.put("id", sp.getId());
+			submitProposalMap.put("stateLabel", sp.getState().getLabel());
+			submitProposalMap.put("createTime", sp.getCreateTime());
+			SubmitProposalParamsTO subProParamsTO = new SubmitProposalParamsTO();
+			BeanUtils.copyProperties(sp.getParams(), subProParamsTO);
+			submitProposalMap.put("params", subProParamsTO);
+			submitProposalMap.put("licenseNumber", sp.getOfferResult().getCreateEnquiry().getLicenseNumber());
+			OfferResultDataResult dataResult = sp.getOfferResult().getData().getResult();
+			submitProposalMap.put("insuranceCompanyName", dataResult.getInsuranceCompanyName());
+			submitProposalMap.put("sumPrice", OfferResultService.getSumPriceFromDataResult(dataResult)); // 保单总价
+			submitProposalTOList.add(submitProposalMap);
+		}
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("page", PageUtil.getPageData(submitProposalPage));
+		resultMap.put("submitProposals", submitProposalTOList);
+		return new ResponseBody(resultMap);
+	}
+
+	// 修改显示
+	@RequestMapping(value = "/changeIsShow", method = RequestMethod.GET)
+	public ResponseBody changeIsShow(@Param("id") int id) {
+		submitProposalRepository.changeByIsShow(id);
+		return new ResponseBody("");
+
+	}
+	// 订单列表状态
+	// @RequestMapping(value="/findForShow", method = RequestMethod.GET)
+	// public ResponseBody findForShow() {
+	// return new ResponseBody(submitProposalStateRepository.findForShow());
+	// }
+	// @RequestMapping(value="/getResultInfo",method=RequestMethod.GET)
+	// public ResponseBody getResultInfo(@Param("orderId") String orderId){
+	// ResponseBody responseBody = submitProposalService.getResultInfo(orderId);
+	// return responseBody;
+
+	@RequestMapping(value = "/getSubmitProposalDetail", method = RequestMethod.GET)
+	public ResponseBody getSubmitProposalDetail(Integer id, String orderId) {
+		ResponseBody response = submitProposalService.getSubmitProposalDetail(id, orderId);
+		return response;
+	}
+
+	/**
+	 * 修改大蜂配送地址
+	 * @return
+	 */
+	@RequestMapping("/modifyDafengAddress")
+	public ResponseBody modifyDafengAddress(@RequestBody(required = true) Map<String, String> addressInfo) {
+		String orderId = addressInfo.get("orderId");
+		String dafengContactName = addressInfo.get("dafengContactName");
+		String dafengContactPhone = addressInfo.get("dafengContactPhone");
+		String dafengAddress = addressInfo.get("dafengAddress");
+		ResponseBody responseBody = submitProposalService.updateDafengAddress(orderId, dafengContactName,
+				dafengContactPhone, dafengAddress);
+		return responseBody;
+	}
+
+	/**
+	 * 临时方式，手动调用 更新原先大蜂配送信息是空的数据
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/updateEmptyDafengAddress")
+	public ResponseBody updateEmptyDafengAddress() {
+		ResponseBody responseBody = submitProposalService.updateEmptyDafengAddress();
+		return responseBody;
+	}
+
+}

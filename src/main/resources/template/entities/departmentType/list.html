@@ -1,0 +1,527 @@
+<script>
+
+    "use strict";
+    app.controller("departmentTypeListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                $scope.states = [];
+                $scope.byState = 'all';
+                $scope.state_code = null;
+                $scope.enabledStates = null;
+                $scope.disabledStates = null;
+                $scope.link = "";
+                $scope.searchInfo = {};
+                $scope.depatmentModalInfo = {};
+                $scope.depatmentTypeEduit = {};
+
+                //状态栏
+                $scope.getStates = function () {
+                    $http.get("/rest/departmenttypeStates/search/findForShow").success(function (resResult) {
+                            $scope.states = resResult._embedded.departmenttypeStates;
+                        });
+                };
+                $scope.getStates();
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                //列表信息
+                $scope.list = [];
+
+                //获取当前状态
+                $scope.state_code = $stateParams.state_code;
+
+                //获取当前列表信息
+                $scope.getList = function (page) {
+                    //传递参数 状态，条数，页码
+                    if($scope.byState==='ALL' || $scope.byState === 'all'){
+                        $scope.link="/dafeng/departmenttype/search?label="+$scope.searchInfo.label+"&contactName="+$scope.searchInfo.contactName+"&contactPhone="+$scope.searchInfo.contactPhone+ "&size=15&page=" + page;
+                    }
+                    else if($scope.byState==='state'){
+                        $scope.link = "/dafeng/departmenttype/search?label="+$scope.searchInfo.label+"&contactName="+$scope.searchInfo.contactName+"&contactPhone="+$scope.searchInfo.contactPhone+"&stateCode="+$scope.state_code+ "&size=15&page=" + page;
+                    }
+                    $http({method: "GET", url: $scope.link}).success(function (resResult) {
+                   }).success(function(resResult){
+                        $scope.list = resResult.data.content;
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.page.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#roles_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    }).error(function () {
+                        $rootScope.toasterError("失败！", "新增失败！");
+                    })
+                };
+                $scope.getList(0);
+
+
+                //新增部门
+                $scope.addDepartmentType=function(){
+                    //判断是否有部门名称
+                    if($scope.depatmentModalInfo.label && $scope.depatmentModalInfo.contactPhone){
+                        if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test($scope.depatmentModalInfo.contactPhone))&&$scope.depatmentModalInfo.contactPhone){
+                            $rootScope.toasterWarning("失败！","请输入正确的手机号码！");
+                        } else {
+                            $http({
+                                method: 'POST',
+                                url: 'dafeng/departmenttype/save',
+                                data: {
+                                    label: $scope.depatmentModalInfo.label,
+                                    contactName: $scope.depatmentModalInfo.contactName,
+                                    contactPhone: $scope.depatmentModalInfo.contactPhone,
+                                    contactAddress: $scope.depatmentModalInfo.contactAddress
+                                }
+                            }).success(function (response) {
+                                if(response.ErrorCode){
+                                    $rootScope.toasterError("失败！",response.ErrorInfo);
+                                } else {
+                                    $rootScope.toasterSuccess("成功！", "新增成功！");
+                                    $scope.depatmentModalInfo = {};
+                                    $("#type_modal_add").modal("hide");
+                                }
+                                $scope.getList(0);
+
+                            }).error(function () {
+                                $rootScope.toasterError("失败！", "新增失败！");
+                            })
+                        }
+                    }else{
+                        if($scope.depatmentModalInfo.label){
+                            $rootScope.toasterWarning("失败！", "手机号不能为空！");
+                        }else{
+                            $rootScope.toasterWarning("失败！", "机构名称不能为空！");
+                        }
+
+                    }
+
+
+                };
+
+                //获取编辑时的id
+                $scope.eduitDepartType = function(item,id){
+
+                    $http.get("/dafeng/departmenttype/" + id).then(function(resResult){
+                       console.log(resResult);
+                        $scope.depatmentTypeEduit = resResult.data.data;
+                    });
+
+                    //编辑部门类型
+                    $scope.eduitDepartmentType = function(){
+
+                        if(item.label === $scope.depatmentTypeEduit.label && item.contactName === $scope.depatmentTypeEduit.contactName && item.contactPhone === $scope.depatmentTypeEduit.contactPhone && item.contactAddress === $scope.depatmentTypeEduit.contactAddress){
+                            $rootScope.toasterWarning("失败！","请修改信息后提交！");
+                        }else{
+                            if($scope.depatmentTypeEduit.label && $scope.depatmentTypeEduit.contactPhone){
+                                if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test($scope.depatmentTypeEduit.contactPhone))&&$scope.depatmentTypeEduit.contactPhone){
+                                    $rootScope.toasterWarning("失败！","请输入正确的手机号码！");
+                                } else {
+                                    $http({
+                                        method: 'POST',
+                                        url: '/dafeng/departmenttype/edit',
+                                        data: {
+                                            id:id,
+                                            label: $scope.depatmentTypeEduit.label,
+                                            contactName: $scope.depatmentTypeEduit.contactName,
+                                            contactPhone: $scope.depatmentTypeEduit.contactPhone,
+                                            contactAddress: $scope.depatmentTypeEduit.contactAddress
+                                        }
+                                    }).success(function (response) {
+                                        if(response.ErrorCode){
+                                            $rootScope.toasterError("失败！",response.ErrorInfo);
+                                        } else {
+                                            $rootScope.toasterSuccess("成功！", "编辑成功！");
+                                            $scope.depatmentTypeEduit = {};
+                                            $("#type_modal_eduit").modal("hide");
+                                        }
+                                        $scope.getList(0);
+
+                                    }).error(function () {
+                                        $rootScope.toasterError("失败！", "编辑失败！");
+                                    })
+                                }
+                            }else{
+                                if($scope.depatmentTypeEduit.label){
+                                    $rootScope.toasterWarning("失败！", "手机号不能为空！");
+                                }else{
+                                    $rootScope.toasterWarning("失败！", "机构名称不能为空！");
+                                }
+
+                            }
+                        }
+
+
+
+                    };
+                };
+
+
+
+                //禁用部门
+                $scope.disabledDeparment = function(id){
+
+                    var disabledId = function(){
+                    	$http({
+                            method:'PATCH',
+                            url:'/dafeng/departmenttype/changeState?id=' + id,
+                        }).success(function(response){
+                            console.log(response);
+                            $rootScope.toasterSuccess("成功！", "禁用成功！");
+                            $scope.getList(0);
+
+                        }).error(function(){
+                            $rootScope.toasterError("失败！", "禁用失败！");
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认禁用此部门吗？",disabledId);
+                };
+
+                //启用部门
+                $scope.addDeparment = function(id){
+
+                    var addId = function(){
+                    	$http({
+                            method:'PATCH',
+                            url:'/dafeng/departmenttype/changeState?id=' + id,
+                        }).success(function(response){
+                            $rootScope.toasterSuccess("成功！", "启用成功！");
+                            $scope.getList(0);
+
+                        }).error(function(){
+                            $rootScope.toasterSuccess("失败！", "启用失败！");
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认启用此部门吗？",addId);
+
+                };
+
+
+                //获取全部
+                $scope.getAll=function(){
+                    $scope.state_code=null;
+                    $scope.byState='all';
+                    $scope.getList(0);
+                };
+
+                //状态栏搜索
+                $scope.stateSelect = function ($event, stateCode) {
+                    if ($event.target.nodeName === "INPUT") {
+                        $scope.byState = 'state';
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+
+                //搜索功能
+                $scope.search = function () {
+                    if($scope.searchInfo.label || $scope.searchInfo.contactName || $scope.searchInfo.contactPhone) {
+                        $scope.getList(0);
+                    } else {
+                        $rootScope.toasterWarning("失败！", "请输入查询条件！");
+                    }
+                };
+
+                //清除搜索功能
+                $scope.clearSearch = function () {
+                    $scope.searchInfo = {};
+                    $scope.depatmentModalInfo = {};
+                    $scope.depatmentTypeEduit = {};
+                    $scope.getList(0);
+                };
+
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="departmentTypeListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <!--<span translate="createEnquiries.self.label"></span>-->
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n">
+                        <input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state"><i></i> {{ state.label }}
+                    </label>
+                </div>
+                <div class="pull-right">
+                    <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                            data-target="#type_modal_add"
+                            data-toggle="modal">
+                        <i class="fa fa-plus"></i>
+                        新增部门类型
+                    </button>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入机构名称"
+                                               ng-model="searchInfo.label"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入联系人"
+                                               ng-model="searchInfo.contactName"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入手机号"
+                                               ng-model="searchInfo.contactPhone"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search()">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                            <tr>
+                                                <th>机构</th>
+                                                <th>联系人</th>
+                                                <th>手机号</th>
+                                                <th>联系地址</th>
+                                                <th>创建时间</th>
+                                                <th>更新时间</th>
+                                                <th>当前状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in list">
+                                                <td class="v-middle">
+                                                    {{ item.label }}
+                                                </td>
+                                                <td class="v-middle">
+                                                    {{ item.contactName }}
+                                                </td>
+                                                <td class="v-middle">
+                                                	{{item.contactPhone}}
+                                                </td>
+                                                <td class="v-middle">
+                                                    {{ item.contactAddress }}
+                                                </td>
+
+                                                <td class="v-middle">
+                                                    {{ item.createdAt | datetime }}
+                                                </td>
+
+                                                <td class="v-middle">
+                                                    {{ item.lastModifiedAt | datetime }}
+                                                </td>
+                                                <td class="v-middle">
+                                                    {{ item.state}}
+                                                </td>
+                                                <td class="v-middle" >
+                                                    <button class="btn btn-xs btn-info"
+                                                            data-toggle="modal"
+                                                            data-target="#type_modal_eduit"
+                                                            ng-click="eduitDepartType(item,item.id)">编辑</button>
+                                                    <button class="btn btn-xs btn-danger"
+                                                            ng-if="item.stateCode === 'ENABLED'"
+                                                            ng-click="disabledDeparment(item.id)">禁用</button>
+                                                    <button class="btn btn-xs btn-success"
+                                                            ng-if="item.stateCode === 'DISABLED'"
+                                                            ng-click="addDeparment(item.id)">启用</button>
+                                                    <button class="btn btn-xs btn-info">
+				                                        <a ui-sref="workflowEntity.home.profile.info({id:item.id})">
+				                                            详情
+				                                        </a>
+				                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+            </div>
+
+            <div class="modal fade" id="type_modal_eduit" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title">编辑部门类型</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div class="form-group">
+                                    <label for="eduit_label"><span class="text-danger">*</span>机构名称</label>
+                                    <input type="text"
+                                           id="eduit_label"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           required
+                                           ng-model="depatmentTypeEduit.label">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eduit_name">联系人</label>
+                                    <input type="text"
+                                           id="eduit_name"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentTypeEduit.contactName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="deduit_phone"><span class="text-danger">*</span>手机号</label>
+                                    <input type="text"
+                                           id="deduit_phone"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentTypeEduit.contactPhone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eduit_address">联系地址</label>
+                                    <input type="text" class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentTypeEduit.contactAddress">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" ng-click="clearSearch()" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" ng-click="eduitDepartmentType()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="type_modal_add" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title">新增部门类型</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <input type="hidden" ng-model="template.id">
+                                <div class="form-group">
+                                    <label for="depart_template_label"><span class="text-danger">*</span>机构名称</label>
+                                    <input type="text"
+                                           id="depart_template_label"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           required
+                                           ng-model="depatmentModalInfo.label">
+                                </div>
+                                <div class="form-group">
+                                    <label for="depart_template_name">联系人</label>
+                                    <input type="text"
+                                           id="depart_template_name"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentModalInfo.contactName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="depart_template_phone"><span class="text-danger">*</span>手机号</label>
+                                    <input type="text"
+                                           id="depart_template_phone"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentModalInfo.contactPhone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="depart_template_address">联系地址</label>
+                                    <input type="text"
+                                           id="depart_template_address"
+                                           class="form-control"
+                                           autocomplete="off"
+                                           ng-model="depatmentModalInfo.contactAddress">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" ng-click="clearSearch()" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-primary" ng-click="addDepartmentType()">确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

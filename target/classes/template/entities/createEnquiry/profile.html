@@ -1,0 +1,48 @@
+<script>
+    app.controller("createEnquiryProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state, $filter) {
+
+                $scope.state_code = $stateParams.state_code;
+
+                $scope.id = $stateParams.id;
+
+                $scope.errorInfo = null;
+
+                $scope.getProfile = function () {
+                    $http.get("dafeng/getCreateEnquiryDetail?id=" + $scope.id).success(function(resResult){
+                        $scope.createList = resResult.data;
+                        console.log($scope.createList);
+                    });
+                };
+                $scope.getProfile();
+
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="createEnquiryProfileCtrl">
+    <div class="wrapper-md b-b b-light clearfix">
+        <!--<button class="pull-left btn btn-md btn-primary">-->
+            <!--<i class="fa fa-plus">取消询价</i>-->
+        <!--</button>-->
+        <div class="font-thin h4 pull-left" style="padding: 8.5px 0">询价详情</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

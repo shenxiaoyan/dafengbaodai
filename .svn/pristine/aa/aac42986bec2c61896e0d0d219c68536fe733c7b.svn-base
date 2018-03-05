@@ -1,0 +1,21 @@
+
+<div class="panel-body">
+    
+    <form class="form-horizontal" method="get">
+        <div ng-repeat="(key,value) in profile">
+            <div class="form-group">
+                <div class="col-sm-3 text-right">{{key}}：</div>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" placeholder="{{value}} 这里将根据之后的表单情况来设计input的形式">
+                </div>
+            </div>
+            <div class="line line-dashed b-b line-lg pull-in"></div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <a type="submit" href="javascript:history.go(-1);" class="btn btn-default">取消</a>
+                <button type="submit"  ng-click="save()" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </form>
+</div>

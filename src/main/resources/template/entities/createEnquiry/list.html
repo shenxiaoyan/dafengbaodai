@@ -1,0 +1,302 @@
+<script>
+    "use strict";
+    app.controller("createEnquiriesListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams,$filter) {
+
+                //状态栏
+                $scope.states    = [];
+                $scope.list = [];
+                $scope.link = {};
+                $scope.createEnquiry = {};
+
+                //获取状态
+                $scope.getStates = function () {
+                    $http.get("/rest/createEnquiryStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.createEnquiryStates;
+//                            console.log($scope.states)
+                        });
+                };
+
+                $scope.getStates();
+
+                if ($stateParams.entity_key === "createEnquiry") {
+
+                    var len = $stateParams.entity_key.length;
+                    $scope.entity_key = $stateParams.entity_key.substring(0,len-1) + "ies";
+//                    console.log($scope.entity_key)
+
+                } else {
+                    $scope.entity_key = $stateParams.entity_key;
+                }
+
+            	//设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+
+
+                    if($scope.stateCode){
+                        if($scope.stateCode === "ALL"){
+                            $scope.searchInfo = {};
+                            $scope.link = "/dafeng/searchCreateEnquiry?size=15&page=" + page;
+                        }else{
+                            $scope.searchInfo = {
+                                stateCode: $scope.stateCode
+                            };
+                            $scope.link = "/dafeng/searchCreateEnquiry?stateCode=" + $scope.stateCode + "&size=15&page=" + page;
+                        }
+                    }else {
+                        $scope.searchInfo = {};
+                        $scope.stateCode ="ALL";
+                        $scope.link = "/dafeng/searchCreateEnquiry?size=15&page=" + page;
+                    }
+
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : $scope.link,
+                        data: $scope.searchInfo
+                    }).success(function(resResult){
+                        console.log(resResult);
+                        $scope.list = resResult.createEnquiries;
+
+                        console.log($scope.list);
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number === 0 ? 0 : resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+
+                };
+                $scope.getList(0);
+
+                //根据搜索框搜索
+                $scope.search = function(page){
+                    console.log($scope.searchInfo);
+
+                    if($scope.searchInfo.offerUnique || $scope.searchInfo.ownerName || $scope.searchInfo.licenseNumber  || $scope.searchInfo.mobilePhone){
+                        $http({
+                            method:"POST",
+                            url:"/dafeng/searchCreateEnquiry?size=15&page=" +page,
+                            data: $scope.searchInfo
+                        }).then(function(resResult){
+
+                            $scope.list = resResult.data.createEnquiries;
+                            console.log($scope.list);
+
+                            $scope.pageList = {
+                                size: resResult.data.page.size,
+                                total_elements: resResult.data.page.totalElements,
+                                current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                                num_page: resResult.data.page.totalPages,
+                                total_page: resResult.data.page.totalPages
+                            };
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.search);
+                            }
+                        });
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写搜索信息！");
+                    }
+                };
+
+                //清除搜索
+                $scope.clearSearch = function(){
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.stateCode = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+                $scope.getAll = function () {
+                    $scope.stateCode="ALL";
+                    $scope.getList(0);
+                };
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="createEnquiriesListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n" ng-click="getAll()">
+                        <input type="radio" name="state" checked="checked"/><i></i> 全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state" value="{{state.stateCode}}" ng-model="state_code"><i></i> {{ state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="wrapper">
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入询价单号"
+                                               ng-model="searchInfo.offerUnique"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入车主"
+                                               ng-model="searchInfo.ownerName"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入车牌"
+                                               ng-model="searchInfo.licenseNumber"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入询价人联系方式"
+                                               ng-model="searchInfo.mobilePhone"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                            <tr>
+                                                <th>询价单号</th>
+                                                <th style="width: 270px">车主</th>
+                                                <th>车牌</th>
+                                                <th>询价人联系方式</th>
+                                                <th style="width: 300px">询价时间</th>
+                                                <th ng-if="state_code !=='INENQUIRY' || state_code !== 'ENQUIRY_RESULT' || state_code !=='SUBMIT_ALREADY' || state_code !== 'ENQUIRY_TIMEOUT'">询价状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <div class="table-responsive" ng-if="list.length > 0" style="max-height: 620px;overflow: auto">
+                                        <table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+                                            <tbody style="overflow: auto">
+                                                <tr ng-repeat="item in list">
+                                                    <td class="v-middle" style="width: 450px">
+                                                        {{ item.offerUnique?item.offerUnique:"暂无"}}
+                                                    </td>
+                                                    <td class="v-middle" style="width: 270px">
+                                                        {{ item.ownerName? item.ownerName: "暂无"}}
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        {{item.licenseNumber?item.licenseNumber:"暂无" }}
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        {{ item.mobilePhone?item.mobilePhone:"暂无" }}
+                                                    </td>
+                                                    <td class="v-middle" style="width: 300px">
+                                                        {{ item.createdAt?(item.createdAt | dateSecondTime) : "暂无" }}
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        {{ item.stateCode ? (item.stateCode | createStateCode) : "暂无结果" }}
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        <button class="btn btn-xs btn-info"  ui-sref="workflowEntity.home.profile.info({id:item.id})">
+                                                            <a>
+                                                                详情
+                                                            </a>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length > 0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- /column -->
+    </div>
+<!-- /hbox layout -->
+</div>
+
+
+

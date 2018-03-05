@@ -1,0 +1,541 @@
+<script>
+    /*
+    * LYQ
+    * 产品返佣列表
+    * 2018/02/01
+    *
+    * */
+    "use strict";
+    app.controller("insureRebateListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                $scope.list = [];
+                $scope.role = {};
+                $scope.teamId = "";
+
+                $scope.searchInfo = {};
+                $scope.productCompany = [];
+                $scope.productAddModal = {
+                    type : 1
+                };
+
+                //获取当前接口
+                $scope.entity_key = $stateParams.entity_key;
+
+                $scope.state_code = $stateParams.state_code;
+
+                //状态栏
+                $scope.states = [];
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                //获取所有代理人状态
+                $scope.getState = function(){
+                    $http.get("/rest/productStates").success(function(resResult){
+                        $scope.states = resResult._embedded.productStates;
+                    })
+                };
+                $scope.getState();
+
+                //获取所有产品公司
+                $scope.getPC = function(){
+                    $http.post("dafeng/product/company/query",{stateCode:"ENABLED"}).success(function(resResult){
+                        $scope.productCompany = resResult.data.productCompanies;
+                    })
+                };
+                $scope.getPC();
+
+                //当前列表
+                $scope.getList = function (page,icon) {
+
+                    if(icon){
+                        if($scope.state_code === "all"){
+                            $scope.searchInfo = {};
+                        }else{
+                            $scope.searchInfo = {
+                                stateCode : $scope.state_code
+                            }
+                        }
+
+                    }
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/product/query?size=15&page=" + page,
+                        data: $scope.searchInfo
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.products;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0,true);
+                    }
+                };
+
+
+                /*
+                * 新增产品返佣
+                * */
+                $scope.addProductCompany = function(){
+
+                    var addProduct = function(){
+                        $http({
+                            method : "POST",
+                            url : "/dafeng/product/add",
+                            data : $scope.productAddModal
+                        }).success(function(resResult){
+
+                            if(resResult.ErrorCode){
+                                $rootScope.toasterError("失败！",resResult.ErrorInfo);
+                            }else{
+                                $rootScope.toasterSuccess("成功！","新增成功！");
+                                $scope.productAddModal = {
+                                    type : 1
+                                };
+                                $("#product_modal_add").modal("hide");
+                                $scope.getList(0);
+
+                            }
+                        }).error(function(resResult){
+                            $rootScope.toasterError("失败！","新增失败！");
+                        })
+                    };
+
+
+                    if(!$scope.productAddModal.label){
+                        $rootScope.toasterWarning("失败！","产品名称为必填");
+                    }else if(!$scope.productAddModal.productCompanyId){
+                        $rootScope.toasterWarning("失败！","产品保险公司为必选");
+                    }else if( $scope.productAddModal.compulsoryCommissionRate < 0 || $scope.productAddModal.compulsoryCommissionRate > 100) {
+                        $rootScope.toasterWarning("失败！","请填写0-100的交强险返佣比");
+                    }else if($scope.productAddModal.vehicleCommissionRate < 0 || $scope.productAddModal.vehicleCommissionRate > 100) {
+                        $rootScope.toasterWarning("失败！","请填写0-100的车船税返佣比");
+                    }else if($scope.productAddModal.commercialCommissionRate < 0 || $scope.productAddModal.commercialCommissionRate > 100) {
+                        $rootScope.toasterWarning("失败！","请填写0-100的商业险返佣比");
+                    }else{
+                        addProduct();
+                    }
+
+                };
+
+                /*
+               * 编辑产品返佣
+               * */
+                $scope.eduitProduct = function(id,item){
+
+                    $http.post("/dafeng/product/query",{id:id}).then(function(resResult){
+                        $scope.productEduitModal = resResult.data.data.products[0];
+                    });
+
+                    $scope.eduit = function(){
+                        var addProduct = function(){
+                            $http({
+                                method : "POST",
+                                url : "/dafeng/product/update",
+                                data : $scope.productEduitModal
+                            }).success(function(resResult){
+
+                                if(resResult.ErrorCode){
+                                    $rootScope.toasterError("失败！",resResult.ErrorInfo);
+                                }else{
+                                    $rootScope.toasterSuccess("成功！","编辑成功！");
+                                    $scope.productEduitModal = {};
+                                    $("#team_modal_eduit").modal("hide");
+                                    $scope.getList(0);
+                                }
+                            }).error(function(){
+                                $rootScope.toasterError("失败！", "编辑失败！");
+                            })
+                        };
+
+                        if($scope.productEduitModal.label === item.label && $scope.productEduitModal.productCompanyId === item.productCompanyId && $scope.productEduitModal.compulsoryCommissionRate === item.compulsoryCommissionRate && $scope.productEduitModal.vehicleCommissionRate === item.vehicleCommissionRate && $scope.productEduitModal.commercialCommissionRate === item.commercialCommissionRate){
+                            $rootScope.toasterWarning("失败！","请修改数据后提交");
+                        }else{
+                            if(!$scope.productEduitModal.label){
+                                $rootScope.toasterWarning("失败！","产品名称为必填");
+                            }else if(!$scope.productEduitModal.productCompanyId){
+                                $rootScope.toasterWarning("失败！","产品保险公司为必选");
+                            }else if( $scope.productEduitModal.compulsoryCommissionRate < 0 || $scope.productEduitModal.compulsoryCommissionRate > 100) {
+                                $rootScope.toasterWarning("失败！","请填写0-100的交强险返佣比");
+                            }else if($scope.productEduitModal.vehicleCommissionRate < 0 || $scope.productEduitModal.vehicleCommissionRate > 100) {
+                                $rootScope.toasterWarning("失败！","请填写0-100的车船税返佣比");
+                            }else if($scope.productEduitModal.commercialCommissionRate < 0 || $scope.productAddModal.commercialCommissionRate > 100) {
+                                $rootScope.toasterWarning("失败！","请填写0-100的商业险返佣比");
+                            }else{
+
+                                if( !$scope.productEduitModal.compulsoryCommissionRate) {
+                                    $scope.productEduitModal.compulsoryCommissionRate = 0;
+                                }
+                                if(!$scope.productEduitModal.vehicleCommissionRate) {
+                                    $scope.productEduitModal.vehicleCommissionRate = 0;
+                                }
+                                if(!$scope.productEduitModal.commercialCommissionRate) {
+                                    $scope.productEduitModal.commercialCommissionRate = 0;
+                                }
+                                addProduct();
+                            }
+                        }
+
+                    };
+
+
+
+                };
+
+                /*
+                * 禁用，启用
+                * */
+                $scope.disabledPC = function(id){
+                    $http.get("/dafeng/product/reverse?id=" + id).then(function(resResult){
+                        if(resResult.ErrorCode){
+                            $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                        }else{
+                            $rootScope.toasterSuccess("成功！", "状态编辑成功");
+                            $scope.getList(0);
+                        }
+                    })
+                };
+
+                /*
+                * 清空信息
+                * */
+                $scope.clearSearch = function(){
+                    if($scope.state_code === "all"){
+                        $scope.searchInfo = {
+                            stateCode : ""
+                        };
+                    }else{
+                        $scope.searchInfo = {
+                            stateCode : $scope.state_code
+                        };
+                    }
+                    $scope.getList(0);
+                    $scope.productAddModal = {
+                        type : 1
+                    };
+                };
+            }
+        ]
+    )
+</script>
+
+<div ng-controller="insureRebateListCtrl">
+
+    <div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+        <div class="inline pull-left m-r">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,'all')">
+                <input type="radio" name="state" checked="checked"/><i></i> 全部
+            </label>
+        </div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"/><i></i> {{ state.label }}
+            </label>
+        </div>
+        <div class="pull-right">
+            <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                    data-target="#product_modal_add"
+                    data-toggle="modal">
+                <i class="fa fa-plus"></i>
+                新增产品返佣
+            </button>
+        </div>
+    </div>
+    <!--<div class="row-row">-->
+        <!--<div class="cell">-->
+            <!--<div class="cell-inner">-->
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" ng-if="list.length > 0">
+                            查询结果
+                        </div>
+                        <div class="panel-heading" ng-if="list.length < 1">
+                            暂无数据！
+                        </div>
+                        <div class="wrapper">
+                            <div class="w inline m-r">
+                                <input type="text" class="form-control"
+                                       placeholder="请输入产品名称"
+                                       ng-model="searchInfo.label"
+                                       autocomplete="off">
+                            </div>
+                            <div class="w inline m-r">
+                                <select name=""
+                                        required
+                                        class="form-control"
+                                        ng-options="item.id as item.label for item in productCompany"
+                                        ng-model="searchInfo.productCompanyId"
+                                        id="productCompanySelect">
+                                    <option value="">请选择保险公司</option>
+                                </select>
+                            </div>
+                            <div class="inline">
+                                <button type="button" class="btn btn-primary m-r" ng-click="getList(0)">
+                                    <span>查询</span>
+                                </button>
+                                <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                    <span>清除</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover b-t b-light">
+                                <thead>
+                                    <tr>
+                                        <th>产品类型</th>
+                                        <th>产品名称</th>
+                                        <th>保险公司</th>
+                                        <th>交强险返佣比例(%)</th>
+                                        <th>车船税返佣比例(%)</th>
+                                        <th>商业险返佣比例(%)</th>
+                                        <th>更新日期</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="item in list">
+                                    <td class="v-middle">
+                                        <!--{{ item.type === '1' ? "车险" : "暂无" }}-->
+                                        车险
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.label ? item.label : "暂无" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.productCompanyLabel ? item.productCompanyLabel : "暂无" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.compulsoryCommissionRate ? item.compulsoryCommissionRate : "0" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.vehicleCommissionRate ? item.vehicleCommissionRate : "0" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.commercialCommissionRate ? item.commercialCommissionRate : "0"}}
+                                    </td>
+                                    <td class="v-middle">
+                                        {{ item.lastModifiedAt ? (item.lastModifiedAt | dateSecondTime): "0" }}
+                                    </td>
+                                    <td class="v-middle">
+                                        <button class="btn btn-xs btn-info"
+                                                data-toggle="modal"
+                                                data-target="#team_modal_eduit"
+                                                ng-click="eduitProduct(item.id,item)">
+                                            编辑
+                                        </button>
+                                        <button class="btn btn-xs btn-danger"
+                                                ng-if="item.stateCode === 'ENABLED'"
+                                                ng-click="disabledPC(item.id)">
+                                            禁用
+                                        </button>
+                                        <button class="btn btn-xs btn-success"
+                                                ng-if="item.stateCode === 'DISABLED'"
+                                                ng-click="disabledPC(item.id)">
+                                            启用
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="wrapper b-t b-light clearfix">
+        <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+    </div>
+
+    <div class="modal fade" id="product_modal_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="clearSearch()">
+                    <span>&times;</span>
+                </button>
+                <h4 class="modal-title">新增产品返佣</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label><span class="text-danger">*</span>产品类型</label>
+                        <input type="text"
+                               name="teamName"
+                               id="team_template_type"
+                               class="form-control"
+                               required
+                               disabled
+                               placeholder="车险">
+                    </div>
+                    <div class="form-group">
+                        <label><span class="text-danger">*</span>产品名称</label>
+                        <input type="text"
+                               name="teamName"
+                               id="team_template_name"
+                               class="form-control"
+                               required
+                               placeholder="请输入产品名称"
+                               ng-model="productAddModal.label">
+                    </div>
+                    <div class="form-group">
+                        <label><span class="text-danger">*</span>保险公司</label>
+                        <select name=""
+                                required
+                                class="form-control"
+                                ng-options="item.id as item.label for item in productCompany"
+                                ng-model="productAddModal.productCompanyId"
+                                id="productCompany">
+                            <option value="">请选择保险公司</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>交强险返佣比例(%)</label>
+                        <input type="number"
+                               id="team_template_lecomplysoryCommissionRateader"
+                               class="form-control"
+                               autocomplete="off"
+                               ng-model="productAddModal.compulsoryCommissionRate">
+                    </div>
+                    <div class="form-group">
+                        <label>车船税返佣比例(%)</label>
+                        <input type="number"
+                               id="team_template_vehicleCommissionRate"
+                               class="form-control"
+                               autocomplete="off"
+                               ng-model="productAddModal.vehicleCommissionRate">
+                    </div>
+                    <div class="form-group">
+                        <label>商业险返佣比例(%)</label>
+                        <input type="number"
+                               id="team_template_commercialCommissionRate"
+                               class="form-control"
+                               autocomplete="off"
+                               ng-model="productAddModal.commercialCommissionRate">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearSearch()">关闭</button>
+                <button type="button" class="btn btn-primary" id="addModalBtn" ng-click="addProductCompany()">确定</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="team_modal_eduit" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="eduitTeamModal">修改产品返佣</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label><span class="text-danger">*</span>产品类型</label>
+                            <input type="text"
+                                   name="teamName"
+                                   id="team_type"
+                                   class="form-control"
+                                   required
+                                   disabled
+                                   placeholder="车险">
+                        </div>
+                        <div class="form-group">
+                            <label><span class="text-danger">*</span>产品名称</label>
+                            <input type="text"
+                                   name="teamName"
+                                   id="team_name"
+                                   class="form-control"
+                                   required
+                                   placeholder="请输入产品名称"
+                                   ng-model="productEduitModal.label">
+                        </div>
+                        <div class="form-group">
+                            <label><span class="text-danger">*</span>保险公司</label>
+                            <select name=""
+                                    required
+                                    class="form-control"
+                                    ng-options="item.id as item.label for item in productCompany"
+                                    ng-selected="item.id == productEduitModal.productCompanyId"
+                                    ng-model="productEduitModal.productCompanyId"
+                                    id="eduitProductCompany">
+                                <option value="">请选择保险公司</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>交强险返佣比例(%)</label>
+                            <input type="number"
+                                   id="team_lecomplysoryCommissionRateader"
+                                   class="form-control"
+                                   autocomplete="off"
+                                   ng-model="productEduitModal.compulsoryCommissionRate">
+                        </div>
+                        <div class="form-group">
+                            <label>车船税返佣比例(%)</label>
+                            <input type="number"
+                                   id="team_vehicleCommissionRate"
+                                   class="form-control"
+                                   autocomplete="off"
+                                   ng-model="productEduitModal.vehicleCommissionRate">
+                        </div>
+                        <div class="form-group">
+                            <label>商业险返佣比例(%)</label>
+                            <input type="number"
+                                   id="team_commercialCommissionRate"
+                                   class="form-control"
+                                   autocomplete="off"
+                                   ng-model="productEduitModal.commercialCommissionRate">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                    <button type="button" class="btn btn-primary" id="eduitTeam" ng-click="eduit()">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

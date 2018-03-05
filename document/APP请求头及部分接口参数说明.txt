@@ -1,0 +1,20 @@
+1.请求头（所有接口通用）：
+app_code:DAFENGBAODAI
+applicationid:fengxianwuyou_android
+client:android
+content-type:application/json;charset=UTF-8
+imei:idfv
+token:f9de3ac5-3a66-4c8d-b990-47f338ec36c6
+
+2.queryLatestPolicy接口（Post方式 raw->JSON(application/json)） 
+//车牌号码 
+licenseNumber;
+//车主姓名 
+ownerName;
+//号牌种类（默认值为02，代表小型车)
+carTypeCode;
+//默认值为（android或ios）
+applicationId;
+
+3.queryInviteCustomersForMobile接口（get请求）
+不需要传任何参数

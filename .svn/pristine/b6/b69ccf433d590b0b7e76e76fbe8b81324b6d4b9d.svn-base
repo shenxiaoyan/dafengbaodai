@@ -1,0 +1,16 @@
+<div class="vbox bg-white">
+    <div class="wrapper b-b b-light">
+        <a  class="btn btn-sm btn-danger" tooltip="打包下载" tooltip-placement="bottom"><i class="fa fa-download"></i> 下载凭证</a>
+        <a  class="btn btn-sm btn-default" tooltip="打包下载" tooltip-placement="bottom"><i class="fa fa-download"></i> 请求服务？</a>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md ">
+                    <h4>e签保相关数据</h4>
+                    下载凭证
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

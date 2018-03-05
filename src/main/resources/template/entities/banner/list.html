@@ -1,0 +1,544 @@
+<link rel="stylesheet" type="text/css" href="css/cropper.css"/>
+<style type="text/css">
+	td,th{text-align: center;}
+	tr{width: 500px;}
+	#show{width: 100%;height: 500px;}
+	#result img{height: 300px;}
+	.flexBigBox{display: flex;}
+	.flexBox{flex: 1;box-sizing: border-box;margin: 0 20px;}
+	.btnP{margin: 25px 20px 0;height: 25px;}
+	.cutBtn{width: 50px;height: 25px;border: none;color: #FFFFFF;background-color: #6254B2;}
+</style>
+<script src="js/ddsort.js" type="text/javascript"></script>
+<script src="js/cropper.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var srcs=[];
+    app.controller("bannerListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+            	$scope.bannerOrder=[];
+            	$scope.canOrder=false;
+            	$scope.findImgName='';
+            	app.directive('repeatFinish',function(){
+				    return {
+				        link: function(scope,element,attr){
+				            if(scope.$last == true){
+				            	if($scope.state_code==='ONSHELF'&&$scope.byState==='state'){
+				            		$( '#tableBody' ).DDSort({
+										target: '.listRow',		
+										floatStyle: {
+											'border': '1px solid #ccc',
+											'background-color': '#fff'
+										},
+										up:function(){
+											var listRows=document.getElementsByClassName('listRow');
+											$scope.bannerOrder=[];
+											for(var i=0;i<listRows.length;i++){
+												$scope.bannerOrder.push(Number(listRows[i].getElementsByTagName('td')[0].innerHTML));
+											}
+											console.log($scope.bannerOrder);
+										}
+									});
+				            	}
+				            	else if($scope.state_code==='ONSHELF'&&$scope.byState==='state'){}
+				            	else{
+				            		$('#tableBody tr').removeClass('listRow');
+				            		$scope.canOrder=false;
+				            	}
+				            }
+				        }
+				    }
+				});
+                //状态栏
+                $scope.states=[];
+				$scope.byState='all';
+                $scope.getStates = function () {
+                    $http.get("/rest/bannerStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.bannerStates;
+                            for(var i=0;i<$scope.states.length;i++){
+                            	if($scope.states[i].stateCode=='DELETED'){
+                            		$scope.states.splice(i,1);
+                            	}
+                            }
+                        });
+                };
+
+                $scope.getStates();
+                $scope.entity_key = $stateParams.entity_key;
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+						$scope.list=[];
+                    	$scope.byState='state';
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                        $scope.findImgName='';
+                    }
+                };
+                //获取全部
+                $scope.getAll=function(){
+                	$scope.findImgName='';
+					$scope.list=[];
+                	$scope.byState='all';
+                	$scope.getList(0);
+                }
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.list = [];
+                //获取当前状态
+                $scope.state_code = $stateParams.state_code;
+
+                $scope.getList = function (page) {
+                	if($scope.byState==='state'){
+                		if($scope.state_code=='ONSHELF'){
+                			$scope.link="/dafeng/banner/search?size=15&sort=weight&sort=lastModifiedAt,desc&page=" + page+"&stateCode="+$scope.state_code;
+                		}
+                		else{
+                			$scope.link="/dafeng/banner/search?size=15&page=" + page+"&stateCode="+$scope.state_code;
+                		}
+                	}
+                	else if($scope.byState==='all'){
+                		$scope.link="/dafeng/banner/search?name="+$scope.findImgName+"&size=15&page=" + page;
+                	}
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "GET",
+                        url : $scope.link
+                    }).success(function(resResult){
+                        $scope.list = resResult.data.content;
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#banner_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                        console.log($scope.list);
+                    });
+                };
+                $scope.getList(0);
+                //图片预览
+                $scope.c=function () {
+					var r= new FileReader();
+					f=document.getElementById('update_list_icon').files[0];
+					if(f){
+						var fArray=f.name.split('.');
+						var fString='';
+						for(var a=0;a<fArray.length-1;a++){
+							if(fString){
+								fString=fString+'.'+fArray[a];
+							}
+							else{
+								fString=fString+fArray[a];
+							}
+						}
+						$scope.imgName=fString;
+						angular.element('#imgName')[0].value=fString;
+						r.readAsDataURL(f);
+						r.onload=function  (e) {
+							$('#cutDiv').html('<div class="flexBigBox"><div class="flexBox"><img src="" id="show"/></div><div class="flexBox"><p>预览图片</p><div id="result"></div></div></div><p class="btnP"><button id="button" class="cutBtn">裁剪</button></p>');
+							document.getElementById('show').src=this.result;
+							var croppable = false;
+				    		var $button = $('#button');
+				      		var $result = $('#result');
+				      		var $image = $('#show');
+							$('#show').cropper({
+					      		aspectRatio:750/420,
+					        	viewMode: 1,
+					        	dragMode: 'move',
+					        	resizable:false,
+					        	autoCropArea: 0.65,
+					        	restore: false,
+					        	guides: false,
+					        	highlight: false,
+					        	cropBoxMovable: false,
+					        	cropBoxResizable: false,
+					        	ready: function () {
+					          		croppable = true;
+					        	}
+					      	});
+					      	$button.on('click', function () {
+					        	var croppedCanvas;
+					        	var roundedCanvas;
+					        	if (!croppable) {
+					          		return;
+					        	}
+					        	croppedCanvas = $image.cropper('getCroppedCanvas');
+					        	roundedCanvas = getRoundedCanvas(croppedCanvas);
+					        	$result.html('<img src="' + roundedCanvas.toDataURL() + '">');
+					        	srcs=$('#result img')[0].src.split(',');
+					      	});
+						};
+					}
+					else{
+						$('#cutDiv').html('');
+						$scope.imgName='';
+						angular.element('#imgName')[0].value='';
+					}
+					function getRoundedCanvas(sourceCanvas) {
+				  		var canvas = document.createElement('canvas');
+				  		var context = canvas.getContext('2d');
+				  		var width = sourceCanvas.width;
+				  		var height = sourceCanvas.height;
+				  		canvas.width = width;
+				  		canvas.height = height;
+				  		context.beginPath();
+				  		context.rect(0, 0, width, height);
+				  		context.strokeStyle = 'rgba(0,0,0,0)';
+				  		context.stroke();
+				  		context.clip();
+				  		context.drawImage(sourceCanvas, 0, 0, width, height);
+				  		return canvas;
+				    }
+				}
+               	//新增图片
+	            $scope.updateListIcon = function () {
+	               	if(!angular.element('#result img').length){
+	               		$rootScope.toasterError("失败！", "请选择并裁剪图片！");
+	               	}
+	               	else if(!$scope.imgName){
+	               		$rootScope.toasterError("失败！", "请输入图片名称！");
+	               	}
+	               	else{
+	                    $http({
+	                        method: "POST",
+	                        url: "/dafeng/base64Upload",
+							params:{
+								filename:$scope.imgName,
+								maxSize:204800
+							},
+	                        data:srcs[1]
+	                    }).then(function (resResult) {
+	                    	console.log(resResult);
+	                        if(resResult.data.ErrorCode==0){
+	                        	$scope.editListIconURL="http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/" + resResult.data.data.newFileName;
+	                        	console.log($scope.editListIconURL);
+		                        $http({
+		                        	method:'POST',
+		                        	url:'/dafeng/banner/save',
+		                        	data:{
+		                        		name:$scope.imgName,
+		                        		imgURL:$scope.editListIconURL
+		                        	}
+		                        }).then(function successCallback(response){
+		                        	console.log(response);
+		                        	if(response.data.ErrorCode==0){
+		                        		$rootScope.toasterSuccess("成功！", "上传图片成功！");
+		                        		$scope.getList(0);
+		                        		$scope.imgName='';
+		                        		angular.element('#update_list_icon')[0].outerHTML=angular.element('#update_list_icon')[0].outerHTML;
+		                        		$('#cutDiv').html('');
+		                        	}
+		                        },function errorCallback(){
+		                        	$rootScope.toasterError("失败！", "上传图片失败！");
+		                        });
+	                        }
+	                        else{
+	                        	$rootScope.toasterError("失败！", resResult.ErrorInfo);
+	                        }
+	                    });
+	               	}
+	            }
+	            //修改图片名称
+	            $scope.editImgMessage=function(item){
+	            	$scope.imgNameEdit=item.name;
+	            	$scope.editImgHttp=function(){
+	            		if(!$scope.imgNameEdit){
+	            			$rootScope.toasterError("失败！", "请输入图片名称！");
+	            		}
+	            		else{
+	            			$http({
+	            				method:'PATCH',
+	            				url:'/dafeng/banner/update',
+	            				data:{
+	            					id:item.id,
+	            					name:$scope.imgNameEdit
+	            				}
+	            			}).then(function successCallback(response){
+	            				if(response.data.ErrorCode==0){
+	            					$rootScope.toasterSuccess("成功！", "修改成功！");
+	            					$scope.getList(0);
+	            				}
+	            			});
+	            		}
+	            	}
+	            }
+	            //上架
+	            $scope.toOnshelf=function(id){
+					var toOnshelfFun=function(){
+	            		$http({
+	            			method:'PATCH',
+	            			url:'/dafeng/banner/onshelf',
+	            			data:{
+	            				id:id
+	            			}
+	            		}).then(function successCallback(response){
+	            			console.log(response);
+	            			if(response.data.ErrorCode==0){
+		            			$rootScope.toasterSuccess("成功！", "上架图片成功！");
+		                        $scope.getList(0);
+	            			}
+	            		});						
+					}
+					$rootScope.sweetConfirm('确认上架该图片？',toOnshelfFun);
+	           }
+	            //删除banner图
+	            $scope.deleteImg=function(id){
+	            	var deleteImgFun=function(){
+	            		$http({
+	            			method:'DELETE',
+	            			url:'/dafeng/banner/delete?id='+id
+	            		}).then(function successCallback(response){
+	            			if(response.data.ErrorCode==0){
+	            				$rootScope.toasterSuccess("成功！", "删除图片成功！");
+		                        $scope.getList(0);
+	            			}
+	            		});
+	            	}
+	            	$rootScope.sweetConfirm('确认删除该图片？',deleteImgFun);
+	            }
+	            //下架
+	            $scope.toOffshelf=function(id){
+	            	var toOffshelfFun=function(){
+		            	$http({
+		            		method:'PATCH',
+		            		url:'/dafeng/banner/offshelf',
+		            		data:{
+		            			id:id
+		            		}
+		            	}).then(function successCallback(response){
+		            		console.log(response);
+		            		if(response.data.ErrorCode==0){
+		            			$rootScope.toasterSuccess("成功！", "下架图片成功！");
+			                    $scope.getList(0);
+		            		}
+		            	});
+	            	}
+	            	$rootScope.sweetConfirm('确认下架该图片？',toOffshelfFun);
+	            }
+	            //排序
+	            $scope.ordering=function(){
+	            	$scope.canOrder=true;
+	            	$('#tableBody tr').addClass('listRow');
+	            	var listRows=document.getElementsByClassName('listRow');
+					$scope.bannerOrder=[];
+					for(var i=0;i<listRows.length;i++){
+						$scope.bannerOrder.push(Number(listRows[i].getElementsByTagName('td')[0].innerHTML));
+					}
+					console.log($scope.bannerOrder);
+	            }
+	            //排序取消
+	            $scope.cancelOrder=function(){
+	            	$scope.canOrder=false;
+	            	$('#tableBody tr').removeClass('listRow');
+	            	$scope.list=[];
+                	$scope.byState='state';
+                    $scope.state_code = 'ONSHELF';
+                    $scope.getList(0);
+	            }
+	            //排序确定
+	            $scope.sureOrder=function(){
+	            	$scope.canOrder=false;
+	            	$('#tableBody tr').removeClass('listRow');
+	            	$http({
+	            		method:'PATCH',
+	            		url:'/dafeng/banner/orderImg',
+	            		data:{
+	            			ids:$scope.bannerOrder
+	            		}
+	            	}).then(function successCallback(response){
+	            		console.log(response);
+	            		if(response.data.ErrorCode==0){
+	            			$rootScope.toasterSuccess("成功！", "排序成功！");
+	            		}
+	            	});
+	            }
+            }]);
+</script>
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="bannerListCtrl">
+	
+	<div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">状态：</div>
+        <div class="inline pull-left m-r">
+            <label class="i-checks pull-left m-n">
+                <input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+            </label>
+        </div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"><i></i> {{ state.label }}
+            </label>
+        </div>
+        <div class="pull-right m-r inline" ng-if="(state_code=='OFFSHELF'&&byState==='state')||byState==='all'">
+			<button class="btn m-b-xs btn-sm btn-danger btn-addon" data-toggle="modal" data-target="#addImg" style="background-color: deepskyblue;border-color: deepskyblue;">上传</button>
+		</div>
+		<div class="pull-right m-r inline" ng-if="state_code=='ONSHELF'&&byState==='state'&&!canOrder">
+			<button class="btn m-b-xs btn-sm btn-danger btn-addon" style="background-color: green;border-color: green;" ng-click="ordering()">排序</button>
+		</div>
+		<div class="pull-right m-r inline" ng-if="state_code=='ONSHELF'&&byState==='state'&&canOrder">
+			<button class="btn m-b-xs btn-sm btn-danger btn-addon" ng-click="sureOrder()" style="background-color: deepskyblue;border-color: deepskyblue;">确定</button>
+		</div>
+		<div class="pull-right m-r inline" ng-if="state_code=='ONSHELF'&&byState==='state'&&canOrder">
+			<button class="btn m-b-xs btn-sm btn-danger btn-addon" ng-click="cancelOrder()" style="background-color: #C1C1C1;border-color: #C1C1C1;">取消</button>
+		</div>
+		<div class="pull-right m-r inline" ng-if="state_code=='ONSHELF'&&byState==='state'&&canOrder" style="color: red;">拖动内容条以排序</div>
+    </div>
+	<!--搜索-->
+	<form class="clearfix" ng-show="byState==='all'">
+     	<div class="pull-left m-r inline">
+     		<label class="form-label" style="padding:6px 0px;"></label>
+     	</div>
+        <div class="pull-left m-r winline">
+            <input type="text" class="form-control" id="release_waybill_number"
+                   placeholder="请输入图片标题" ng-model="findImgName"/>
+        </div>
+        <div class="pull-left m-r inline">
+            <button type="button" class="btn btn-primary" ng-click="getList(0)">
+                <span>查询</span>
+            </button>
+        </div>
+    </form>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" ng-if="list.length < 1">暂无数据！</div>
+                        <div class="table-responsive" ng-if="list.length > 0">
+                            <table ng-if="list.length>0" class="table table-hover b-t b-light">
+                    	<thead>
+                    		<tr>
+                    			<th>系统编号</th>
+	                        	<th>标题</th>
+	                            <th>图片缩略图</th>
+	                            <th ng-if="byState==='all'">状态</th>
+	                            <th>上传时间</th>
+	                            <th>更新时间</th>
+	                            <th ng-if="byState==='state'">操作</th>
+                    		</tr>
+                    	</thead>
+                    	<tbody id="tableBody">
+                    		<tr ng-repeat="item in list" repeat-finish>
+                    			<td class="v-middle">
+	                                {{item.id}}
+	                            </td>
+	                            
+	                            <td class="v-middle">
+	                                {{item.name}}
+	                            </td>
+	                            
+	                            <td class="v-middle">
+	                                <img ng-src="{{item.imgURL}}" class="littleImg" style="height: 100px;"/>
+	                            </td>
+	                            
+	                            <td class="v-middle" style="color: red;" ng-if="byState==='all'&&item.state.label=='上架'">
+	                            	{{item.state.label}}
+	                            </td>
+	                            
+	                            <td class="v-middle" ng-if="byState==='all'&&item.state.label!='上架'">
+	                            	{{item.state.label}}
+	                            </td>
+	                            
+	                            <td class="v-middle">
+	                                {{item.createdAt}}
+	                            </td>
+	                            
+	                            <td class="v-middle">
+	                                {{item.lastModifiedAt}}
+	                            </td>
+	                            <td class="v-middle" ng-if="byState==='state'">
+	                            	<button class="btn btn-xs btn-info" ng-click="editImgMessage(item)" data-toggle="modal" data-target="#editImg" ng-if="byState==='state'&&state_code=='OFFSHELF'">修改名称</button>
+	                            	<button class="btn btn-xs btn-info" ng-click="deleteImg(item.id)" ng-if="byState==='state'&&state_code=='OFFSHELF'" style="background-color: red;border-color: red;">删除</button>
+	                            	<button class="btn btn-xs btn-info" ng-click="toOffshelf(item.id)" ng-if="byState==='state'&&state_code=='ONSHELF'&&!canOrder" style="background-color: red;border-color: red;">下架</button>
+	                            	<button class="btn btn-xs btn-info" ng-click="toOnshelf(item.id)" ng-if="byState==='state'&&state_code=='OFFSHELF'" style="background-color: green;border-color: green;">上架</button>
+	                            </td>
+                    		</tr>
+                    	</tbody>
+                    </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper b-t b-light clearfix">
+	                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"></ul>
+	                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+	            </div>
+            </div>
+        </div>
+    </div>
+	
+	<div class="modal fade" id="addImg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">  
+	    <div class="modal-dialog" role="document" style="width: 1600px;">  
+	        <div class="modal-content">  
+	            <div class="modal-header">
+	            	<button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="createDepartModal">上传图片</h4>
+	            </div>  
+	            <div class="modal-body">
+	            	<form>
+                        <div class="form-group">
+                            <label for="depart_template_name"><span class="text-danger">*</span>选择图片</label>
+							<input type="file" id="update_list_icon" ng-model="fileModel" accept="image/*" onchange="angular.element(this).scope().c()"/>
+							<span style="color: red;">支持jpg、png、bmp等格式的图片，且裁剪后文件小于200k,建议上传尺寸为750*420</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="depart_template_name"><span class="text-danger">*</span>图片名称</label>
+                            <input type="text" class="form-control" autocomplete="off" required="required" ng-model="imgName" id="imgName"/>
+                        </div>
+                        <div class="form-group" id="cutDiv"></div>
+                    </form>
+		        </div>  
+	            <div class="modal-footer">  
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>  
+	                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="updateListIcon()">确定</button>  
+	            </div>  
+		    </div>  
+		</div>
+	</div>
+	<!--修改图片和权重弹窗-->
+	<div class="modal fade" id="editImg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">  
+	    <div class="modal-dialog" role="document">  
+	        <div class="modal-content">  
+	            <div class="modal-header">
+	            	<button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="createDepartModal">修改图片名称</h4>
+	            </div>  
+	            <div class="modal-body">
+	            	<form>
+                        <div class="form-group">
+                            <label for="depart_template_name"><span class="text-danger">*</span>图片标题</label>
+                            <input type="text" class="form-control"
+                                   autocomplete="off"
+                                   required
+                                   ng-model="imgNameEdit"/>
+                        </div>
+                    </form>
+		        </div>  
+	            <div class="modal-footer">  
+	                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>  
+	                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editImgHttp()">确定</button>  
+	            </div>  
+		    </div>  
+		</div>
+	</div>
+</div>

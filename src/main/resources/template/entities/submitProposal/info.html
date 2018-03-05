@@ -1,0 +1,541 @@
+<div class="wrapper-md" ng-controller="workflowEntityInfoController">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">车辆/车主信息:</div>
+                <div class="panel-body">
+                    <ul class="col-xs-6" style="list-style: none">
+                        <li>
+                            <label class=" text-info-color">
+                                车主姓名：
+                            </label>
+                            <span>
+                                {{ subProList.ownerName?subProList.ownerName:"暂无" }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                车牌：
+                            </label>
+                            <span>
+                                {{ subCreate.licenseNumber?subCreate.licenseNumber:"暂无" }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                投保地址：
+                            </label>
+                            <span>
+                                {{ subCreate.createEnquiryParams.cityName?subCreate.createEnquiryParams.cityName:(subOfferList.data.result.cityName?subOfferList.data.result.cityName:"暂无") }}
+                            </span>
+                        </li>
+                        <!--<li>-->
+                            <!--<label class=" text-info-color">-->
+                                <!--初登日期：-->
+                            <!--</label>-->
+                            <!--<span>-->
+                                <!--&lt;!&ndash;要在offer里找&ndash;&gt;-->
+                                <!--{{ subOfferList.data.result.insuranceStartTime | datetime  }}-->
+                            <!--</span>-->
+                        <!--</li>-->
+                    </ul>
+                    <ul class="col-xs-6" style="list-style: none">
+                        <!--<li>-->
+                            <!--<label class=" text-info-color">-->
+                                <!--车架号：-->
+                            <!--</label>-->
+                            <!--<span>-->
+                                <!--{{ profile.notice?profile.notice:"未知"}}-->
+                            <!--</span>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<label class=" text-info-color">-->
+                                <!--发动机号：-->
+                            <!--</label>-->
+                            <!--<span>-->
+                                <!--{{ profile.createdAt?profile.createdAt:"未知" }}-->
+                            <!--</span>-->
+                        <!--</li>-->
+                        <li>
+                            <label class=" text-info-color">
+                                厂牌型号：
+                            </label>
+                            <span>
+                                {{ subOfferList.data.result.modelJson.modelName ?subOfferList.data.result.modelJson.modelName:(subCreate.createEnquiryParams.carInfoDto.brandName ? subCreate.createEnquiryParams.carInfoDto.brandName : "未知") }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                证件号码：
+                            </label>
+                            <span>
+                                {{ subProList.ownerIdCard?subProList.ownerIdCard:"未知" }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">出单投保日期</div>
+                <div class="panel-body">
+                    <ul class="col-xs-6" style="list-style: none">
+                        <li>
+                            <label class=" text-info-color">
+                                出单人：
+                            </label>
+                            <span>
+                                {{ custorm.nickname ? custorm.nickname: "暂无" }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                联系方式：
+                            </label>
+                            <span>
+                                {{ subProList.customerPhone }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                出单人类型：
+                            </label>
+                            <span>
+                                {{ custormGrade }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                出单状态：
+                            </label>
+                            <span>
+                                <!--要在offer里找-->
+                                 {{ subStateList.label?subStateList.label:"暂无" }}
+                            </span>
+                        </li>
+                    </ul>
+                    <ul class="col-xs-6" style="list-style: none">
+                        <li>
+                            <label class=" text-info-color">
+                                支付方式：
+                            </label>
+                            <span>
+                                支付宝
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                出单单号：
+                            </label>
+                            <span>
+                                {{ subProList.orderId?subProList.orderId:"未知" }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                出单时间：
+                            </label>
+                            <span>
+                                {{ subTime.creteTime | dateSecondTime }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class=" text-info-color">
+                                发票抬头：
+                            </label>
+                            <span>
+                               {{ subProList.customerName }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">投保明细</div>
+                <div class="panel-body">
+                    <div class="col-sm-2">
+                        <span class="center">
+                            投保公司：{{ subOfferList.data.result.insuranceCompanyName }}
+                        </span>
+                    </div>
+                    <div class="col-sm-10">
+                        <ul class="col-xs-5" style="list-style: none">
+                            <li ng-repeat="list in subResultList">
+                                <label class="w-sm text-info-color">
+                                    {{ list.insuranceName? list.insuranceName:"" }}：
+                                </label>
+                                <label class="w-sm">
+                                    {{ list.amountStr? list.amountStr:"0" }}
+                                </label>
+                                <span>
+                                    {{ list.quotesPrice }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-7" style="list-style: none">
+                            <li>
+                                <label class="text-info-color">
+                                    不计免赔附加：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.offerDetail.additionalPrice }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class=" text-info-color">
+                                    交强险：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.offerDetail.forcePremium.quotesPrice?subOfferList.data.result.offerDetail.forcePremium.quotesPrice:"0" }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class=" text-info-color">
+                                    车船税：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.offerDetail.taxPrice.quotesPrice?subOfferList.data.result.offerDetail.taxPrice.quotesPrice:"0" }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="line line-dashed b-b line-lg pull-in"></div>
+                    <div>
+                        <ul class="col-xs-3" style="list-style: none">
+                            <li ng-repeat="item in subOfferList.data.result.ratioJson">
+                                <label class=" text-info-dker">
+                                    {{ item.content }}：
+                                </label>
+                                <span>
+                                    {{ item.ratio| number:2 }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-3" style="list-style: none">
+                            <li>
+                                <label class=" text-info-dker">
+                                    商业险总价：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.offerDetail.currentPrice ? subOfferList.data.result.offerDetail.currentPrice : ((subOfferList.data.result.currentPrice/100) | number : 2 )}}
+                                </span>
+                            </li>
+                            <li>
+                                <label class=" text-info-dker">
+                                    商业险底价：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.offerDetail.originalPrice | number:2 }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class="text-info-color">
+                                    商业险起期：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.insuranceStartTime | datetime }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-3" style="list-style: none">
+                            <li>
+                                <label class="text-info-dker">
+                                    强制险总价：
+                                </label>
+                                <span>
+                                {{ subOfferList.data.result.offerDetail.ciBasePrice }}
+                            </span>
+                            </li>
+                            <li>
+                                <label class="text-info-dker">
+                                    强制险底价：
+                                </label>
+                                <span>
+                                {{ subOfferList.data.result.offerDetail.ciBasePrice }}
+                            </span>
+                            </li>
+                            <li>
+                                <label class="text-info-color">
+                                    交强险起期：
+                                </label>
+                                <span>
+                                    {{ subOfferList.data.result.forceInsuranceStartTime ? (subOfferList.data.result.forceInsuranceStartTime | datetime) : "暂无" }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-3" style="list-style: none">
+                            <li>
+                                <label class="text-danger-lter">
+                                    保费合计：
+                                </label>
+                                <span class="text-danger-lter">
+                                    {{ subOfferList.data.result.offerDetail.currentPrice ? ((subOfferList.data.result.offerDetail.currentPrice + subOfferList.data.result.offerDetail.ciBasePrice ) | number : 2) : (((subOfferList.data.result.currentPrice/100) + subOfferList.data.result.offerDetail.ciBasePrice) | number : 2) }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class="text-danger-lter">
+                                    底价合计：
+                                </label>
+                                <span class="text-danger-lter">
+                                    {{ (subOfferList.data.result.offerDetail.originalPrice + subOfferList.data.result.offerDetail.ciBasePrice )  | number:2 }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class="text-danger-lter">
+                                    折扣：
+                                </label>
+                                <span class="text-danger-lter">
+                                    {{ subOfferList.data.result.commercialDiscount ? (subOfferList.data.result.commercialDiscount | number:2) : "0" }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">投保人信息</div>
+                <div class="panel-body">
+                    <ul style="list-style: none">
+                        <li>
+                            <label class="text-info-color">
+                                投保人：
+                            </label>
+                            <span>
+                            {{ subProList.customerName }}
+                        </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                联系方式：
+                            </label>
+                            <span>
+                            {{ subProList.customerPhone }}
+                        </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                证件号码：
+                            </label>
+                            <span>
+                            {{ subProList.customerIdNo?subProList.customerIdNo:"暂无" }}
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">被保人信息</div>
+                <div class="panel-body">
+                    <ul style="list-style: none">
+                        <li>
+                            <label class="text-info-color">
+                                被保人：
+                            </label>
+                            <span>
+                            {{ subProList.insuredName }}
+                        </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                联系方式：
+                            </label>
+                            <span>
+                            {{ subProList.insuredPhone }}
+                        </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                证件号码：
+                            </label>
+                            <span>
+                            {{ subProList.insuredIdNo?subProList.insuredIdNo:"未知" }}
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">配送信息</div>
+                <div class="panel-body">
+                    <ul style="list-style: none">
+                        <li>
+                            <label class="text-info-color">
+                                收件人：
+                            </label>
+                            <span>
+                                {{ subProList.contactName }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                联系方式：
+                            </label>
+                            <span>
+                                {{ subProList.ownerMobilePhone }}
+                            </span>
+                        </li>
+                        <li>
+                            <label class="text-info-color">
+                                地址：
+                            </label>
+                            <span>
+                                {{ subProList.contactAddress.contactAddressDetail?subProList.contactAddress.contactAddressDetail:"暂无" }}
+                            </span>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">投保信息</div>
+                <div class="panel-body">
+                    <div class="col-sm-12" ng-if="submitUnderWriting">
+                        <ul class="col-xs-12" style="list-style: none" ng-if="submitUnderWriting.underwritingJson.errorMsg">
+                            <li>
+                                <label class="text-info-color">
+                                    失败原因：
+                                </label>
+                                <span>
+                                {{ submitUnderWriting.underwritingJson.errorMsg }}
+                            </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-6" style="list-style: none">
+                            <li ng-if="submitUnderWriting.underwritingJson.biNo">
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.biNo.name }}：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.biNo.value }}
+                                </span>
+                            </li>
+                            <li ng-if="submitUnderWriting.underwritingJson.exchangeNo">
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.exchangeNo.name }}：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.exchangeNo.value }}
+                                </span>
+                            </li>
+                            <li ng-if="submitUnderWriting.underwritingJson.payNo">
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.payNo.name }}：
+                                </label>
+                                <span>
+                                {{ submitUnderWriting.underwritingJson.payNo.value }}
+                            </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-6" style="list-style: none">
+                            <li ng-if="submitUnderWriting.underwritingJson.ciNo">
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.ciNo.name }}：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.ciNo.value }}
+                                </span>
+                            </li>
+                            <li ng-if="submitUnderWriting.underwritingJson.checkCode">
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.checkCode.name }}：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.checkCode.value}}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-12" style="list-style: none" ng-hide="insuranceResult" ng-if="submitUnderWriting.underwritingJson.payJson.payQrcode">
+                            <li>
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.name }}&ensp;
+                                    ({{ submitUnderWriting.underwritingJson.payJson.payQrcode.desc }})：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.content }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-12" style="list-style: none" ng-hide="insuranceResult" ng-if="submitUnderWriting.underwritingJson.payJson.payUrl">
+                            <li>
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.payJson.payUrl.name }}&ensp;
+                                    ({{ submitUnderWriting.underwritingJson.payJson.payUrl.desc }})：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.payJson.payUrl.content }}
+                                </span>
+                            </li>
+                        </ul>
+                        <ul class="col-xs-12" style="list-style: none" ng-if="submitUnderWriting.underwritingJson.uwInfo">
+                            <li>
+                                <label class="text-info-color">
+                                    {{ submitUnderWriting.underwritingJson.uwInfo.name }}：
+                                </label>
+                                <span>
+                                    {{ submitUnderWriting.underwritingJson.uwInfo.value }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div ng-if="!submitUnderWriting">
+                        暂无投保信息详情！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="insuranceResult">
+        <div class="wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading font-bold">承保信息</div>
+                <div class="panel-body">
+                    <div class="col-sm-12" ng-if="submitUnderWriting">
+                        <ul class="col-xs-12" style="list-style: none">
+                            <li>
+                                <label class="text-info-color">
+                                    商业险保单号：
+                                </label>
+                                <span>
+                                    {{ insuranceResult.biPolicyNo ?  insuranceResult.biPolicyNo : "暂无"}}
+                                </span>
+                            </li>
+                            <li>
+                                <label class="text-info-color">
+                                    交强险保单号：
+                                </label>
+                                <span>
+                                    {{ insuranceResult.ciPolicyNo ? insuranceResult.ciPolicyNo : "暂无" }}
+                                </span>
+                            </li>
+                            <li>
+                                <label class="text-info-color" ng-if="subStateList">
+                                    承保状态：
+                                </label>
+                                <span>
+                                   {{ subStateList.label }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

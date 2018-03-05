@@ -1,0 +1,371 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *多头借贷全量核查
+     * */
+    app.controller('personalWholeCheck', ['$scope', function ($scope) {
+
+        $scope.mockData = {
+            phone: "18860469557",
+            province: "安徽省",
+            city: "亳州",
+            time: "2017-01-01--2017-8-3",
+            creditRegister: [
+                {
+                    platformType: 2,
+                    registerTime: "2016/01/02 17:20:20"
+                },
+                {
+                    platformType: 2,
+                    registerTime: "2016/01/08 12:20:20"
+                }
+            ],
+            loanApplication: [
+                {
+                    platformType: 2,
+                    registerTime: "2016/01/02 17:20:20",
+                    registerMoney: "0w~0.2w",
+                    result: "失败"
+                },
+                {
+                    platformType: 1,
+                    registerTime: "2016/01/02 16:20:20",
+                    registerMoney: "0w~0.2w",
+                    result: "成功"
+                }
+            ]
+        };
+
+        $scope.resultSwitch = false;
+
+        $scope.info={
+            phone:'18860469557'
+        };
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.phone = '';
+            $scope.resultSwitch = false;
+        };
+
+        $scope.submitInfo = function (myForm) {
+            if (myForm.phone) {
+                myForm.phone.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+            if($scope.info.phone === $scope.mockData.phone){
+                $scope.resultSwitch = true;
+                console.log('aaa')
+            }
+
+        }
+
+
+    }])
+
+</script>
+
+
+<div class="vbox" ng-controller="personalWholeCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">多头借贷全量核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" method="post" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span
+                                            style="color: #ff0000">*</span>手机号：</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.phone" name="phone" class="form-control" ng-required="true" pattern="^1[3|4|5|7|8][0-9]{9}$">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.phone.$dirty && myForm.phone.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.required">手机号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.phone.$error.pattern">手机号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label"><span style="color: #ff0000">*</span>时间段(单位：月)：</label>
+                                    <div class="col-sm-4">
+                                        <select>
+                                            <option value="1">1个月</option>
+                                            <option value="3">3个月</option>
+                                            <option value="6">6个月</option>
+                                            <option value="9">9个月</option>
+                                            <option value="12">12个月</option>
+                                            <option value="24" selected="selected">24个月</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-3 col-md-offset-3 col-sm-8">
+                                        <button type="button" class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button" class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i>
+                                            生成PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr>
+                                    <td>手机号</td>
+                                    <td>135****8385</td>
+                                </tr>
+                                <tr>
+                                    <td>省</td>
+                                    <td>福建</td>
+                                </tr>
+                                <tr>
+                                    <td>市</td>
+                                    <td>泉州</td>
+                                </tr>
+                                <tr>
+                                    <td>查询时间段</td>
+                                    <td>2014-11-22--2016-11-22</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信贷平台注册详情</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>注册时间</td>
+                                    <td>2016/8/14 0:00:00</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款申请详情</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>申请时间</td>
+                                    <td>2016/8/14 0:00:00</td>
+                                </tr>
+                                <tr>
+                                    <td>申请金额区间</td>
+                                    <td>0w～0.2w</td>
+                                </tr>
+                                <tr>
+                                    <td>申请结果</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款放款详情</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>放款时间</td>
+                                    <td>2016/8/14 0:00:00</td>
+                                </tr>
+                                <tr>
+                                    <td>放款金额区间</td>
+                                    <td>0w～0.2w</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款驳回详情</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>驳回时间</td>
+                                    <td>2015/11/11 0:00:00</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">逾期平台详情查询</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>逾期数量</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>逾期金额区间</td>
+                                    <td>0w～0.2w</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">欠款查询</th>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="background-color: #f6f8f8">暂无数据</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr>
+                                    <td>手机号</td>
+                                    <td>{{mockData.phone}}</td>
+                                </tr>
+                                <tr>
+                                    <td>省</td>
+                                    <td>{{mockData.province}}</td>
+                                </tr>
+                                <tr>
+                                    <td>市</td>
+                                    <td>{{mockData.city}}</td>
+                                </tr>
+                                <tr>
+                                    <td>查询时间段</td>
+                                    <td>{{mockData.time}}</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信贷平台注册详情</th>
+                                </tr>
+                                <tbody ng-repeat="(index,creditRegister) in mockData.creditRegister">
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>{{creditRegister.platformType}}</td>
+                                </tr>
+                                <tr>
+                                    <td>注册时间</td>
+                                    <td>{{creditRegister.registerTime}}</td>
+                                </tr>
+                                </tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款申请详情</th>
+                                </tr>
+                                <tbody ng-repeat="(index,loanApplication) in mockData.loanApplication">
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>{{loanApplication.platformType}}</td>
+                                </tr>
+                                <tr>
+                                    <td>申请时间</td>
+                                    <td>{{loanApplication.registerTime}}</td>
+                                </tr>
+                                <tr>
+                                    <td>申请金额区间</td>
+                                    <td>{{loanApplication.registerMoney}}</td>
+                                </tr>
+                                <tr>
+                                    <td>申请结果</td>
+                                    <td>{{loanApplication.result}}</td>
+                                </tr>
+                                </tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款放款详情</th>
+                                </tr>
+                                <tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>放款时间</td>
+                                    <td>2016/8/14 0:00:00</td>
+                                </tr>
+                                <tr>
+                                    <td>放款金额区间</td>
+                                    <td>0w～0.2w</td>
+                                </tr>
+                                </tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">贷款驳回详情</th>
+                                </tr>
+                                <tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>平台类型(0 全部 1 银行 2 非银行)</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>驳回时间</td>
+                                    <td>2015/11/11 0:00:00</td>
+                                </tr>
+                                </tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">逾期平台详情查询</th>
+                                </tr>
+                                <tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">信息1</th>
+                                </tr>
+                                <tr>
+                                    <td>逾期数量</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>逾期金额区间</td>
+                                    <td>0w～0.2w</td>
+                                </tr>
+                                </tbody>
+                                <tr>
+                                    <th colspan="2" style="background-color: #f6f8f8">欠款查询</th>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="background-color: #f6f8f8">暂无数据</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

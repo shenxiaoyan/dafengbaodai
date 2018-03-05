@@ -1,0 +1,44 @@
+<script>
+    /*
+     * 通知控制器
+     * @author 金杭
+     * */
+    "use strict";
+    app.controller("globalNoticeCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$state",
+            function ($rootScope, $scope, $state) {
+
+            }
+        ]
+    )
+</script>
+<div class="hbox hbox-auto-xs bg-light">
+    <div class="col w-md b-r ">
+        <div class="vbox">
+            <div class="wrapper-md" ng-controller="globalNoticeCtrl">
+                <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
+                    <a href="#/{{notice.elems[0].content.ext.entityType}}/{{notice.elems[0].content.ext.entityName}}s/{{notice.elems[0].content.ext.entityId}}/profile/info" class="list-group-item clearfix b-l-warning b-l-3x" ng-repeat="(key,notice) in notices">
+                        <div class="avatar thumb pull-left m-r">
+                            <img src="img/megaphone.png">
+                        </div>
+                        <div class="pull-right text-sm text-muted">
+                            <span class="hidden-xs">{{ notice.time | datetime }}</span>
+                        </div>
+                        <div class="clear">
+                            <div>
+                                <span class="text-md">系统通知</span>
+                                <span class="label bg-light m-l-sm"></span>
+                            </div>
+                            <div class="text-ellipsis m-t-sm">
+                                {{ notice.elems[0].content.data }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

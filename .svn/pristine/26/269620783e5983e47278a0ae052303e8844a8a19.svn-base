@@ -1,0 +1,285 @@
+package com.liyang.enums;
+
+import com.liyang.domain.banner.Banner;
+import com.liyang.domain.poster.Poster;
+
+/**  
+* 类说明   
+* @author lcj 
+* @date 2017年10月23日  新建  
+*/
+public enum ExceptionResultEnum {
+	UNKNOW_ERROR(-1,"unknow error"),
+	SUCCESS(0,"OK"),
+	PLATFORM_APPLICATIONID_MIS_ERROR(100, "请带上平台标识访问"),
+	PLATFORM_DATA_ERROR(101, "平台没有权限访问，请联系管理人员"),
+	PLATFORM_DISABLE_ERROR(102, "平台权限已被关闭，请联系管理人员"),
+	PLATFORM_FREQ_DISABLE_ERROR(103, "平台已被系统关闭权限，原因：查询过多,成交量低"),
+	
+	REGIS_MOB_INSERT_ERROR(104,"数据库插入失败"),
+	
+	REGIS_MOB_CELLFORMART_ERROR(105,"请输入正确的手机号码"),
+	REGIS_MOB_ALIYUN_SEND_ERROR(106,"AliyunSms发送验证码错误"),
+	REGIS_MOB_ALIYUN_RETURN_ERROR(107,"发送验证码失败"),
+	REGIS_MOB_SAVEIDENTI_ERROR(108,"修改数据库验证码发生异常"),
+	REGIS_MOB_INVI_CUSEXSIST_ERROR(109,"您已注册！"),
+
+	
+	CUSTOMER_TOKEN_MIS_ERROR(110, "在请求头中带上用户唯一标示:token"),
+	CUSTOMER_DATA_ERROR(111, "用户不存在"),
+	CUSTOMER_DISABLE_ERROR(112, "当前用户已被禁用！"),
+	CUSTOMER_INI_INVITE_ERROR(113, "生成邀请码错误"),
+	CUSTOMER_NOUSER_ERROR(114,"用户不存在"),
+	CUSTOMER_NOUSERORFORBIDDEN_ERROR(115, "用户不存在或已被禁用"),
+	CUSTOMER_ALREADYINTEAM_ERROR(116, "用户已有团队"),
+	CUSTOMER_NOACCOUNT_ERROR(117, "用户未完成实名认证"),
+	CUSTOMER_INTEAM_NOEXIST_NOACCOUNT_ERROR(118,"未找到用户 或 用户已有团队 或 未完成实名认证"),
+	CUSTOMER_NOTEAM_ERROR(119, "用户无团队"),
+	
+	LOGIN_IDENTIFY_ERROR(115, "验证码输入错误或验证码已过期！"),
+	
+	CUSTOMER_UPGRADE_APPLY_AUIDT_ERROR(116,"您的申请正在等待审核，请耐心等待审核"),
+	CUSTOMER_STATECODE_ERROR(117, "stateCode异常"),
+	
+	QUERYLATPOL_DATA_ERROR(120, "查询续保数据格式错误或数据为空"),
+	QUERYLATPOL_RETURN_DATA_ERROR(121, "查询续保接口请求失败或返回数据为空，请重新查询"),
+	
+	CREQUERY_DATA_ERROR(126, "创建询价数据格式错误或数据为空"),
+	CREQUERY_RETURN_DATA_ERROR(125, "创建询价接口请求失败或返回数据为空，请重新查询"),
+	CREQUERY_NOIDINFO_ERROR(127,"找不到该Id的询价信息"),
+	CREQUERY_DATA_INSURECOM_ERROR(128,"创建询价传入参数错误，投保公司为空"),
+
+	
+	DAFENGAPI_API_KEY_DATA_ERROR(131, "api-key 错误 或 ipAddress 不在白名单"),
+	DAFENGAPI_PLATFORM_MIS_ERROR(132, "API用户对应平台不存在，请联系管理员"),
+	
+	ADDRESS_ID_ERROR(141, "ID错误，请输入正确的ID"),
+	ADDRESS_STATECODE_ERROR(142, "stateCode错误"),
+	
+	BANNER_ONSHELF_NUMBER_ERROR(151,"上架数最多为"+Banner.ONSHELF_MAX+"个"),
+	BANNER_DATA_ERROR(152,"数据格式错误或数据为空"),
+	BANNER_ID_ERROR(153,"未获取到id对应的数据"),
+	BANNER_WEIGHT_ERROR(154,"权重值错误，请输入"+Banner.WEIGHT_MIN+"-"+Banner.WEIGHT_MAX),
+	BANNER_STATE_ERROR(155,"所选数据状态异常"),
+	
+
+	OFFERRES_REQHEADER_TRANS_ERROR(161, "RequestHeader转化错误"),
+	OFFERRES_DATA_TRANS_ERROR(162, "返回询价结果对象转化错误"),
+	OFFERRES_DATA_MIS_ERROR(163, "找不到报价返回对应的保险公司询价记录"),
+	OFFERRES_DATA_RECORD_ERROR(164,"该报价结果没有询价记录，请重新询价"),
+	OFFERRES_DATA_STATE_ERROR(165,"修改询价状态失败"),
+	OFFERRES_DATA_FAIL_ERROR(166,"获取报价结果数据失败，请重新获取"),
+	OFFERRES_DATA_PUSH_ERROR(167, "报价结果无法推送"),
+	OFFERRES_QUERY_DATA_MIS_ERROR(168, "询价查询记录为空"),
+	OFFERRES_OFFER_MIS_ERROR(169, "找不到询价对应的报价结果"),
+	
+	ADVERUSE_DATA_PUSH_ERROR(170, "未匹配到用户平台，结果无法推送"),
+
+
+		
+	ABSTRACT_AUDITOR_NOACT_ERROR(171,"没有角色操作动作"),
+	ABSTRACT_AUDITOR_METHOD_ERROR(172,"方法不能访问"),
+	ABSTRACT_AUDITOR_NEEDLOGIN_ERROR(173,"需要登录"),
+	
+	ABSTRACT_WORKFLOW_NOTASKSTART_ERROR(181,"没有任务以这个动作启动"),
+	ABSTRACT_WORKFLOW_START_ERROR(182,"工作流已经启动"),
+	ABSTRACT_WORKFLOW_NOFILE_ERROR(183,"文件没有发现"),
+	ABSTRACT_WORKFLOW_ZIP_ERROR(184,"zip流关闭错误"),
+	
+	ADMIN_NOUSERFOUND_ERROR(191,"系统中没有这个用户"),
+	ADMIN_ACCPETUPGRADE_ERROR(192,"该用户已经通过实名认证"),
+	
+	
+	FILEDOWNLOAD_ERROR(202,"抱歉，服务器开小差，文件下载失败~"),
+	CLAIMPOLICY_DATA_IMPORT_ERROR(203,"请选择导入数据~"),
+	CLAIMPOLICY_BATCH_IMPORT_ERROR(204,"数据导入成功"),
+	CLAIMPOLICY_CLAIM_ERROR(205,"认领成功"),
+	CLAIMPOLICY_CLAIM_CHECK_ERROR(206,"请输入车船税返还或附加费"),	
+	CLAIMPOLICY_COMMISSION_COUNT_ERROR(207,"请携带部门Id参数"),	
+	
+	COMFIRM_PAYRESULT_NOPAYRESULT_ERROR(211,"没有查询过这个订单的支付结果"),
+	COMFIRM_PAYRESULT_NOORDERINFO_ERROR(212,"找不到该orderId的提交核保信息"),
+	COMFIRM_PAYRESULT_NOORDERINFO_ERROR_TIANAN(212,"找不到该orderNo的核保信息"),
+	COMFIRM_PAYRESULT_NOUSERINFO_ERROR(213,"找不到该orderId的用户信息"),
+	COMFIRM_PAYRESULT_PRICERESULLT_ERROR(214,"报价结果无法推送"),
+	COMFIRM_PAYRESULT_DATA_MIS_ERROR(215,"支付状态返回传入参数有误"),
+	COMFIRM_PAYRESULT_DATA_TRANS_ERROR(216, "返回支付状态结果对象转化错误"),
+
+	FILEUPLOAD_IO_ERROR(221,"IO错误"),
+	FILEUPLOAD_LASTFILE_ERROR(222,"上次文件出错"),
+	FILEUPLOAD_PICTURE_FORMAT_ERROR(223,"未知的图片格式"),
+	FILEUPLOAD_PICTURE_UPLOAD_ERROR(224,"图片文件上传出错"),
+	FILEUPLOAD_UNKNOWN_ERROR(225,""),
+	FILEUPLOAD_COMMONFILE_UPLOAD_ERROR(226,"普通文件上传出错"),
+	FILEUPLOAD_FILE_FORMAT_ERROR(227,"不支持的文件格式"),
+	FILEUPLOAD_ALIYUN_FILE_ERROR(228,"阿里云转换文件格式出错"),
+	FILEUPLOAD_ALIYUN_PICTURE_ERROR(229,"阿里云图片格式转换出错"),
+	FILEUPLOAD_URL_FORMAT_ERROR(230,"URL格式出错"),
+	FILEUPLOAD_URL_FILE_ERROR(231,"从url地址取文件出错"),
+	FILEUPLOAD_REMOTE_SERVER_ERROR(232,"读取远程服务器出错"),
+	FILEUPLOAD_PICTURE_FAIL_ERROE(233,"图片上传失败"),
+	FILEUPLOAD_APPLICATIONID_ERROR(234,"请带上applicationId，重新上传文件"),
+	
+	INSURANCE_RESULT_PUSH_ERROR(241,"承保结果无法推送"),
+	INSURANCE_ADDRESS_EXPIRE_ERROR(242,"承保时间超过24小时，无法修改"),
+	INSURANCE_ADDRESS_HAS_MODIFIED_ERROR(243,"地址仅支持修改一次，无法多次修改"),
+	
+	SUBPROPOSAL_NULLINFO_ERROR(251,"提交核保信息为空，请正确提交"),
+	SUBPROPOSAL_INFONAME_ERROR(252,"提交核保信息，请传入车辆所有人姓名"),
+	SUBPROPOSAL_FAIL_ERROR(253,"提交核保信息失败，请重新提交"),
+	SUBPROPOSAL_RETURN_DATA_ERROR(254, "提交核保接口请求失败或返回数据为空，请重新查询"),
+	SUBPROPOSAL_OFFERRES_DATA_MIS_ERROR(255, "找不到核保请求对应的报价返回记录"),
+	SUBPROPOSAL_ORDERID_ERROR(256, "找不到该订单号的核保数据"),
+	
+	TIM_NOTICE_ACTUSER_ERROR(261,"noticeActUser动作不存在"),
+	TIM_NOTICE_SHOWUSER_ERROR(262,"noticeShowUser动作不存在"),
+	TIM_NOTICE_OTHER_ERROR(263,"noticeOther动作不存在"),
+	TIM_SEND_ACCOUNT_ERROR(264,"发送的账户不存在"),
+	TIM_SEND_ACTINFO_ERROR(265,"没有设置行为消息模板"),
+	TIM_REST_PARSEINFO_ERROR(266,"解析tim信息错误"),
+	
+	UNDERWRITING_RESULT_PUSN_ERROR(271,"核保结果无法推送"),
+	UNDERWRITING_FAIL_ASKINTERFACE_ERROR(272,"请求查询承保接口失败"),
+	UNDERWRITING_RESULT_ORDERID_ERROR(273,"请带上orderId进行访问"),
+	UNDERWRITING_ORDER_PRICE_ERROR(274,"该orderId的订单没有对应的报价结果,请检查"),
+	UNDERWRITING_RESULT_NOPRICE_ERROR(275,"该报价结果下,没有对应的询价,请检查"),
+	UNDERWRITING_DATA_MIS_ERROR(276,"该orderId没有找到相应的提交核保数据"),
+	UNDERWRITING_DATA_TRANS_ERROR(277,"核保推送返回数据转换异常"),
+	UNDERWRITING_SUBPROPOSAL_DATA_MIS_ERROR(278,"核保返回对应的提交核保数据不存在"),
+	
+	USER_LOAD_USERNAME_ERROE(281,"用户名不存在"),
+	USER_LENGTH_USERNAME_ERROR(282,"用户名长度错误"),
+	USER_HAVEUSER_ERROR(283,"已有此用户"),
+	USER_NOTFOUND_DEPARTMENT_ERROR(284,"找不到Department"),
+	USER_NOTFOUND_ROLE_ERROR(285,"找不到Role"),
+	USER_NOUSER_ERROR(286,"找不到该用户"),
+	USER_NOSTATE_ERROR(287,"找不到该状态"),
+	USER_CREATED_ERROR(288,"用戶添加失敗"),
+	
+	WECHAT_LOGIN_BINDING_ERROR(291,"微信已经被绑定过"),
+	WECHAT_LOGIN_CACHE_ERROR(292,"缓存已经过期"),
+	WECHAT_EXIST_USER_ERROR(293,"用户已存在"),
+	WECHAT_LOGIN_CACHE_FORMAT_ERROR(294,"微信登录缓存格式不符"),
+	WECHAT_LOGIN_NOUSER_ERROR(295,"用户不存在"),
+	WECHAT_LOGIN_USER_DISABLE_ERROR(296,"用户被禁用"),
+	WECHAT_LOGIN_USER_DELETE_ERROR(297,"用户被删除"),
+	WECHAT_LOGIN_USER_AUDIT_ERROR(298,"用户正被审核"),
+	WECHAT_LOGIN_USER_ROLE_ERROR(299,"用户没有角色"),
+	WECHAT_LOGIN_USER_PERMISSION_ERROR(300,"你没有登陆的权限"),
+	WECHAT_LOGIN_AUTHORISE_ERROR(301,"用户微信授权解析失败"),
+	WECHAT_LOGIN_USER_INFO_ERROR(302,"用户微信信息解析失败"),
+	
+	SALESMAN_CREATE_ERROR(311,"人员创建失败"),
+	SALESMAN_EDIT_ERROR(312,"修改成功"),
+	SALESMAN_STATECODE_ERROR(313,"stateCode错误"),
+	SALESMAN_ID_ERROR(314,"id异常"),
+	
+	TABLEINFO_ANNOTATION_ERROR(321,"boolean型变量需要两个注解"),
+	
+	QUERYPAY_MIS_DATA_ERROR(333,"查询支付传入参数有误"),
+	QUERYPAY_RETURN_DATA_ERROR(334, "请求查询支付状态接口失败或返回数据为空，请重新查询"),
+
+	INSURANCERES_MIS_DATA_ERROR(341,"查询承保传入参数有误"),
+	INSURANCERES_DATA_TRANS_ERROR(343, "小马承保结果推送，转换对象错误"),
+	INSURANCERES_DATA_MIS_ERROR(344, "保状状态返回传入参数有误，订单编号为空"),
+	
+	LICENSE_IMG_ERROR(351, "证件识别错误,请重试"),
+	LICENSE_INTFC_ERROR(352, "识别接口错误"),
+	
+	DEPARTMENTTYPE_STATE_ERROR(361,"状态码异常"),
+	DEPARTMENTTYPE_CODE_PATTERN(362, "code必须全部为大写字母"),
+	DEPARTMENTTYPE_ID_ERROR(363, "id错误"),
+
+	
+	EXCEL_UPLOAD_FORMAT_ERROR(371, "Excel文件解析错误，请确认文件格式"),
+	EXCEL_SHEET_ANALIZE_ERROR(372, "Excel文件页解析错误，请确认"),
+	EXCEL_MODULE_ANALIZE_ERROR(373, "文件解析错误，请确认是否使用模板文件导入"),
+	EXCEL_WORKBOOK_ANALIZE_ERROR(374,"导入失败，Excel工作簿解析错误"),
+	EXCEL_UPPER_LIMIT_ERROR(375,"导入表单中总数据记录条数超上限，系统目前仅支持单次最大导入10000条，请分批处理，谢谢~"),
+	
+	API_TIANAN_INITFAILED(381, "天安接口初始化错误"),
+	API_TIANAN_PARAMINVLIAD(382, "天安接口参数错误"),
+	API_TIANAN_ERROR(383, "天安接口异常"),
+
+	LOG_ENTITYNAME_ERROR(391, "菜单名错误或者非审计类"),
+	LOG_ENTITYNAME_EMPTY(392, "菜单名不能为空"),
+	LOG_USER_ERROR(393, "当前未登录或者无角色,无法获取到菜单"),
+
+	INSURECOMPANY_STATECODE_ERROR(401, "stateCode错误"), INSURECOMPANY_ID_ERROR(402, "id错误"),
+
+	ROLE_ID_ERROR(411, "无效ID"),
+	ROLE_STATECODE_ERROR(412, "状态码错误"),
+	
+//	421:业务中具体行列错误信息
+	CLAIMMATCH_IMPORT_REPEAT_ERROR(422,"匹配失败，导入文件中存在相同保险公司和车牌的数据,请检查"),
+	CLAIMMATCH_SUBMIT_REPEAT_ERROR(423,"重复提交！,请返回上级页面，重新选择<匹配保单>按钮，谢谢~"),
+	
+	USER_CREATE_USERNAME_ERROR(431, "用户名(username)不能为空"),
+	USER_CREATE_NICKNAME_ERROR(432, "昵称(nickname)不能为空"),
+	USER_CREATE_DEPID_ERROR(433, "部门Id不能为空"),
+	USER_CREATE_ROLECODE_ERROR(434, "角色Code不能为空"),
+	USER_USERNAME_REPEAT_ERROR(435, "手机号已存在"),
+	
+	TEAM_NAMEORCAPTAINID_BLANK_ERROR(440, "团队名称不能为空或团队长不能为空"),
+	TEAM_NAME_LENGTH_ERROR(441, "团队名称不能超过10个字符"),
+	TEAM_NAME_FORMAT_ERROR(442, "团队名称仅支持中文字符"),
+	TEAM_NAME_REPEAT_ERROR(443, "该团队名称已存在"),
+	TEAM_CAPTAIN_ERROR(444, "用户不存在或未完成实名认证或已有团队"),
+	TEAM_INVITECODE_ERROR(445, "未获取到团队信息，请检查邀请码是否正确"),
+	TEAM_INAPPLIE_ERROR(446, "团队仍处于审核状态，请稍后尝试"),
+	TEAM_VERIFY_ERROR(447, "团队Id或状态未传"),
+	TEAM_EDIT_QUALIFICATION_ERROR(448, "仅团长可编辑"),
+	TEAM_DROP_CAPTAIN_ERROR(449, "团长无法删除"),
+	
+	TEAM_INVITE_CUSTOMER_ERROR(470, "抱歉，页面已失效，发起邀请用户已退出团队或团队已解散"),
+	
+	TEAM_OBJECTIVE_ID_ERROR(450, "团队业绩Id错误"),
+	TEAM_OBJECTIVE_EXIST_ERROR(451,"该月团队业绩已存在，无法新增"),
+	TEAM_OBJECTIVE_PERIOD_MISS_ERROR(452,"业绩时间未选择"),
+	
+	TEAM_ADVERTISE_ID_ERROR(460,"团队公告Id错误"),
+	
+	PERBUSINESS_ID_ERROR(511, "客户编号不存在"),
+
+	POSTER_DATA_ERROR(601, "图片数据错误"),
+	POSTER_ID_ERROR(602, "图片id错误"),
+	POSTER_TYPE_ERROR(603, "图片主题类型参数错误"),
+	POSTER_STATE_ERROR(604, "只能删除无效状态的海报，当前海报状态：有效"),
+	POSTER_DATA_IS_NULL(605, "必填数据不能为空"),
+	POSTER_REPEAT(606,"所选类型下已存在相同名称海报"),
+	
+	PRODUCT_COMPANY_LABEL_OR_CODE_ENPTY(610,"产品公司名或公司名称英文缩写为空"),
+	PRODUCT_COMPANY_ID_ERROR(611,"产品公司Id错误"),
+	
+	PRODUCT_LABEL_ENPTY(620,"产品名称为空"),
+	PRODUCT_PRODUCTCOMPANY_ENPTY(621,"产品公司为空"),
+	PRODUCT_TYPE_ENPTY(622,"产品类型为空")
+	
+	;
+	
+
+
+
+	
+	
+
+	private Integer code;
+	private String message;
+	
+	private ExceptionResultEnum(Integer code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	
+
+}
+

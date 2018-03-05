@@ -1,0 +1,531 @@
+package com.liyang.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.liyang.client.CreateEnquiryJsonParseFactory;
+import com.liyang.client.ICreateEnquiryJsonParseAdapter;
+import com.liyang.client.tianan.enums.ApiSupplierEnums;
+import com.liyang.domain.api.tianan.PremiumAccurateApiParams;
+import com.liyang.domain.base.StateVO;
+import com.liyang.domain.createenquiry.CreateEnquiry;
+import com.liyang.domain.createenquiry.CreateEnquiryForSearch;
+import com.liyang.domain.createenquiry.CreateEnquiryRepository;
+import com.liyang.domain.createenquiry.CreateEnquiryVO;
+import com.liyang.domain.insurercompany.InsureCompany;
+import com.liyang.domain.insurercompany.InsureCompanyRepository;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.offerresult.OfferResultData;
+import com.liyang.domain.offerresult.OfferResultDataResult;
+import com.liyang.domain.offerresult.OfferResultRepository;
+import com.liyang.domain.platform.Platform;
+import com.liyang.domain.platform.PlatformRepository;
+import com.liyang.domain.submitproposal.SubmitProposal;
+import com.liyang.domain.submitproposal.SubmitProposalRepository;
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.CreateEnquiryService;
+import com.liyang.util.CityCodeUtil;
+import com.liyang.util.PageUtil;
+import com.liyang.util.RequestUtill;
+
+import net.sf.json.JSONObject;
+
+/**
+ * @author Administrator
+ *
+ */
+
+@RestController
+@RequestMapping("/dafeng")
+public class CreateEnquiryController {
+	/**
+	 * 在creEnqMap中createEnquiryParams中到带上requestHeader参数, 参数值为applicationId公司标识
+	 * 询价控制器
+	 */
+	@Autowired
+	CreateEnquiryService createEnquiryService;
+	@Autowired
+	CreateEnquiryRepository createEnquiryRepository;
+	@Autowired
+	PlatformRepository platformRepository;
+	@Autowired
+	InsureCompanyRepository insureCompanyRepository;
+	@Autowired
+	SubmitProposalRepository submitProposalRepository;
+	@Autowired
+	PremiumAccurateController tiananPreAccurateController;
+	@Autowired
+	OfferResultRepository offerResultRepository;
+
+	@Autowired
+	EntityManager entityManager;
+
+	@Value("${xmcxapi.apikey}")
+	private String xmcxApiKey;
+
+	private final static Logger logger = LoggerFactory.getLogger(QueryLatestPolicyController.class);
+
+	/**
+	 * 查询询价接口
+	 * 
+	 * @param creEnqMap
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/createEnquiry", method = RequestMethod.POST)
+	public ResponseBody mobileCreateEnquiry(@RequestBody Map<String, Object> creEnqMap, HttpServletRequest request)
+			throws Exception {
+		logger.info("【新询价发起，App端传入参数】：" + creEnqMap);
+		Object tiananObject = creEnqMap.get("tianan");
+		if (tiananObject != null) {
+			String paramString = JSON.toJSONString(tiananObject);
+			PremiumAccurateApiParams tiananParams = JSON.parseObject(paramString,
+					new TypeReference<PremiumAccurateApiParams>() {
+					});
+			return tiananPreAccurateController.mobilePremiumAccurate(tiananParams, request);
+		} else {
+			Platform platform = RequestUtill.getMobileAppPlatform(request, platformRepository);
+			ResponseBody responseBody = createEnquiryService.saveCreEnqAndForward(platform, creEnqMap, request,
+					xmcxApiKey);
+			logger.info("【询价创建返回App结果】：" + JSONObject.fromObject(responseBody).toString());
+			return responseBody;
+		}
+	}
+
+	@RequestMapping(value = "/createEnquirySync", method = RequestMethod.POST)
+	public ResponseBody mobileCreateEnquirySync(@RequestBody Map<String, Object> creEnqMap, HttpServletRequest request)
+			throws Exception {
+		logger.info("【创建询价补充车辆信息重新询价，App端传入参数】:" + creEnqMap);
+		Platform platform = RequestUtill.getMobileAppPlatform(request, platformRepository);
+		ResponseBody responseBody = createEnquiryService.saveCreEnqAndForward(platform, creEnqMap, request, xmcxApiKey);
+		logger.info("询价结果数据返回" + JSONObject.fromObject(responseBody).toString());
+		return responseBody;
+	}
+
+	/*
+	 * replaced with getCreateEnquiryListForMobile
+	 */
+	// @RequestMapping(value="/getCreateEnquiryList",method=RequestMethod.GET)
+	// public ResponseBody getCreateEnquiryList(HttpServletRequest request)
+	// throws Exception {
+	// String token=request.getHeader("token");
+	// if(token==null) {
+	// throw new FailReturnObject(ExceptionResultEnum.CUSTOMER_TOKEN_MIS_ERROR);
+	// }
+	//// String token = "5ff7be41-2167-43bf-af29-3600996717b0";
+	//
+	//// change for enquire time out status
+	//// createEnquiryService.validEnquireTimeStatus(token);
+	//
+	//// Map<String, Object> dataMap =
+	// createEnquiryService.findCreateEnquiryByToken(token);
+	//// return new ResponseBody(dataMap);
+	//
+	//// 原先方法
+	// String responseResult=HttpUtil.getBody("http://" + serverIpaddress +
+	// "/rest/createEnquiries/search/findCreateEnquiryListByToken?token="+token);
+	// ObjectMapper objectMapper=new ObjectMapper();
+	// Map<String, Object>
+	// responseResultMap=objectMapper.readValue(responseResult, Map.class);
+	// Map embedded = (Map) responseResultMap.get("_embedded");
+	// List<Map> list = (List)embedded.get("createEnquiries");
+	// for(Map creEnq : list){
+	// Map creEnqPar = (Map)creEnq.get("createEnquiryParams");
+	// String insCom = (String)creEnqPar.get("insuranceCompanyName");
+	// String [] comlist = insCom.split(",");
+	// List coms = new ArrayList<>();
+	// for(String com : comlist){
+	// int comId = Integer.parseInt(com);
+	// InsureCompany company =
+	// insureCompanyRepository.findByInsurerCompanyId(comId);
+	// coms.add(company);
+	// }
+	// creEnq.put("insureCompany", coms);
+	// Integer idd = (Integer)creEnq.get("id");
+	// CreateEnquiry ce = createEnquiryRepository.findById(idd);
+	// CreateEnquiryState cestate = ce.getState();
+	// creEnq.put("status", cestate.getLabel());
+	// //得到哪个报价被核保
+	// Integer id = (Integer)creEnq.get("id");
+	// CreateEnquiry createEnquiry = createEnquiryRepository.findById(id);
+	// List<OfferResult> resultList =
+	// offerResultRepository.getByCreateEnquiry(createEnquiry);
+	// for(OfferResult offerResult : resultList){
+	// String resultOrderId = offerResult.getData().getResult().getOfferId();
+	// List<SubmitProposal> submitProposal =
+	// submitProposalRepository.findByOrderId2(resultOrderId);
+	// if(null != submitProposal && submitProposal.size() != 0){
+	// creEnq.put("toubaoCompanyId",offerResult.getData().getResult().getInsuranceCompanyId());
+	// }
+	// }
+	// }
+	// //封装成指定格式的数据返回
+	// ResponseBody responseBody=new ResponseBody();
+	// responseBody.setErrorCode(0);
+	// responseBody.setData(responseResultMap.get("_embedded"));
+	// responseBody.setErrorInfo("OK");
+	// return responseBody;
+	// }
+
+	/**
+	 * 移动端获取询价记录列表、查询
+	 * 
+	 * @param creEnqForSearch
+	 * @param pageable
+	 * @param request
+	 * @return
+	 */
+	// TODO 换为根据创建时间排序？
+	@RequestMapping(value = "/getCreateEnquiryListForMobile", method = RequestMethod.POST)
+	public ResponseBody mobileGetCreateEnquiryList(HttpServletRequest request,
+			@RequestBody(required = false) CreateEnquiryForSearch creEnqForSearch,
+			@PageableDefault(value = 15, sort = { "lastModifiedAt" }, direction = Direction.DESC) Pageable pageable) {
+		String token = request.getHeader("token");
+		createEnquiryService.validEnquireTimeStatus(token); // change for enquire time out status
+		Page<CreateEnquiry> createEnquiryPage = createEnquiryService.multiConditionSearchForMobile(creEnqForSearch,
+				pageable, token);
+		List<Object> createEnquiryMapList = new ArrayList<>();
+		for (CreateEnquiry ce : createEnquiryPage.getContent()) {
+			Map<String, Object> creEnqMap = new HashMap<String, Object>();
+			creEnqMap.put("id", ce.getId());
+			creEnqMap.put("createdAt", ce.getCreatedAt());
+			ICreateEnquiryJsonParseAdapter adapter = new CreateEnquiryJsonParseFactory(ce).createAdapter();
+			creEnqMap.put("licenseNumber", adapter.getLicenseNumber());
+			creEnqMap.put("ownerName", adapter.getOwnerName());
+			creEnqMap.put("schemeName", adapter.getInsurancesListSchemeName());
+			creEnqMap.put("cityName", adapter.getCityName());
+			creEnqMap.put("idCard", adapter.getIdCard());
+			creEnqMap.put("offerUnique", ce.getOfferUnique());
+			creEnqMap.put("status", ce.getState().getLabel());
+			// 返回选择的投保公司
+			// String insureCompanyIds = (String)
+			// ce.getCreateEnquiryParams().get("insuranceCompanyName");
+			String insureCompanyIds = (String) adapter.getInsuranceCompanyName();
+			String[] insureCompanyIdArray = insureCompanyIds.split(",");
+			List<Map<String, Object>> insComMapList = new ArrayList<>();
+			for (String companyIdStr : insureCompanyIdArray) {
+				InsureCompany insureCompany = insureCompanyRepository
+						.findByInsurerCompanyId(Integer.valueOf(companyIdStr));
+				if (insureCompany != null) {
+					Map<String, Object> insComMap = new HashMap<>();
+					insComMap.put("insurerCompanyId", insureCompany.getInsurerCompanyId());
+					insComMap.put("name", insureCompany.getName());
+					insComMap.put("listIcon", insureCompany.getListIcon());
+					insComMapList.add(insComMap);
+				}
+			}
+			creEnqMap.put("insureCompany", insComMapList);
+			// 返回投保的公司
+			for (OfferResult offerResult : ce.getOfferResult()) {
+				String offerId = offerResult.getData().getResult().getOfferId();
+				List<SubmitProposal> submitProposal = submitProposalRepository.findByOrderId2(offerId);
+				if (null != submitProposal && submitProposal.size() != 0) {
+					creEnqMap.put("toubaoCompanyId", offerResult.getData().getResult().getInsuranceCompanyId());
+					creEnqMap.put("submitProposalId", submitProposal.get(0).getId());
+					creEnqMap.put("submitProposalState", submitProposal.get(0).getState().getLabel());
+				}
+			}
+			createEnquiryMapList.add(creEnqMap);
+		}
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		Map<String, Integer> pageDataMap = new HashMap<>();
+		pageDataMap.put("size", createEnquiryPage.getSize());
+		pageDataMap.put("totalElements", (int) createEnquiryPage.getTotalElements());
+		pageDataMap.put("totalPages", createEnquiryPage.getTotalPages());
+		pageDataMap.put("number", createEnquiryPage.getNumber());
+		returnMap.put("page", pageDataMap);
+		returnMap.put("createEnquiries", createEnquiryMapList);
+		// Map<String, List<Object>> dataMap =
+		// createEnquiryService.findCreateEnquiryListByToken(token);
+		return new ResponseBody(returnMap);
+	}
+
+	/*
+	 * replaced with getCreateEnquiryForMobile
+	 */
+	// @RequestMapping(value="/getCreateEnquiry" , method= RequestMethod.GET)
+	// public ResponseBody getCreateEnquiry(@RequestParam("id") Integer id)
+	// throws Exception{
+	//
+	//// Map<String, Object> dataMap =
+	// createEnquiryService.findCreateEnquiryById(id);
+	//// return new ResponseBody(dataMap);
+	//
+	// //原先方法
+	// String
+	// responseResult=HttpUtil.getBody("http://"+serverIpaddress+"/rest/createEnquiries/"+id);
+	// ObjectMapper objectMapper=new ObjectMapper();
+	// Map<String, Object> creEnq = objectMapper.readValue(responseResult,
+	// Map.class);
+	// Map creEnqPar = (Map)creEnq.get("createEnquiryParams");
+	// String insCom = (String)creEnqPar.get("insuranceCompanyName");
+	// String [] comlist = insCom.split(",");
+	// List coms = new ArrayList<>();
+	// for(String com : comlist){
+	// int comId = Integer.parseInt(com);
+	// InsureCompany company =
+	// insureCompanyRepository.findByInsurerCompanyId(comId);
+	// coms.add(company);
+	// }
+	// creEnq.put("insureCompany", coms);
+	// Integer idd = (Integer)creEnq.get("id");
+	// CreateEnquiry ce = createEnquiryRepository.findById(idd);
+	// CreateEnquiryState cestate = ce.getState();
+	// creEnq.put("status", cestate.getLabel());
+	// //封装成指定格式的数据返回
+	// ResponseBody responseBody=new ResponseBody();
+	// responseBody.setErrorCode(0);
+	// responseBody.setData(creEnq);
+	// responseBody.setErrorInfo("OK");
+	// return responseBody;
+	//
+	// }
+
+	/**
+	 * 移动端根据createEnquiry_Id获取询价记录
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/getCreateEnquiryForMobile", method = RequestMethod.GET)
+	public ResponseBody mobileCreateEnquiry(@RequestParam("id") Integer id) {
+		Map<String, Object> returnData = createEnquiryService.findCreateEnquiryById(id);
+		return new ResponseBody(returnData);
+	}
+
+	/**
+	 * TODO 确认此方法使用处及正确性？？？
+	 * 
+	 * @param coustomerId
+	 * @return
+	 */
+	@RequestMapping(value = "/getCreateEnquiryForCustomer", method = RequestMethod.GET)
+	public ResponseBody getCreateEnquiryForCustomer(@RequestParam("customerId") Integer coustomerId) {
+		Map<String, Object> returnData = createEnquiryService.findCreateEnquiryByCustomerId(coustomerId);
+		return new ResponseBody(returnData);
+	}
+
+	/**
+	 * web端询价列表、查询
+	 * 
+	 * @param ceForSearch
+	 * @param pageable
+	 * @return
+	 */
+	@PostMapping("/searchCreateEnquiry")
+	public Map<String, Object> multiConditionSearch(@RequestBody(required = false) CreateEnquiryForSearch ceForSearch,
+			@PageableDefault(value = 15, sort = { "createdAt" }, direction = Direction.DESC) Pageable pageable) {
+		ceForSearch = (ceForSearch != null ? ceForSearch : new CreateEnquiryForSearch());
+		Page<CreateEnquiry> createEnquiryPage = createEnquiryService.multiConditionSearch(ceForSearch, pageable);
+		// entityManager.clear();
+		// Map<String, Object> returnMap = new HashMap<String, Object>();
+		// for (CreateEnquiry ce : createEnquiryPage) {
+		// ce.setCustomer(null);
+		// if (ce.getState() != null) {
+		// ce.getState().setActs(null);
+		// ce.getState().setEntities(null);
+		// ce.getState().setFromActs(null);
+		// ce.getState().setWorkflows(null);
+		// ce.setPlatform(null);
+		// }
+		// }
+		// returnMap.put("createEnquiries", createEnquiryPage.getContent());
+		// Map<String, Integer> pageDataMap = new HashMap<>();
+		// pageDataMap.put("size", createEnquiryPage.getSize());
+		// pageDataMap.put("totalElements", (int) createEnquiryPage.getTotalElements());
+		// pageDataMap.put("totalPages", createEnquiryPage.getTotalPages());
+		// pageDataMap.put("number", createEnquiryPage.getNumber());
+		// returnMap.put("page", pageDataMap);
+		// return returnMap;
+
+		List<CreateEnquiryVO> VOList = new ArrayList<>();
+		for (CreateEnquiry creEnquiry : createEnquiryPage) {
+			CreateEnquiryVO creEnquiryVO = new CreateEnquiryVO();
+			BeanUtils.copyProperties(creEnquiry, creEnquiryVO);
+			StateVO stateVO = new StateVO();
+			if (null != creEnquiry.getState()) {
+				BeanUtils.copyProperties(creEnquiry.getState(), stateVO);
+			}
+			creEnquiryVO.setState(stateVO);
+			VOList.add(creEnquiryVO);
+		}
+		Map<String, Integer> pageMap = PageUtil.getPageData(createEnquiryPage);
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		returnMap.put("createEnquiries", VOList);
+		returnMap.put("page", pageMap);
+		return returnMap;
+	}
+
+	/**
+	 * // 将一条数据改成作废状态
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/deleteCreateEnquiryForMobile", method = RequestMethod.GET)
+	public ResponseBody mobileDeleteCreateEnquiryById(@RequestParam("id") Integer id) {
+
+		// String token=request.getHeader("token");
+
+		createEnquiryRepository.updateCreateEnquiryStateById(id);
+
+		return new ResponseBody(" ");
+	}
+
+	/**
+	 * 
+	 * web端用户多条件查询+显示询价列表
+	 * 
+	 * @param createEnquiryForSearch
+	 * @param pageable
+	 * @param request
+	 * @return
+	 */
+	@PostMapping("/searchCreateEnquiryForCustomer")
+	public Map<String, Object> multiConditionSearchForCustomer(HttpServletRequest request,
+			@RequestBody(required = false) CreateEnquiryForSearch createEnquiryForSearch,
+			@PageableDefault(value = 15, sort = { "lastModifiedAt" }, direction = Direction.DESC) Pageable pageable) {
+		Integer customerId = Integer.valueOf(request.getParameter("customerId"));
+		Page<CreateEnquiry> createEnquiryPage = createEnquiryService
+				.multiConditionSearchForCustomer(createEnquiryForSearch, pageable, customerId);
+		
+//		for (CreateEnquiry ce : createEnquiryPage) {
+//			ce.setCustomer(null);
+//			if (ce.getState() != null) {
+//				ce.getState().setActs(null);
+//				ce.getState().setEntities(null);
+//				ce.getState().setFromActs(null);
+//				ce.getState().setWorkflows(null);
+//			}
+//		}
+//		Map<String, Object> returnMap = new HashMap<String, Object>();
+//		returnMap.put("createEnquiries", createEnquiryPage.getContent());
+//		Map<String, Integer> pageDataMap = new HashMap<>();
+//		pageDataMap.put("size", createEnquiryPage.getSize());
+//		pageDataMap.put("totalElements", (int) createEnquiryPage.getTotalElements());
+//		pageDataMap.put("totalPages", createEnquiryPage.getTotalPages());
+//		pageDataMap.put("number", createEnquiryPage.getNumber());
+//		returnMap.put("page", pageDataMap);
+//		return returnMap;
+		
+		List<CreateEnquiryVO> VOList = new ArrayList<>();
+		for (CreateEnquiry ce : createEnquiryPage) {
+			CreateEnquiryVO creEnquiryVO = new CreateEnquiryVO();
+			BeanUtils.copyProperties(ce, creEnquiryVO);
+			StateVO stateVO = new StateVO();
+			if (null != ce.getState()) {
+				BeanUtils.copyProperties(ce.getState(), stateVO);
+			}
+			creEnquiryVO.setState(stateVO);
+			VOList.add(creEnquiryVO);
+		}
+		Map<String, Integer> pageMap = PageUtil.getPageData(createEnquiryPage);
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		returnMap.put("createEnquiries", VOList);
+		returnMap.put("page", pageMap);
+		return returnMap;
+		
+	}
+
+//	/**
+//	 * 手动执行一次即可，添加车主车牌字段，更新已有记录添加数据
+//	 * 
+//	 * @return
+//	 */
+//	@RequestMapping("/updateLicenseAndOwner")
+//	public ResponseBody updateLicenseAndOwner() {
+//		String msg = createEnquiryService.updateLicenseAndOwner();
+//		return new ResponseBody(msg);
+//	}
+
+	/**
+	 * 通过id获取询价详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GetMapping("/getCreateEnquiryDetail")
+	public ResponseBody getDetailByCreateEnquiryId(Integer id) {
+		CreateEnquiry createEnquiry = createEnquiryRepository.findById(id);
+//		createEnquiry.setCustomer(null);
+//		if (createEnquiry.getState() != null) {
+//			createEnquiry.getState().setActs(null);
+//			createEnquiry.getState().setEntities(null);
+//			createEnquiry.getState().setFromActs(null);
+//			createEnquiry.getState().setWorkflows(null);
+//		}
+		Map<String, Object> returnMap = new HashMap<>();
+		returnMap.put("licenseNumber", createEnquiry.getLicenseNumber());
+		returnMap.put("ownerName", createEnquiry.getOwnerName());
+		returnMap.put("createEnquiryParams", createEnquiry.getCreateEnquiryParams());
+		returnMap.put("mobilePhone", createEnquiry.getMobilePhone());
+//		returnMap.put("state", createEnquiry.getState());
+		StateVO stateVO = new StateVO();
+		if (null != createEnquiry.getState()) {
+			BeanUtils.copyProperties(createEnquiry.getState(), stateVO);
+		}
+		returnMap.put("state", stateVO);
+		returnMap.put("label", createEnquiry.getState().getLabel());
+		returnMap.put("offerUnique", createEnquiry.getOfferUnique());
+		returnMap.put("createdAt", createEnquiry.getCreatedAt());
+		if (ApiSupplierEnums.TIANAN.equals(createEnquiry.getApiSupplier())) {
+			if (!createEnquiry.getCreateEnquiryParams().get("startDate")
+					.equals(createEnquiry.getCreateEnquiryParams().get("startDateBus"))
+					&& createEnquiry.getCreateEnquiryParams().get("startDateBus") != null) {
+				returnMap.put("insuranceStartTime", createEnquiry.getCreateEnquiryParams().get("startDateBus"));
+				returnMap.put("forceInsuranceStartTime", createEnquiry.getCreateEnquiryParams().get("startDate"));
+			} else {
+				returnMap.put("insuranceStartTime", createEnquiry.getCreateEnquiryParams().get("startDate"));
+				returnMap.put("forceInsuranceStartTime", createEnquiry.getCreateEnquiryParams().get("startDate"));
+			}
+			// 投保城市统一返回
+			String cityCode = createEnquiry.getCreateEnquiryParams().getString("cityCode").substring(1);
+			String cityName = CityCodeUtil.getCityName(cityCode);
+			returnMap.put("cityName", cityName);
+
+		} else {
+			returnMap.put("insuranceStartTime", createEnquiry.getCreateEnquiryParams().get("insuranceStartTime"));
+			returnMap.put("forceInsuranceStartTime",
+					createEnquiry.getCreateEnquiryParams().get("forceInsuranceStartTime"));
+			returnMap.put("cityName", createEnquiry.getCreateEnquiryParams().getString("cityName"));
+		}
+
+		List<OfferResult> offerResults = offerResultRepository.getByCreateEnquiry(createEnquiry);
+		List<OfferResultDataResult> resultList = new ArrayList<>();
+		for (OfferResult offerResult : offerResults) {
+			OfferResultData data = offerResult.getData();
+			if (data != null) {
+				OfferResultDataResult result = data.getResult();
+				resultList.add(result);
+			}
+		}
+		returnMap.put("resultList", resultList);
+		return new ResponseBody(returnMap);
+	}
+
+}

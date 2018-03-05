@@ -1,0 +1,302 @@
+<div class="vbox bg-white">
+    <div class="wrapper-md b-b b-light">
+        <div class="h4">客户列表</div>
+    </div>
+    <div class="wrapper b-b b-light">
+        <a class="btn btn-sm btn-default" tooltip="这是操作说明" tooltip-placement="bottom"><i class="fa fa-fw fa-tag"></i> 发送短信 </a>
+        <a class="btn btn-sm btn-default" tooltip="这是操作说明" tooltip-placement="bottom"><i class="fa fa-fw fa-tag"></i> 导出excel </a>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-sm">
+                    <div class="wrapper-md bg-white-only">
+                        <div class="row text-center">
+                            <div class="col-sm-3 col-xs-6">
+                                <div>客户总数 <i class="fa fa-fw fa-caret-up text-success text-sm"></i></div>
+                                <div class="h2 m-b-sm">25001</div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div>成交客户 <i class="fa fa-fw fa-caret-down text-warning text-sm"></i></div>
+                                <div class="h2 m-b-sm">1500</div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div>平均标的额 <i class="fa fa-fw fa-caret-up text-success text-sm"></i></div>
+                                <div class="h2 m-b-sm">15.06万</div>
+                            </div>
+                            <div class="col-sm-3 col-xs-6">
+                                <div>其它指标 <i class="fa fa-fw fa-caret-down text-danger text-sm"></i></div>
+                                <div class="h2 m-b-sm">？？？</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            客户列表
+                        </div>
+                        <div class="row wrapper">
+                            <div class="col-sm-5 m-b-xs">
+                                <select class="input-sm form-control w-sm inline v-middle">
+                                    <option value="0">批量操作1</option>
+                                    <option value="1">批量操作2</option>
+                                    <option value="2">批量操作3</option>
+                                    <option value="3">批量操作4</option>
+                                </select>
+                                <button class="btn btn-sm btn-default">执行</button>                
+                            </div>
+                            <div class="col-sm-4">
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="input-group">
+                                    <input class="input-sm form-control" placeholder="Search" type="text">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-sm btn-default" type="button">过滤</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20px;">
+                                            <label class="i-checks m-b-none">
+                                                <input type="checkbox"><i></i>
+                                            </label>
+                                        </th>
+                                        <th>客户</th>
+                                        <th>主要信息</th>
+                                        <th>类型</th>
+                                        <th>标的</th>
+                                        <th>创建日期</th>
+                                        <th style="width:30px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="info">
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                   <tr class="warning">
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr class="success">
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                                 <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                     <tr class="success">
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                                 <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr> <tr>
+                                        <td><label class="i-checks m-b-none"><input name="post[]" type="checkbox"><i></i></label></td>
+                                        <td>容儿</td>
+                                        <td>330613455445564  15967170639</td>
+                                        <td>自然人</td>
+                                        <td><a href="" class=text-info">2笔</a></td>
+                                        <td>2017.05.19</td>
+                                        <td>
+                                            <a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                    
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                        <footer class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-4 hidden-xs">
+                                    <select class="input-sm form-control w-sm inline v-middle">
+                                    <option value="0">批量操作1</option>
+                                    <option value="1">批量操作2</option>
+                                    <option value="2">批量操作3</option>
+                                    <option value="3">批量操作4</option>
+                                </select>
+                                <button class="btn btn-sm btn-default">执行</button>                
+                                </div>
+                                <div class="col-sm-4 text-center">
+                                    <small class="text-muted inline m-t-sm m-b-sm">showing 20-30 of 50 items</small>
+                                </div>
+                                <div class="col-sm-4 text-right text-center-xs">                
+                                    <ul class="pagination pagination-sm m-t-none m-b-none">
+                                        <li><a href=""><i class="fa fa-chevron-left"></i></a></li>
+                                        <li><a href="">1</a></li>
+                                        <li><a href="">2</a></li>
+                                        <li><a href="">3</a></li>
+                                        <li><a href="">4</a></li>
+                                        <li><a href="">5</a></li>
+                                        <li><a href=""><i class="fa fa-chevron-right"></i></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

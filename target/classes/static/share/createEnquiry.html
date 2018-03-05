@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>询价详情</title>
+    <link rel="stylesheet" type="text/css" href="css/invite.css"/>
+</head>
+<script src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    if ('addEventListener' in document) {
+        document.addEventListener('DOMContentLoaded', function() {
+            FastClick.attach(document.body);
+        }, false);
+    }
+</script>
+<body style="text-align: center">
+    <div id="container" @click="hidenPanel" v-cloak >
+        <div id="downloadDiv">
+            <button id="downloadBtn" @click="downloadAPP">
+                <span>立即下载&ensp;优惠购险</span>
+            </button>
+        </div>
+        <div id="inviteText">
+            <img class="weight_left" src="img/weight_left.png">
+            <span class="invite_p">您的好友邀您共享优惠购险政策</span>
+            <img class="weight_right" src="img/weight_right.png">
+        </div>
+        <div class="list_card">
+            <div class="card_title">好友购险报价大比拼</div>
+            <div v-if="licenseNumber !== ''">
+                <span class="enquiry_item_2 item_title" style="text-align: left">投保车辆</span>
+                <span class="enquiry_item_2" style="text-align: right">{{licenseNumber}}</span>
+            </div>
+            <div v-if="modelName !== ''">
+                <span class="enquiry_item_2 item_title" style="text-align: left;width: 110px" v-show="modelName">厂牌型号</span>
+                <span class="enquiry_item_2" style="text-align: right;width: 200px">{{modelName}}</span>
+            </div>
+            <div v-if="boughtTime !== ''">
+                <span class="enquiry_item_2 item_title" style="text-align: left">初登日期</span>
+                <span class="enquiry_item_2" style="text-align: right">{{boughtTime | dateformat}}</span>
+            </div>
+            <div v-if="ownerName !== ''">
+                <span class="enquiry_item_2 item_title" style="text-align: left">车主</span>
+                <span class="enquiry_item_2" style="text-align: right">{{ownerName}}</span>
+            </div>
+            <div v-if="cityName !== ''">
+                <span class="enquiry_item_2 item_title" style="text-align: left">投保区域</span>
+                <span class="enquiry_item_2" style="text-align: right">{{cityName}}</span>
+            </div>
+            <div>
+                <span class="enquiry_item_2 item_title" style="text-align: left">保险公司</span>
+                <span class="enquiry_item_2" style="text-align: right">{{companyName}}</span>
+            </div>
+            <hr style="margin: 8px 8px 0px 8px">
+            <div class="itemPanel">
+                <div class="itemPanel" v-if="insuranceType[1]">
+                    <div>
+                        <span class="enquiry_item_2" style="text-align: left">
+                            <img class="weight_left" src="img/weight_left.png">
+                            <span class="item_title">{{insuranceType[1]}}</span>
+                        </span>
+                        <span class="enquiry_item_2" style="text-align: right">{{'￥'+originalForcePrice}}</span>
+                    </div>
+                    <div v-for="item in secondItems">
+                        <div class="item_panel">
+                            <span class="enquiry_item_2" style="padding-left: 10px"> {{item.insuranceName}}</span>
+                            <span class="enquiry_item_2" style="text-align: right"> {{item.price}}</span>
+                        </div>
+                    </div>
+                    <hr style="margin: 8px 8px 0px 8px">
+                </div>
+                <div>
+                    <span class="enquiry_item_2" style="text-align: left">
+                        <img class="weight_left" src="img/weight_left.png">
+                        <span class="item_title">{{insuranceType[0]}}</span>
+                    </span>
+                    <span class="enquiry_item_2" style="text-align: right">{{insuranceType[0]==='商业险'?'￥'+originalPrice :'￥'+originalForcePrice}}</span>
+                </div>
+                <div class="item_panel" v-for="item in firstItems">
+                    <div  v-if="insuranceType[0]==='商业险'">
+                        <span class="enquiry_item_3" style="width: 120px"> {{item.insuranceName}}</span>
+                        <span class="enquiry_item_3" style="text-align: center;width: 100px"> {{item.amountStr}}</span>
+                        <span class="enquiry_item_3" style="text-align: right"> {{'￥'+item.quotesPrice}}</span>
+                    </div>
+                </div>
+                <div class="item_panel" v-if="insuranceType[0]==='商业险'">
+                    <span class="enquiry_item_3" style="width: 120px">不计免赔附加</span>
+                    <span class="enquiry_item_3" style="text-align: center;width: 100px;color: #cfa639" @click.stop="showPanel"> 查看详情</span>
+                    <span class="enquiry_item_3" style="text-align: right"> {{'￥'+additionalPrice}}</span>
+                </div>
+                <hr style="margin: 8px 8px 0px 8px">
+            </div>
+            <div class="itemPanel" style="margin-bottom: 0px;">
+                <span class="enquiry_item_2 item_title" style="text-align: left">总计</span>
+                <span class="enquiry_item_2" style="text-align: right">￥{{sumPrice | number : 2}}</span>
+                <hr style="margin: 8px 8px 0px 8px">
+            </div>
+            <div v-if="startTime.length>0" class="itemPanel">
+                <div style="text-align: left;padding-left: 8px">
+                    <span>
+                        <img class="weight_left" src="img/weight_left.png">
+                        <span class="item_title">起保日期</span>
+                    </span>
+                </div>
+                <div  class="item_panel" v-for="item in startTime">
+                    <div>
+                        <span class="enquiry_item_2" style="padding-left: 10px"> {{item.type}}</span>
+                        <span class="enquiry_item_2" style="text-align: right"> {{item.time | dateformat}}</span>
+                    </div>
+                </div>
+                <hr style="margin: 8px 8px 0px 8px">
+            </div>
+            <div v-if="ratioJson.length>0" class="itemPanel">
+                <div style="text-align: left;padding-left: 8px">
+                    <span>
+                        <img class="weight_left" src="img/weight_left.png">
+                        <span class="item_title">定价系数</span>
+                    </span>
+                </div>
+                <div  class="item_panel" v-for="item in ratioJson">
+                    <div>
+                        <span class="enquiry_item_2" style="padding-left: 10px"> {{item.content}}</span>
+                        <span class="enquiry_item_2" style="text-align: right"> {{item.ratio}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="background-color: #fcbe43;height: 20px"></div>
+        <div id="showDiv" v-if="detail" v-show="show">
+            <span class="closeBtn" @click.stop="hidenPanel">x</span>
+            <div class="showPanel">{{detail}}</div>
+        </div>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.js" type="text/javascript"></script>
+    <script src="https://cdn.bootcss.com/axios/0.16.2/axios.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/createEnquiry.js"></script>
+</body>
+</html>

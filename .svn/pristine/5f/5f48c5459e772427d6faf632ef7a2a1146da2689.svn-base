@@ -1,0 +1,62 @@
+<div class="vbox">
+    <div class="wrapper b-b clearfix">
+        <div class="pull-left m-t-xs">
+            {{entity_key}} /  acts
+        </div>
+        <div class="pull-right">
+            <a class="btn btn-sm btn-danger" ui-sref="auditEntityConfig.actCreate({})">
+                <i class="fa fa-cog"></i> 新增
+            </a>
+        </div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>全称</th>
+                                <th>actCode</th>
+                                <th>按钮样列</th>
+                                <th>是否弹窗</th>
+                                <th>可手动通知</th>
+                                <th>消息类型</th>
+                                <th>分组</th>
+                                <th>行为类型</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in acts">
+                                <td class="v-middle">{{item.label}}</td>
+                                <td class="v-middle">{{item.actCode}}</td>
+                                <td class="v-middle">
+                                    <button type="button" ng-if="item.btnClass" ng-class="item.btnClass" tooltip="{{item.description}}" tooltip-placement="bottom">
+                                        <i ng-class="item.iconClass"></i> {{item.alias}}
+                                    </button>
+                                    <span ng-if="!item.btnClass">未设置</span>
+                                </td>
+                                <td class="v-middle">{{item.view}}</td>
+                                <td class="v-middle">{{item.handNotice}}</td>
+                                <td class="v-middle">{{item.messageType}}</td>
+                                <td class="v-middle">{{item.actGroup}}</td>
+                                <td class="v-middle">{{item.actType}}</td>
+                                <td colspan="2" class="clearfix v-middle">
+                                 	<a class="pull-left m-r-sm btn btn-info btn-xs" ng-click="actEdit(item.id)">
+                                 	 	<i class="fa fa-edit"></i> 编辑
+                                 	</a>
+                                 	<a class="pull-left btn btn-info btn-xs" ng-click="actRole(item.id)">
+                                 		<i class="fa fa-group"></i> 角色
+                                 	</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

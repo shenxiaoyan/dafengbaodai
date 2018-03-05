@@ -1,0 +1,267 @@
+<div class="hbox hbox-auto-xs bg-light">
+    <!-- column -->
+    <div class="col lter" style="width:500px;">
+        <div class="vbox" ng-controller="GroupSessionCtrl">
+            <div class="wrapper b-b">
+                <div class="font-thin h4">
+                    <button class="btn btn-xs btn-default pull-right"  tooltip="群成员管理" tooltip-placement="bottom" ui-toggle-class="show" target=".app-aside-right">成员管理</button>
+                    {{groups[session_id].Name}}
+                    {{sessions[session_key].SessionNick}}</div>
+            </div>
+
+            <div class="wrapper-sm lter b-b  bg-light b-light">
+                <button class="btn btn-xs btn-success" tooltip="这是操作提示" ng-click="group_act_example()"><i class="fa fa-archive"></i> 群操作</button>
+            </div>
+
+            <div class="row-row">
+                <div class="cell  scrollable hover">
+                    <div class="cell-inner msgflow" id="session_wrapper">
+                        <div ng-show='message_loading' class="text-center text-info" style='padding:5px;'>
+                            <i class='fa fa-times-circle'></i> {{message_loading}}
+                        </div>
+                        <div class="wrapper-md msgflow" ng-if="sessions[session_key]">
+                            <div ng-repeat="member in groups[group_id].MemberList">
+                                群成员：
+                                <!--
+                                <span>JoinTime {{member.JoinTime}}</span><br />
+                                <span>LastSendMsgTime {{member.LastSendMsgTime}}</span><br />
+                                <span>ShutUpUntil {{member.ShutUpUntil}}</span><br />
+                                -->
+                                <span>{{member.Role}}：{{member.Member_Account}}</span>
+                                <br />
+
+                            </div>
+                            <div ng-repeat="item in sessions[session_key].msgs">
+
+                                <div class="m-b">
+                                    <a href class=" thumb-sm avatar"  ng-class="item.From_Account == myinfo.unionid ? 'pull-right' : 'pull-left'"><img src="img/a2.jpg" alt="..."></a>
+                                    <div ng-class="item.From_Account == myinfo.unionid ? 'm-r-xxl' : 'm-l-xxl'">
+                                        <div class="pos-rlt wrapper-sm bg-white b b-light r r-2x">
+                                            <span class="arrow  pull-up arrow-light" ng-class="item.From_Account == myinfo.unionid ? 'right' : 'left'"></span>
+                                            <p class="m-b-none">
+                                                <span ng-repeat="element in item.elems">
+                                                    <span ng-if="element.type == 'TIMTextElem'" ng-controller="GroupTIMTextElemCtrl">
+                                                        <!--文本：<br />-->
+                                                        {{element.content.text}}
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMLocationElem'" ng-controller="GroupTIMLocationElemCtrl">
+                                                        位置：<br />
+                                                        Desc: {{element.content.desc}}<br />
+                                                        Latitude: {{element.content.latitude}}<br />
+                                                        Longitude: {{element.content.longitude}}<br />
+
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMFaceElem'" ng-controller="GroupTIMFaceElemCtrl">
+                                                        <!--表情：<br />
+                                                        <img src="{{element.content.emotionUrl}}" />-->
+                                                        {{element.content.data}}
+                                                        {{element.content.index}}
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMCustomElem'" ng-controller="GroupTIMCustomElemCtrl">
+                                                        自定义：<br />
+                                                        {{element.content.data}}
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMSoundElem'" ng-controller="GroupTIMSoundElemCtrl">
+                                                        <audio src="{{element.content.downUrl}}" controls="controls" preload="none"></audio>
+                                                        <!--
+                                                       声音<br />
+                                                       "UUID": {{element.content.uuid}}<br />
+                                                       "Size": {{element.content.size}}<br />
+                                                       "Second": {{element.content.second}}
+                                                        -->
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMImageElem'" ng-controller="GroupTIMImageElemCtrl">
+                                                        <!--
+                                                        图片：<br />
+                                                        "UUID": {{element.content.UUID}}<br/>
+                                                        -->
+                                                        <span ng-repeat="image in element.content.ImageInfoArray">
+                                                            <span ng-if="image.type == 3">
+                                                                <!--
+                                                               图片（要做对应的弹窗处理，与弹窗后下载原图处理）：<br />
+                                                               "type":  {{image.type}}（对应1原图、2中图、3小图）<br />
+                                                               "size": {{image.size}}<br />
+                                                               "width": {{image.width}}<br />
+                                                               "height": {{image.height}}<br />
+                                                               "url": {{image.url}}
+                                                                --> 
+                                                                <img ng-src="{{image.url}}" />
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                    <span ng-if="element.type == 'TIMFileElem'" ng-controller="GroupTIMFileElemCtrl">
+                                                        <!--
+                                                        文件 ：<br />
+                                                        "uuid": {{element.content.uuid}}<br />
+                                                        "downUrl": {{element.content.downUrl}}<br />
+                                                        "name": {{element.content.name}}<br />
+                                                        -->
+                                                        <a href="{{element.content.downUrl}}" target="_blank">{{element.content.name}}</a>
+                                                    </span>
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <small class="text-muted"><i class="fa fa-ok text-success"></i> {{item.time| datetime}}</small>
+                                        <br />
+                                        <br />
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <!--群成员管理-->
+                <div class="app-aside-right pos-fix  no-padder w-md w-auto-xs bg-white b-l animated fadeInRight hide">
+                    <div class="vbox">
+                        <div class="wrapper b-b b-t b-light m-b">
+                            <a href class="pull-right text-muted text-md" ui-toggle-class="show" target=".app-aside-right"><i class="icon-close"></i></a>
+                            群成员
+                        </div>
+                        <div class="row-row">
+                            <div class="cell">
+                                <div class="cell-inner padder">
+                                    <div class="form-group">
+                                        <label class="mute">群名</label>
+                                        <input class="form-control" ng-model="group_name" type="text" />
+                                    </div>
+
+                                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#group_members_popup">
+                                        增加成员
+                                    </button>
+
+
+                                    <ul class="list-group no-bg no-borders pull-in">
+                                        <li class="list-group-item">
+                                            <a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"    class="pull-left thumb-sm avatar m-r">
+                                                <img src="img/a4.jpg" alt="..." class="img-circle">
+                                                <i class="on b-white bottom"></i>
+                                            </a>
+                                            <div class="clear">
+                                                <a href ng-click="deleteGroupMember('110')" class="pull-right"><i class="fa fa-close"></i></a>
+                                                <div><a href ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"  >容儿</a></div>
+                                                <small class="text-muted">总部 风控专员</small>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a  ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"  class="pull-left thumb-sm avatar m-r">
+                                                <img src="img/a5.jpg" alt="..." class="img-circle">
+                                                <i class="on b-white bottom"></i>
+                                            </a>
+                                            <div class="clear">
+                                                <div><a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})">杨过</a></div>
+                                                <small class="text-muted">总部 容儿助理</small>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a  ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"  class="pull-left thumb-sm avatar m-r">
+                                                <img src="img/a6.jpg" alt="..." class="img-circle">
+                                                <i class="busy b-white bottom"></i>
+                                            </a>
+                                            <div class="clear">
+                                                <div><a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})">小新</a></div>
+                                                <small class="text-muted">台州门店 店长</small>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a  ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"  class="pull-left thumb-sm avatar m-r">
+                                                <img src="img/a7.jpg" alt="..." class="img-circle">
+                                                <i class="away b-white bottom"></i>
+                                            </a>
+                                            <div class="clear">
+                                                <div><a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})">林朝英</a></div>
+                                                <small class="text-muted">渠道商 普通员</small>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <a  ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})"  class="pull-left thumb-sm avatar m-r">
+                                                <img src="img/a8.jpg" alt="..." class="img-circle">
+                                                <i class="away b-white bottom"></i>
+                                            </a>
+                                            <div class="clear">
+                                                <div><a ui-sref="users.user.page({user_id:1,entity_type:'users',view_type:'dashboard'})">娜娜</a></div>
+                                                <small class="text-muted">台州门店 业务员</small>
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="wrapper m-t b-t b-light">
+                            <form class="m-b-none">
+                                <button class="btn w-full btn-danger" type="button">删除并退出</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="b-t b-light bg-white" ng-controller="GroupMessageFormCtrl">
+                <progressbar value="message_form_upload_bar" class="progress-xxs m-n" ng-show='message_form_upload_bar'></progressbar>
+                <div  style="padding:4px 10px 24px 10px;">
+                    <form>
+                        <div class="text-left" style="margin: 10px 0;">
+                            <input type="file" id="upd_pic" />
+                            <button class="btn btn-sm btn-primary" ng-click="upload_picture()" >
+                                上传图片
+                            </button>
+                            <input type="file" id="upd_file" />
+                            <button class="btn btn-sm btn-primary" ng-click="upload_file()">
+                                上传文件
+                            </button>
+
+                        </div>
+                        <div>
+                            <span class="input-group-btn" style="position: absolute;right:70px; bottom:10px;">
+                                <button class="btn btn-default btn-sm" type="button" ng-click="form_submit()" style="width:65px;">发送(S)</button>
+                            </span>
+                            <textarea id="message_form_input" class="no-borders" ng-model="message_input" ng-keyup="form_keyup($event)" style="height:100px;width:100%;vertical-align: top; padding:0;margin:0"></textarea>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col b-l" ui-view></div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="group_members_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"  ng-controller="GroupSessionCtrl">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">增加群成员</h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div class="col-sm-6">
+                    <div class="radio" ng-repeat="item in friends" >
+                        <label class="i-checks" ng-click="toggle_to_new_group_members(item)">
+                            <input type="checkbox" value="">
+                            <i></i>
+                            {{item.name}}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="radio" ng-repeat="item in new_group_members" >
+                        <label class="i-checks" ng-click="remove_from_new_group_members(item)">
+                             <input type="checkbox" checked value="">
+                            <i></i>
+                            {{item.name}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" ng-click="save_new_group_members()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>

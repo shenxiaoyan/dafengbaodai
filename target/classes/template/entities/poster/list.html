@@ -1,0 +1,371 @@
+<script>
+    "use strict";
+
+    app.controller("posterCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            "$timeout",
+            function ($rootScope, $scope, $http, $stateParams,$filter,$timeout) {
+                $scope.entity_key = $stateParams.entity_key;
+
+                //反馈列表
+                $scope.list = [];
+
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.searchInfo = {
+                    name:"",
+                    stateCode:"",
+                    type:""
+                };
+
+                //获取状态
+                $http({method:"GET",url:"/dafeng/poster/getStateList"}).then(
+                    function (result) {
+                        $scope.states = result.data.data;
+                    }
+                );
+                $scope.getList = function (page) {
+                    $scope.link = "/dafeng/poster/search?size=15&page=" + page;
+
+                    $http({method: "POST", url: $scope.link,data: $scope.searchInfo}).success(function (resResult) {
+                        console.log(resResult);
+                        $scope.list = resResult.data.posterList;
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#" + $scope.entity_key + "_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+                };
+
+                $scope.getList(0);
+
+                $scope.getAll = function () {
+                    $scope.searchInfo.stateCode = "";
+                    $scope.getList(0);
+                };
+
+                /*
+                * 清空按钮
+                * */
+                $scope.clearSearch = function(){
+                    $scope.searchInfo.name = "";
+					$scope.searchInfo.type = "";
+                    $scope.getList(0);
+                };
+
+                $scope.stateSelect = function($event,stateCode){
+                    console.log(stateCode);
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.searchInfo.stateCode = stateCode;
+                        $scope.searchInfo.name = "";
+                        $scope.getList(0);
+                    }
+                };
+
+                $scope.changeState = function (id,type) {
+                    var link;
+                    if(type === "enabled"){
+                        link = "/dafeng/poster/changeState?id=";
+                    } else{
+                        link = "/dafeng/poster/delete?id=";
+                    }
+                    $http.get(link+id).then(function (result) {
+                        if(result.data.ErrorCode === 0){
+                            if(type === "enabled"){
+                                $rootScope.toasterSuccess("成功！", "修改状态成功！");
+                            } else{
+                                $rootScope.toasterSuccess("成功！", "删除成功！");
+                            }
+                            $scope.getList(0);
+                        }
+                    })
+                };
+                $scope.listTip = "请选择上传文件";
+                $scope.checked = false;
+                var input = document.getElementById("fileImg");
+                input.addEventListener('change',readFile,false);
+                function readFile(){
+                    var fd = new FormData();
+                    var file = this.files[0];
+                    fd.append("file", file);
+                    $http({
+                        method: "POST",
+                        url: "/dafeng/fileUpload",
+                        headers: {
+                            "Content-Type": undefined
+                        },
+                        timeout: 0,
+                        transformRequest: angular.identity,
+                        data: fd
+                    }).success(function (resResult) {
+                        console.log(resResult);
+                        var image = resResult.data.imageInfo[2];
+
+                        $scope.imageInfo = {
+                            height: image.Height,
+                            size: image.Size,
+                            imgUrl: "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/"+image.URL,
+                            width: image.Width
+                        };
+                        var imgUrl = "http://fengxianwuyou.oss-cn-hangzhou.aliyuncs.com/"+image.URL;
+                        var textHtml = "<img src='"+imgUrl+"'width='250px' height='180px'/>";
+                        $(".imageCrop").empty();
+                        console.log($(".imageCrop"));
+                        $(".imageCrop").append(textHtml);
+                    }).error(function () {
+                        $rootScope.toasterError("失败！", "保存失败！");
+                    });
+                }
+
+                $scope.submitClick = function () {
+                    if($scope.posterName === "" || $scope.posterType === "" || $("#fileImg").val() === ""){
+                        $rootScope.toasterError("失败！", "请输入必填数据");
+                        return 0;
+                    }
+                    $scope.imageInfo.name = $scope.posterName;
+                    $scope.imageInfo.posterType = $scope.posterType;
+                    $http({method:"POST",url:"/dafeng/poster/save",data:$scope.imageInfo}).then(
+                        function (result) {
+                            if(result.data.ErrorCode === 0){
+                                $timeout(function () {
+                                    $("#upload_poster").modal("hide");
+                                    $scope.$apply();
+                                    $rootScope.toasterSuccess("成功！", "新增成功！");
+                                    $scope.getList(0);
+                                },0,false);
+
+                            }else{
+                                $rootScope.toasterError("失败！", result.data.ErrorInfo);
+                            }
+                        })
+                };
+
+                $('#upload_poster').on('hide.bs.modal',
+                    function() {
+                        $scope.posterName = "";
+                        $("#fileImg").val("");
+                        $(".imageCrop").remove();
+                        $scope.posterType = "";
+                        $scope.$apply();
+                    })
+            }
+        ]
+    );
+</script>
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="posterCtrl">
+    <!-- column -->
+    <div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+        <div class="inline pull-left m-r">
+            <label class="i-checks pull-left m-n">
+                <input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+            </label>
+        </div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"/><i></i> {{ state.label }}
+            </label>
+        </div>
+        <div class="pull-right m-r inline">
+            <button type="button" class="btn m-b-xs btn-sm btn-danger btn-addon"
+                    data-toggle="modal"
+                    data-target="#upload_poster">
+                <i class="fa fa-plus"></i>上传
+            </button>
+        </div>
+    </div>
+
+
+    <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <!--开始-->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-heading" ng-if="list.length > 0">
+                                        查询结果
+                                    </div>
+                                    <div class="panel-heading" ng-if="list.length < 1">
+                                        暂无数据！
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <select type="text" class="form-control"
+                                                ng-model="searchInfo.type"
+                                                autocomplete="off">
+                                            <option value="" selected>请选择海报类型</option>
+                                            <option value="APHORISM" selected>名言</option>
+                                            <option value="FESTIVAL" selected>节日</option>
+                                            <option value="PRODUCT" selected>产品</option>
+                                            <option value="OTHER" selected>其他</option>
+                                        </select>
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入海报名称"
+                                               ng-model="searchInfo.name"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="getList(0)">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>海报名称</th>
+                                            <th>分类</th>
+                                            <th>状态</th>
+                                            <th>上传时间</th>
+                                            <th>更新时间</th>
+                                            <th ng-if="searchInfo.stateCode !== 'DELETED'">操作</th>
+                                            <th>图片</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.type| posterType }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.state }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt/1000 | datetime }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.lastModifiedAt/1000 | datetime }}
+                                            </td>
+                                            <td class="v-middle" ng-if="searchInfo.stateCode !== 'DELETED'">
+                                                <button class="btn btn-xs btn-danger"
+                                                        ng-if="item.state === '有效'"
+                                                        ng-click="changeState(item.id,'enabled')">
+                                                    禁用
+                                                </button>
+                                                <button class="btn btn-xs btn-success"
+                                                        ng-if="item.state === '无效'"
+                                                        ng-click="changeState(item.id,'enabled')">
+                                                    启用
+                                                </button>
+                                                <button class="btn btn-xs btn-info" ng-if="item.state !== '已删除'" ng-click="changeState(item.id,'delete')">
+                                                    删除
+                                                </button>
+                                            </td>
+                                            <td class="v-middle">
+                                                <img ng-if="item.image.imgUrl.length>0" style="height: 80px;width:150px;margin: 10px 20px 10px 0px;" class="img-responsive" ng-src={{item.image.imgUrl}}>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div>
+                            <!--结束-->
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper b-t b-light clearfix">
+                     <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                     <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="upload_poster" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <h4 class="modal-title">上传海报</h4>
+                    </div>
+                    <div class="modal-body contentFont">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label" style="padding-left: 1px"><span class="text-danger">*</span>海报名称：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control"
+                                           ng-model="posterName"
+                                           placeholder="请输入海报名称"
+                                           autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-2 control-label" style="padding-left: 1px"><span class="text-danger">*</span>海报类型：</label>
+                                <div class="col-sm-8">
+                                    <select type="text" class="form-control"
+                                           ng-model="posterType"
+                                           autocomplete="off">
+                                        <option value="" selected>请选择海报类型</option>
+                                        <option value="APHORISM" selected>名言</option>
+                                        <option value="FESTIVAL" selected>节日</option>
+                                        <option value="PRODUCT" selected>产品</option>
+                                        <option value="OTHER" selected>其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"><span class="text-danger">*</span>上传海报:</label>
+                                <div class="col-sm-4">
+                                    <a href="javascript:" class="file">
+                                        <input type="file" name="" id="fileImg" ng-model="file">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-lg-3 control-label"></label>
+                                <div class="col-lg-6">
+                                    <div class="imageCrop">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" ng-click="submitClick()">提交</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+
+
+

@@ -1,0 +1,332 @@
+<script>
+
+    app.controller("teamInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams, $state, $filter) {
+
+                $scope.teamId = $stateParams.id;
+
+                $scope.teamMemberModal = {};
+                $scope.team = {};
+                $scope.numbers = {};
+                $scope.currentObjective = {};
+
+                $scope.entity_id = $stateParams.id;
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                //当前列表
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "GET",
+                        url : "/dafeng/team/info?size=15&page=" + page + "&teamId=" + $scope.entity_id
+                    }).success(function(resResult){
+
+
+                        $scope.team = resResult.data.team;
+
+                        $scope.members = resResult.data.members;
+
+                        $scope.currentObjective = resResult.data.currentObjective;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+
+                /*新增  http://localhost/dafeng/user/getNoTeamCustomer?phone=157*/
+                $('#mumber_phone').autocomplete({
+                    serviceUrl: '/dafeng/user/getNoTeamCustomer',
+                    paramName: "phone",
+                    noCache: true,
+                    type: "get",
+                    minChars: 4,
+                    maxHeight: 200,
+//                    dataType:"jsonp",
+                    onSelect: function (suggestions) {
+
+                        if (suggestions.obj.phone) {
+                            $('#addMember').focus();
+
+                            $scope.$apply(
+
+                                $scope.teamMemberModal.na = suggestions.obj.realName,
+                                $scope.teamMemberModal.phone = suggestions.obj.phone,
+                                $scope.teamMemberModal.id = suggestions.obj.id
+                            )
+                        } else {
+
+                            $('#addModalBtn').addClass(disabled);
+
+                            $scope.$apply(
+
+                                $scope.teamMemberModal.teamLader = "",
+                                $scope.teamMemberModal.phone = "",
+                                $scope.teamMemberModal.id = ""
+                            )
+
+                        }
+                        $(this).val(suggestions.data).blur();
+
+                    },
+                    transformResult: function (response) {
+
+                        if(response.ErrorCode){
+                            $scope.teamMemberModal.na = "";
+                            $scope.teamMemberModal.id = "";
+                        }else{
+                            return {
+                                suggestions: $.map(JSON.parse(response).data, function(dataItem) {
+                                    return {
+                                        value: dataItem.phone + " " + dataItem.realName,
+                                        data: dataItem.phone,
+                                        obj: dataItem
+                                    };
+                                })
+                            };
+                        }
+
+                    }
+                });
+
+                //判断
+                $scope.teamPhone = function(){
+
+                    $scope.teamMemberModal.id = "";
+                    $scope.teamMemberModal.na = "";
+
+                };
+
+
+
+                /*
+                * 新增成员
+                * */
+
+                $scope.confirmAddNumber = function(){
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/team/addMember",
+                        params : {
+                            teamId : $scope.entity_id,
+                            customerId : $scope.teamMemberModal.id
+                        }
+                    }).success(function (resResult) {
+
+                        if(resResult.ErrorCode){
+
+                            $rootScope.toasterError("失败！", resResult.ErrorInfo);
+
+                        }else{
+
+                            $rootScope.toasterSuccess("成功！", "新建成功！");
+                            $("#add_modal_member").modal("hide");
+                            $scope.teamMemberModal = {};
+                            $scope.getList(0);
+
+                        }
+                    }).error(function () {
+
+                        $rootScope.toasterError("失败！", "新建失败！");
+                        $scope.teamMemberModal = {};
+
+                    });
+                };
+
+
+                //正则验证
+                $scope.getSelect = function(name, phone){
+                    if (name && phone) {
+
+                        $scope.confirmAddNumber();
+
+                    } else {
+                        $rootScope.toasterWarning("失败！", " 您所填写的联系人号码已有团队或没有完善粉丝信息或不是前段用户！");
+                    }
+                };
+
+
+                /*
+                 *  移除团队的成员
+                * */
+                $scope.outputMember = function(id){
+                    var remove = function(){
+                        $http({
+                            method : "GET",
+                            url : "/dafeng/team/dropTeam?customerId=" + id
+                        }).success(function(resResult){
+                            if(resResult.ErrorCode){
+                                $rootScope.toasterError("失败！", resResult.ErrorInfo);
+                            }else{
+                                $rootScope.toasterSuccess("成功！", "移除成功！");
+                                $scope.getList(0);
+                            }
+                        }).error(function(resResult){
+                            $rootScope.toasterWarning("失败！", resResult.ErrorInfo);
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认移除此成员吗？", remove);
+
+                };
+
+                /*
+                * 清除填写的信息
+                * */
+                $scope.clearSearch = function(){
+                    $scope.teamMemberModal = {};
+                    $scope.getList(0);
+                };
+
+            }
+        ]
+    );
+</script>
+
+
+<div ng-controller="teamInfoCtrl">
+    <div class="b-b clearfix wrapper-md bg-light">
+        <div class="pull-left h4">
+            <span>
+                团队详情
+            </span>
+        </div>
+        <div class="pull-right">
+            <button class="btn btn-danger"
+                    data-target="#add_modal_member"
+                    data-toggle="modal">
+                添加成员
+            </button>
+        </div>
+    </div>
+    <div style="background:url(img/c1.jpg) center center; background-size:cover">
+        <div class="wrapper-lg bg-white-opacity">
+            <div class="row m-t">
+                <div class="col-sm-7">
+                    <div class="clear m-b">
+                        <div class="m-b m-t-sm">
+                            <span class="h3 text-black">{{team.label}}</span>
+                            <div class="text-black" style="margin: 10px 0 0 20px;">
+                                <small class="m-l">队长名称：{{team.contactName}}</small>
+                                <small class="m-l">队长联系方式：{{team.contactPhone}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper-md"  style="padding-bottom: 0">
+        <table class="table" style="margin-bottom: 0">
+            <caption style="font-weight:900;font-size:20px;">本团队下的所有代理人</caption>
+            <thead>
+            <tr>
+                <th>代理人姓名</th>
+                <th>代理人电话</th>
+                <th>代理人角色</th>
+                <th>车险已完成单数</th>
+                <th>车险已完成额度（万元）</th>
+                <th>非车险已完成单数</th>
+                <th>非车险已完成额度（万元）</th>
+                <th>加入团队时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in members">
+                <td class="v-middle">{{item.realName ? item.realName : "暂无"}}</td>
+                <td class="v-middle">{{item.phone ? item.phone : "暂无" }}</td>
+                <td class="v-middle">{{item.teamRole ? (item.teamRole | teamMumberRole): "暂无" }}</td>
+                <td class="v-middle">{{item.autoNum ? (item.autoNum | number : 2) : "0" }}</td>
+                <td class="v-middle">{{item.autoCompletion ? ((item.autoCompletion/10000) | number : 2) : "0" }}</td>
+                <td class="v-middle">{{item.lifeNum ? item.lifeNum : "0" }}</td>
+                <td class="v-middle">{{item.lifeCompletion ? ((item.lifeCompletion/10000) | number : 2) : "0" }}</td>
+                <td class="v-middle">{{item.joinTime ? (item.joinTime | dateSecondTime) : "-" }}</td>
+                <td class="v-middle">
+                    <button class="btn btn-xs btn-success" ng-hide="item.teamRole === 'captain'" ng-click="outputMember(item.id)">
+                        移除成员
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="b-t b-light clearfix">
+        <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+    </div>
+
+    <div class="modal fade" id="add_modal_member" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"  data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">新增成员</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="get">
+                        <div class="form-group">
+                            <label for="mumber_phone">成员手机号</label>
+                            <input type="number"
+                                   id="mumber_phone"
+                                   required="required"
+                                   class="form-control"
+                                   ng-change="teamPhone()"
+                                   ng-model="teamMemberModal.phone"
+                                   placeholder="请输入成员手机号">
+                        </div>
+                        <div class="form-group">
+                            <label for="mumber_name">成员姓名</label>
+                            <input type="text"
+                                   id="mumber_name"
+                                   disabled
+                                   required="required"
+                                   class="form-control"
+                                   ng-model="teamMemberModal.na"
+                                   placeholder="请输入成员姓名">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" type="button" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                    <button class="btn btn-danger" type="button" id="addMember" ng-click="getSelect(teamMemberModal.na,teamMemberModal.phone)">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

@@ -1,0 +1,68 @@
+
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light">
+
+
+	<div class="col w-md b-r ">
+
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">客户</div>
+			</div>
+			<div class="wrapper b-b">
+				<div class="btn-group pos-stc">
+					<div class="btn-group dropdown">
+						<a ui-sref="customers.create"
+							class="pull-right btn btn-sm btn-danger w-auto-xs dropdown-toggle"
+							tooltip="新建客户" tooltip-placement="bottom"><i
+							class="fa fa-fw fa-tag"></i> 新建 </a>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+
+						<ul class="nav nav-pills nav-stacked nav-sm">
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'all'})">&nbsp;&nbsp;<b>客户类型</b></a>
+							</li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'enterprise'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;企业
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'people'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;个人
+							</a></li>
+							<br />
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'un3submit'})">&nbsp;&nbsp;<b>客户分析</b></a>
+							</li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'uns4ubmit'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;客户转化率漏斗模型
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'un5submit'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;渠道&终端综合分析
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'uns6ubmit'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;利润贡献分析
+							</a></li>
+							<li ui-sref-active="active"><a
+								ui-sref="customers.list({status:'un9ubmit'})">&nbsp;&nbsp;<i
+									class="fa fa-angle-right"></i> &nbsp;&nbsp;逾期坏账客户专题分析
+							</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

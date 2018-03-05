@@ -1,0 +1,281 @@
+<script>
+	app.controller("insuranceResultListCtrl",
+	    [
+	        "$rootScope",
+	        "$scope",
+	        "$http",
+	        "$stateParams",
+	        function ($rootScope, $scope, $http, $stateParams) {
+
+                //状态栏
+                $scope.states = [];
+                $scope.search = {};
+
+                $scope.getStates = function () {
+                    $http.get("/rest/insuranceResultStates")
+                        .success(function (resResult) {
+                            $scope.states = resResult._embedded.insuranceResultStates;
+                        });
+                };
+
+                $scope.getStates();
+
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+
+	            //单数 例user
+	            $scope.state_code = $stateParams.state_code;
+//	            console.log($scope.state_code)
+
+	            $scope.list = [];
+
+	            $scope.getList = function (page) {
+	               
+	                $scope.link = "/dafeng/searchInsuranceResult?size=15&page=" + page + "&sort=createdAt,desc";
+	                $http({method: "POST", url: $scope.link, data: {}}).success(function (resResult) {
+
+	                    $scope.list = resResult.insuranceResults;
+
+                        $scope.pageList = {
+                            size: resResult.page.size,
+                            total_elements: resResult.page.totalElements,
+                            current_page: resResult.page.number === 0 ? 0 : resResult.page.number,
+                            num_page: resResult.page.totalPages,
+                            total_page: resResult.page.totalPages
+                        };
+
+	                    if ($scope.list.length > 0) {
+	                        $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+	                    }
+	                });
+	            };
+
+	            $scope.getList(0);
+
+                //根据搜索框搜索
+                $scope.search = function(page){
+
+					if($scope.searchInfo.orderId || $scope.searchInfo.insuranceCompanyName || $scope.searchInfo.licenseNumber || $scope.searchInfo.insuredName || $scope.searchInfo.customerPhone){
+                        $http({
+                            method:"POST",
+                            url:"/dafeng/searchInsuranceResult?size=15&page=" +page,
+                            data: $scope.searchInfo
+
+                        }).then(function(resResult){
+
+                            console.log(resResult);
+
+                            $scope.list = resResult.data.insuranceResults;
+
+                            $scope.pageList = {
+                                size: resResult.data.page.size,
+                                total_elements: resResult.data.page.totalElements,
+                                current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                                num_page: resResult.data.page.totalPages,
+                                total_page: resResult.data.page.totalPages
+                            };
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.search);
+                            }
+                        });
+					}else{
+                        $rootScope.toasterWarning("失败！","请填写搜索信息！");
+                    }
+                };
+
+                //按搜索条件导出
+				$scope.insureExport = function(time){
+                    window.location.href = "/dafeng/downloadInsuranceResult?range="+ time ;
+                };
+
+
+                //清除搜索
+                $scope.clearSearch = function(){
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+	        }
+	    ]
+	);
+</script>
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="insuranceResultListCtrl">
+	<!-- column -->
+	<div class="col w-md lter b-l">
+		<div class="vbox">
+			<div class="wrapper b-b b-light clearfix">
+				<div class="">
+					<div class="w inline m-r">
+						<input type="text" class="form-control"
+							   placeholder="请输入出单单号"
+							   ng-model="searchInfo.orderId"
+							   autocomplete="off">
+					</div>
+					<div class="w inline m-r">
+						<input type="text" class="form-control"
+							   placeholder="请输入保险公司"
+							   ng-model="searchInfo.insuranceCompanyName"
+							   autocomplete="off">
+					</div>
+					<div class="w inline m-r">
+						<input type="text" class="form-control"
+							   placeholder="请输入车牌号"
+							   ng-model="searchInfo.licenseNumber"
+							   autocomplete="off">
+					</div>
+					<div class="w inline m-r">
+						<input type="text" class="form-control"
+							   placeholder="请输入车主"
+							   ng-model="searchInfo.insuredName"
+							   autocomplete="off">
+					</div>
+					<div class="w inline m-r">
+						<input type="text" class="form-control"
+							   placeholder="请输入出单人电话"
+							   ng-model="searchInfo.customerPhone"
+							   autocomplete="off">
+					</div>
+					<div class="inline">
+						<button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+							<span>查询</span>
+						</button>
+						<button type="button" class="btn btn-default" ng-click="clearSearch()">
+							<span>清除</span>
+						</button>
+					</div>
+					<div class="inline pull-right">
+						<button type="button" class="btn btn-info" ng-click="insureExport('day')">
+							<span>导出今日</span>
+						</button>
+						<button type="button" class="btn btn-info" ng-click="insureExport('threeday')">
+							<span>最近三天导出</span>
+						</button>
+						<button type="button" class="btn btn-info" ng-click="insureExport('week')">
+							<span>本周导出</span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="row-row">
+				<div class="cell">
+					<div class="cell-inner">
+						<div class="wrapper">
+							<div class="panel panel-default" style="width: 2600px">
+								<div class="panel-heading" ng-if="list.length > 0">
+									<span class="m-r">查询结果</span>
+								</div>
+								<div class="panel-heading" ng-if="list.length < 1">
+									暂无数据！
+								</div>
+								<div class="table-responsive" ng-if="list.length > 0">
+									<table class="table table-hover b-t b-light scroll-x">
+										<thead>
+										<tr class="enchangeClaimed_tr">
+											<th>出单单号</th>
+											<th>商业险保单号</th>
+											<th>交强险保单号</th>
+											<th>投保公司</th>
+											<th>车牌号</th>
+											<th>车主</th>
+											<th>商业险保费</th>
+											<th>交强险保费</th>
+											<th>保费合计</th>
+											<th>出单时间</th>
+											<th>出单人电话</th>
+											<th>联系人</th>
+											<th>联系电话</th>
+											<th>配送地址</th>
+											<th>大蜂联系人</th>
+											<th>大蜂联系电话</th>
+											<th>大蜂配送地址</th>
+
+										</tr>
+										</thead>
+										<!--<tbody  style="height: 2800px;" class="companyClaimedBody">-->
+										<tbody>
+										<tr ng-repeat="item in list">
+											<td class="v-middle">
+												{{item.data.orderId ? item.data.orderId : "暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.data.biPolicyNo ? item.data.biPolicyNo : "暂无" }}
+											</td>
+											<td class="v-middle">
+												{{item.data.ciPolicyNo ? item.data.ciPolicyNo : "暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.offerResult.insuranceCompanyName ? item.offerResult.insuranceCompanyName : "暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.data.licenseNumber ? item.data.licenseNumber : "暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.ownerName ? item.submitProposal.ownerName :"暂无"}}
+											</td>
+											<td class="v-middle">
+												{{ item.offerResult.originalPrice ? (item.offerResult.originalPrice | number : 2) : 0}}
+											</td>
+											<td class="v-middle">
+												{{ item.offerResult.originalForcePrice ? (item.offerResult.originalForcePrice | number : 2) : 0}}
+											</td>
+											<td class="v-middle">
+												{{ item.offerResult.sumPrice ? (item.offerResult.sumPrice | number : 2) : "0"}}
+											</td>
+											<td class="v-middle">
+												{{item.createdAt === null? "暂无" : (item.createdAt | dateSecondTime)}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.customerPhone ? item.submitProposal.customerPhone : "暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.contactName ? item.submitProposal.contactName :"暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.contactPhone ? item.submitProposal.contactPhone :"暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.contactAddress.contactAddressDetail ? item.submitProposal.contactAddress.contactAddressDetail :"暂无"}}
+											</td>
+
+
+											<td class="v-middle">
+												{{item.submitProposal.dafengContactName ? item.submitProposal.dafengContactName :"暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.dafengContactPhone ? item.submitProposal.dafengContactPhone :"暂无"}}
+											</td>
+											<td class="v-middle">
+												{{item.submitProposal.dafengAddress ? item.submitProposal.dafengAddress :"暂无"}}
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper b-t b-light clearfix">
+				<ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+				<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+			</div>
+		</div>
+	</div>
+	<!-- /column -->
+</div>

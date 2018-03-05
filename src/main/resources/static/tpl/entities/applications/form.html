@@ -1,0 +1,47 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h4">终端名称</h1>
+</div>
+<div class="wrapper-md">
+    <p class="m-b">这是配置人员要用的，页面不重要</p>
+    <form class="form-validation form-horizontal">
+        <div class="form-group">
+            <label for="label" class="col-sm-2 control-label">终端名称</label>
+            <div class="col-sm-6">
+                <input type="text" name="label" placeholder="终端名称" class="form-control" ng-model="label" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="app_code" class="col-sm-2 control-label">app_code</label>
+            <div class="col-sm-6">
+                <input type="text" name="app_code" placeholder="唯一标识 code" class="form-control" ng-model="app_code" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="app_secret" class="col-sm-2 control-label">app_secret</label>
+            <div class="col-sm-6">
+                <input type="text" name="app_secret" placeholder="访问进来的appsecret" class="form-control" ng-model="app_secret" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="description" class="col-sm-2 control-label">描述</label>
+            <div class="col-sm-6">
+                <textarea  name="description" class="form-control" ng-model="description">
+
+                </textarea>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="submit" class="col-sm-2 control-label sr-only"></label>
+            <div class="col-sm-6">
+                <button type="button" class="btn btn-success">保存</button>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+
+

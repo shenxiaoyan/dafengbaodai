@@ -1,0 +1,518 @@
+package com.liyang.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
+
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.customer.CustomerRepository;
+import com.liyang.domain.customer.CustomerVO;
+import com.liyang.domain.insuranceresult.InsuranceResult;
+import com.liyang.domain.insuranceresult.InsuranceResultRepository;
+import com.liyang.domain.offerresult.OfferResultDataResult;
+import com.liyang.domain.role.Role;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.team.Team;
+import com.liyang.domain.team.TeamAct;
+import com.liyang.domain.team.TeamActRepository;
+import com.liyang.domain.team.TeamBean;
+import com.liyang.domain.team.TeamLog;
+import com.liyang.domain.team.TeamLogRepository;
+import com.liyang.domain.team.TeamRepository;
+import com.liyang.domain.team.TeamState;
+import com.liyang.domain.team.TeamStateRepository;
+import com.liyang.domain.teamadvertise.TeamAdvertise;
+import com.liyang.domain.teamadvertise.TeamAdvertiseRepository;
+import com.liyang.domain.teamadvertise.TeamAdvertiseTO;
+import com.liyang.domain.teamobjective.TeamObjective;
+import com.liyang.domain.teamobjective.TeamObjectiveRepository;
+import com.liyang.domain.teamobjective.TeamObjectiveTO;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.util.DateUtil;
+import com.liyang.util.FailReturnObject;
+import com.liyang.util.InviteCodeUtil;
+import com.liyang.util.PageUtil;
+
+/**
+ * 
+ * @author Adam
+ *
+ */
+@Service
+public class TeamService extends AbstractAuditorService<Team, TeamState, TeamAct, TeamLog> {
+
+	@Autowired
+	TeamRepository teamRepository;
+	@Autowired
+	TeamLogRepository teamLogRepository;
+	@Autowired
+	TeamActRepository teamActRepository;
+	@Autowired
+	TeamStateRepository teamStateRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	CustomerRepository customerRepository;
+	@Autowired
+	CustomerService customerService;
+	@Autowired
+	TeamObjectiveRepository teamObjRepository;
+	@Autowired
+	TeamAdvertiseRepository teamAdvRepository;
+	@Autowired
+	InsuranceResultRepository insResultRepository;
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+		if (teamActRepository.count() <= 0) {
+			// 初始化行为
+			TeamAct act1 = new TeamAct("创建", "create", 10, ActGroup.UPDATE);
+			TeamAct act2 = new TeamAct("读取", "read", 20, ActGroup.READ);
+			TeamAct act3 = new TeamAct("更新", "update", 30, ActGroup.UPDATE);
+			TeamAct act4 = new TeamAct("删除", "delete", 40, ActGroup.UPDATE);
+			act1 = teamActRepository.save(act1);
+			act2 = teamActRepository.save(act2);
+			act3 = teamActRepository.save(act3);
+			act4 = teamActRepository.save(act4);
+			// 为管理员初始化权限
+			Role administrator = roleRepository.findByRoleCode("ADMINISTRATOR");
+			act1.setRoles(new HashSet<>(Arrays.asList(administrator)));
+			act2.setRoles(new HashSet<>(Arrays.asList(administrator)));
+			act3.setRoles(new HashSet<>(Arrays.asList(administrator)));
+			act4.setRoles(new HashSet<>(Arrays.asList(administrator)));
+			act1 = teamActRepository.save(act1);
+			act2 = teamActRepository.save(act2);
+			act3 = teamActRepository.save(act3);
+			act4 = teamActRepository.save(act4);
+			// 初始化状态
+			TeamState appliedState = new TeamState("待审核", 100, "APPLIED");
+			appliedState.setActs(Arrays.asList(act1, act2, act3, act4).stream().collect(Collectors.toSet()));
+			teamStateRepository.save(appliedState);
+			TeamState rejectedState = new TeamState("审核不通过", 200, "REJECTED");
+			appliedState.setActs(Arrays.asList(act1, act2, act3, act4).stream().collect(Collectors.toSet()));
+			teamStateRepository.save(rejectedState);
+			TeamState enableState = new TeamState("有效", 300, "ENABLED");
+			enableState.setActs(Arrays.asList(act1, act2, act3, act4).stream().collect(Collectors.toSet()));
+			teamStateRepository.save(enableState);
+			TeamState deletedState = new TeamState("已删除", 400, "DELETED");
+			deletedState.setActs(Arrays.asList(act2).stream().collect(Collectors.toSet()));
+			teamStateRepository.save(deletedState);
+		}
+	}
+
+	@Override
+	public LogRepository<TeamLog> getLogRepository() {
+		return teamLogRepository;
+	}
+
+	@Override
+	public TeamLog getLogInstance() {
+		return new TeamLog();
+	}
+
+	@Override
+	public AuditorEntityRepository<Team> getAuditorEntityRepository() {
+		return teamRepository;
+	}
+
+	@Override
+	public ActRepository<TeamAct> getActRepository() {
+		return teamActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new Team().setService(this);
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new Team().setLogRepository(teamLogRepository);
+	}
+
+	/**
+	 * 新增
+	 * 
+	 * @param team
+	 */
+	@Transactional
+	public Team save(Team team, String stateCode) {
+		if (null != existOne(team.getLabel())) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_NAME_REPEAT_ERROR);
+		}
+		TeamState enableState = teamStateRepository.findByStateCode(stateCode);
+		team.setState(enableState);
+		team.setContactName(team.getCaptain().getAccount().getRealName());
+		team.setContactPhone(team.getCaptain().getPhone());
+		team.setTeamInviteCode(generateInviteCode());
+		team.getCaptain().setTeam(team);
+		team.getCaptain().setJoinTime(new Date());
+		team = teamRepository.save(team);
+		return team;
+	}
+
+	/**
+	 * 根据名称从非删除状态查询
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Team existOne(String name) {
+		return teamRepository.findByLabelAndState_StateCodeIn(name, new String[] { "APPLIED", "ENABLED" });
+	}
+
+	/**
+	 * 生成不重复团队邀请码
+	 * 
+	 * @return
+	 */
+	public String generateInviteCode() {
+		String teamInviteCode = "";
+		Team team = null;
+		do {
+			teamInviteCode = InviteCodeUtil.genetateInviteCode();
+			team = teamRepository.findByTeamInviteCode(teamInviteCode);
+		} while (null != team);
+		return teamInviteCode;
+	}
+
+	/**
+	 * 多条件分页查询
+	 * 
+	 * @param teamBean
+	 */
+	public Page<Team> query(TeamBean teamBean, Pageable pageable) {
+		Page<Team> teamPage = null;
+		if (null == teamBean) {
+			teamPage = teamRepository.findAll(pageable);
+		} else {
+			teamPage = teamRepository.findAll(new Specification<Team>() {
+				@Override
+				public Predicate toPredicate(Root<Team> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+					List<Predicate> predicateList = new ArrayList<>();
+					if (!StringUtils.isEmpty(teamBean.getLabel())) {
+						Predicate labelEqual = cb.equal(root.get("label"), teamBean.getLabel());
+						predicateList.add(labelEqual);
+					}
+					if (!StringUtils.isEmpty(teamBean.getContactName())) {
+						Predicate contactNameEqual = cb.equal(root.get("contactName"), teamBean.getContactName());
+						predicateList.add(contactNameEqual);
+					}
+					if (!StringUtils.isEmpty(teamBean.getContactPhone())) {
+						Predicate contactPhoneLike = cb.like(root.get("contactPhone"),
+								"%" + teamBean.getContactPhone() + "%");
+						predicateList.add(contactPhoneLike);
+					}
+					if (!StringUtils.isEmpty(teamBean.getStateCode())) {
+						Predicate stateEqual = cb.equal(root.get("state").get("stateCode"), teamBean.getStateCode());
+						predicateList.add(stateEqual);
+					}
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+					return null;
+				}
+			}, pageable);
+		}
+		return teamPage;
+	}
+
+	/**
+	 * Id 查找
+	 * 
+	 * @param teamId
+	 * @return
+	 */
+	public Team findOne(Integer teamId) {
+		// return teamRepository.findOne(teamId);
+		return teamRepository.findById(teamId);
+	}
+
+	/**
+	 * 添加成员
+	 * 
+	 * @param team
+	 * @param customer
+	 */
+	@Transactional
+	public Customer addTeamMember(Team team, Customer customer) {
+		customer.setTeam(team);
+		customer.setJoinTime(new Date());
+		return customerRepository.save(customer);
+	}
+
+	/**
+	 * 获取团队成员数量
+	 * 
+	 * @param teamId
+	 * @return
+	 */
+	public Integer getMemberNum(Integer teamId) {
+		// return teamRepository.findOne(teamId).getMembers().size();
+		return customerRepository.countByTeam_Id(teamId);
+	}
+
+	/**
+	 * 清空团员并变更状态为删除
+	 * 
+	 * @param team
+	 */
+	@Transactional
+	public Team deleteTeam(Team team) {
+		TeamState teamState = teamStateRepository.findByStateCode("DELETED");
+		team.setState(teamState);
+		return teamRepository.save(team);
+	}
+
+	/**
+	 * 更新团队基本信息
+	 * 
+	 * @param team
+	 * @param teamBean
+	 * @return
+	 */
+	public Team update(Team team, TeamBean teamBean) {
+		if (!StringUtils.isEmpty(teamBean.getLabel())) {
+			team.setLabel(teamBean.getLabel());
+		}
+		if (null != teamBean.getCaptainId()) {
+			Customer captain = customerService.findOne(teamBean.getCaptainId());
+			customerService.validTeamCaptainQualification(captain);
+			team.setCaptain(captain);
+			team.setContactName(captain.getAccount().getRealName());
+			team.setContactPhone(captain.getPhone());
+		}
+		return teamRepository.save(team);
+	}
+
+	/**
+	 * 获取团队详细信息(含当月业绩信息、成员列表)
+	 * 
+	 * @param teamId
+	 */
+	public Map<String, Object> getInfo(Integer teamId, Pageable pageable) {
+		Map<String, Object> returnMap = new HashMap<>();
+		Team team = teamRepository.findOne(teamId);
+		TeamBean teamBean = new TeamBean();
+		BeanUtils.copyProperties(team, teamBean);
+		returnMap.put("team", teamBean);
+		TeamObjective currentObjective = teamObjRepository.findByTeamAndPeriod(team,
+				DateUtil.format2YearMonthStr(new Date()));
+		TeamObjectiveTO teamObjectiveTO = new TeamObjectiveTO();
+		if (null != currentObjective) {
+			BeanUtils.copyProperties(currentObjective, teamObjectiveTO);
+			returnMap.put("currentObjective", teamObjectiveTO);
+		}
+		Page<Customer> memberPage = customerRepository.findByTeam_Id(team.getId(), pageable);
+		List<CustomerVO> memberTOList = getMembersInfo(team, memberPage.getContent());
+		returnMap.put("members", memberTOList);
+		returnMap.put("page", PageUtil.getPageData(memberPage));
+		return returnMap;
+	}
+
+	/**
+	 * 团队成员列表信息
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public List<CustomerVO> getMembersInfo(Team team, List<Customer> customerList) {
+		List<CustomerVO> memberTOList = new ArrayList<>();
+		Date thisMoment = new Date();
+		for (Customer customer : customerList) {
+			CustomerVO customerTO = copyCustomerInfo(customer, team, thisMoment);
+			memberTOList.add(customerTO);
+		}
+		return memberTOList;
+
+	}
+
+	/**
+	 * 单个用户信息处理
+	 */
+	public CustomerVO copyCustomerInfo(Customer customer, Team team, Date date) {
+		CustomerVO customerTO = new CustomerVO();
+		BeanUtils.copyProperties(customer, customerTO);
+		// 设置真实姓名，防止新邀请成员account为空
+		if (null != customer.getAccount()) {
+			customerTO.setRealName(customer.getAccount().getRealName());
+		} else {
+			customerTO.setRealName(customer.getNickname());
+		}
+		if (team.getCaptain().getId() == customer.getId()) {
+			customerTO.setTeamRole("captain");
+		} else {
+			customerTO.setTeamRole("member");
+		}
+		// TODO 新建customer业绩（流水）实体
+		// 获取成员业绩信息，暂时处理
+		Date startDate = DateUtil.monthBegin(date);
+		System.out.println(DateUtil.monthEnd(date));
+		List<InsuranceResult> insResultList = insResultRepository
+				.findByData_StateAndSubmitProposal_Customer_IdAndCreatedAtBetween(4, customer.getId(), startDate, date);
+		Double autoCompletion = 0.0;
+		Double lifeCompletion = 0.0;
+		Integer autoNum = 0;
+		Integer lifeNum = 0;
+		for (InsuranceResult insResult : insResultList) {
+			OfferResultDataResult dataResult = insResult.getSubmitProposal().getOfferResult().getData().getResult();
+			if (null != dataResult && null != dataResult.getOfferDetail()) {
+				if (dataResult.getOfferDetail() != null) {
+					double forcePremium = dataResult.getOfferDetail().getJSONObject("forcePremium").getDouble("quotesPrice");
+					double taxPrice = dataResult.getOfferDetail().getJSONObject("taxPrice").getDouble("quotesPrice");
+					double originalForcePrice = forcePremium + taxPrice;
+					double originalPrice = dataResult.getOfferDetail().getDouble("originalPrice");
+					autoCompletion = +(originalForcePrice + originalPrice);
+					autoNum += 1;
+				}
+			}
+		}
+		customerTO.setAutoCompletion(autoCompletion);
+		customerTO.setLifeCompletion(lifeCompletion);
+		customerTO.setAutoNum(autoNum);
+		customerTO.setLifeNum(lifeNum);
+		return customerTO;
+	}
+
+	/**
+	 * 据团队邀请码获取
+	 * 
+	 * @param teamInviteCode
+	 * @return
+	 */
+	public Team findByInviteCode(String teamInviteCode) {
+		return teamRepository.findByTeamInviteCode(teamInviteCode);
+	}
+
+	/**
+	 * 更新团队--App申请加入
+	 * 
+	 * @param customer
+	 */
+	@Transactional
+	public Customer updateTeamJoin(Customer customer, String teamInviteCode) {
+		Team team = teamRepository.findByTeamInviteCode(teamInviteCode);
+		if (null == team) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_INVITECODE_ERROR);
+		}
+		if ("APPLIED".equals(team.getState().getStateCode())) {
+			throw new FailReturnObject(ExceptionResultEnum.TEAM_INAPPLIE_ERROR);
+		}
+		customer.setTeam(team);
+		customer.setJoinTime(new Date());
+		return customerRepository.save(customer);
+	}
+
+	/**
+	 * 据stateCode获取State
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public TeamState findState(String stateCode) {
+		return teamStateRepository.findByStateCode(stateCode);
+	}
+
+	/**
+	 * 审核--更改状态
+	 * 
+	 * @param team
+	 * @param teamBean
+	 * @return
+	 */
+	public Team updateState(Team team, TeamBean teamBean) {
+		TeamState teamState = null;
+		if ("ENABLED".equals(teamBean.getStateCode())) {
+			teamState = teamStateRepository.findByStateCode("ENABLED");
+		} else {
+			teamState = teamStateRepository.findByStateCode("REJECTED");
+			team.setRejectReason(teamBean.getRejectReason());
+		}
+		team.setState(teamState);
+		return teamRepository.save(team);
+	}
+
+	/**
+	 * 获取用户自身团队信息
+	 * 
+	 * @param header
+	 * @return
+	 */
+	public Map<String, Object> getOwnTeam(String token) {
+		Map<String, Object> returnMap = new HashMap<>();
+		Customer customer = customerRepository.findByToken(token);
+		Team team = customer.getTeam();
+		if (null == team) {
+			return null;
+		}
+		TeamBean teamBean = new TeamBean();
+		BeanUtils.copyProperties(team, teamBean);
+		teamBean.setLogoImgUrl(team.getCaptain().getHeadimgurl());
+		teamBean.setCaptaionHeadImgUrl(team.getCaptain().getHeadimgurl());
+		returnMap.put("team", teamBean);
+		// 团队业绩目标
+		TeamObjective currentObjective = teamObjRepository.findByTeamAndPeriod(team,
+				DateUtil.format2YearMonthStr(new Date()));
+		TeamObjectiveTO currentObjectiveTO = new TeamObjectiveTO();
+		if (null != currentObjective) {
+			BeanUtils.copyProperties(currentObjective, currentObjectiveTO);
+			returnMap.put("currentObjective", currentObjectiveTO);
+		}
+		TeamObjective nextObjective = teamObjRepository.findByTeamAndPeriod(team,
+				DateUtil.format2NextYearMonthStr(new Date()));
+		TeamObjectiveTO nextObjectiveTO = new TeamObjectiveTO();
+		if (null != nextObjective) {
+			BeanUtils.copyProperties(nextObjective, nextObjectiveTO);
+			returnMap.put("nextObjective", nextObjectiveTO);
+		}
+		if (team.getCaptain().getId() == customer.getId()) {
+			returnMap.put("role", "团长");
+		} else {
+			returnMap.put("role", "成员");
+		}
+		// 最新团队公告
+		Pageable pageable = new PageRequest(0, 1);
+		Page<TeamAdvertise> teamAdvPage = teamAdvRepository.findByTeamAndState_StateCodeOrderByCreatedAtDesc(team,
+				"PUBLISHED", pageable);
+		TeamAdvertiseTO teamAdvTO = new TeamAdvertiseTO();
+		if (null != teamAdvPage.getContent() && !teamAdvPage.getContent().isEmpty()) {
+			BeanUtils.copyProperties(teamAdvPage.getContent().get(0), teamAdvTO);
+		}
+		returnMap.put("latestAdvertise", teamAdvTO);
+		return returnMap;
+	}
+
+	/**
+	 * 根据状态码获取
+	 */
+	public List<Team> findByStateCode(String stateCode) {
+		return teamRepository.findByState_StateCode(stateCode);
+	}
+
+}

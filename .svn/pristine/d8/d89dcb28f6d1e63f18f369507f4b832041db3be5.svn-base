@@ -1,0 +1,40 @@
+<div class="wrapper-md">
+    <p class="m-b">这是配置人员要用的，页面不重要</p>
+    <form class="form-validation form-horizontal">
+        <table class="table table-striped bg-white b-a">
+            <thead>
+                <tr>
+                    <th style="width:40px">启用</th>
+                    <th style="width:300px">产品名称</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        车抵贷
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="i-checks  i-checks-lg">
+                            <input checked="" value="" type="checkbox">
+                            <i></i>
+                        </label>
+                    </td>
+                    <td>  
+                        信用贷
+                    </td>
+                </tr>
+            </tbody>
+        </table>  
+        <div class="form-group wrapper-sm">
+            <button type="button" class="btn btn-success">保存</button>
+        </div>
+    </form>
+</div>

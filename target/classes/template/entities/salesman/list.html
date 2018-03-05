@@ -1,0 +1,388 @@
+<script>
+
+    "use strict";
+    app.controller("rolesListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                $scope.list = [];
+                $scope.role = {};
+
+                $scope.searchInfo = {};
+
+                //获取当前接口
+                $scope.entity_key = $stateParams.entity_key;
+
+                $scope.state_code = $stateParams.state_code;
+
+                //状态栏
+                $scope.states    = [];
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+
+
+                //获取所有代理人状态
+                $scope.getState = function(){
+                    $http.get("/rest/salesmanStates").success(function(resResult){
+                        $scope.states = resResult._embedded.salesmanStates;
+                        console.log(resResult)
+                    })
+                };
+                $scope.getState();
+
+                //当前列表
+                $scope.getList = function (page) {
+
+                    if($scope.state_code === "all") {
+                        $scope.state_code = "";
+                    }
+
+                    $scope.searchInfo = {
+                        stateCode : $scope.state_code
+                    };
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/salesman/searchSalesman?size=15&page=" + page,
+                        data: {
+                            stateCode : $scope.state_code
+                        }
+                    }).success(function(resResult){
+                        $scope.list = resResult.data.salesmen;
+                        console.log($scope.list);
+                        $scope.pageList = {
+                            size: resResult.data.size,
+                            total_elements: resResult.data.totalElements,
+                            current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                            num_page: resResult.data.totalPages,
+                            total_page: resResult.data.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+
+                /*
+                * 启用代理人
+                * */
+                $scope.enabledCompany = function(id){
+
+                    var addId = function(){
+                        $http({
+                            method:"PATCH",
+                            url:"/dafeng/salesman/changeState?id=" + id
+                        }).success(function(){
+                            $rootScope.toasterSuccess("成功！", "启用成功！");
+                            $scope.getList(0);
+                        }).error(function(){
+                            $rootScope.toasterError("失败！", "启用失败！");
+                        });
+                    };
+
+                    $rootScope.sweetConfirm("确认启用此角色吗？",addId);
+                };
+
+                /*
+              * 禁用代理人
+              * */
+                $scope.disabledCompany = function (id) {
+
+                    var disabled = function () {
+                        $http({
+                            method: "PATCH",
+                            url: "/dafeng/salesman/changeState?id=" + id
+                        }).success(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "禁用成功！");
+                        }).error(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterError("失败！", "禁用失败！");
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认禁用此代理人吗？", disabled);
+                };
+
+                /*
+                * 删除代理人
+                * */
+                $scope.deleteSalesman = function (id) {
+
+                    var disabled = function () {
+                        $http({
+                            method: "DELETE",
+                            url: "/dafeng/salesman/delete?id=" + id
+                        }).success(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "删除成功！");
+                        }).error(function (resResult) {
+                            $scope.getList(0);
+                            $rootScope.toasterError("失败！", resResult.errorInfo);
+                        })
+                    };
+
+                    $rootScope.sweetConfirm("确认删除此代理人吗？", disabled);
+                };
+
+                /*
+                 * 代理人的修改
+                 * */
+
+                $scope.editRoles = function(id){
+
+                    $http.get("/rest/roles/" + id).success(function(resReuslt){
+                        $scope.role = resReuslt;
+                    });
+
+                    if($scope.oldLabel === $scope.role.label){
+                        $("#eduitBtn").addClass("disabled");
+                    }else{
+                        $("#eduitBtn").removeClass("disabled");
+                    }
+
+                    $scope.editRoleInfo = function(){
+                        $http.patch("/rest/roles/" + id, $scope.role).success(function () {
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "修改成功！");
+                            $scope.role = {};
+
+                        }).error(function(){
+                            $rootScope.toasterError("失败！", "修改失败！");
+                            $scope.role = {};
+                        });
+                    }
+
+                };
+
+                /*
+                * 代理人的保存
+                * */
+                $scope.saveRoleInfo = function() {
+
+                    if ($scope.role.label && $scope.role.roleCode) {
+
+                        $http.post("/rest/roles", $scope.role).success(function () {
+
+                            $scope.getList(0);
+                            $rootScope.toasterSuccess("成功！", "新建成功！");
+                            $scope.role = {};
+                        }).error(function () {
+                            $rootScope.toasterError("失败！", "新建失败！");
+                            $scope.role = {};
+                        });
+                    } else {
+                        $rootScope.toasterWarning("失败！", "信息填写不完整！");
+                    }
+
+                };
+
+                //搜索框查询
+                $scope.search = function(page){
+                    if($scope.searchInfo.name || $scope.searchInfo.phoneNumber || $scope.searchInfo.departmentLabel){
+                        $http({
+                            method: 'POST',
+                            url: "/dafeng/salesman/searchSalesman?size=15&page=" + page,
+                            data: $scope.searchInfo
+                        }).success(function(resResult){
+                            $scope.list = resResult.data.salesmen;
+                            console.log(resResult);
+
+                            $scope.pageList = {
+                                size: resResult.data.size,
+                                total_elements: resResult.data.totalElements,
+                                current_page: resResult.data.number === 0 ? 0 : resResult.data.number,
+                                num_page: resResult.data.totalPages,
+                                total_page: resResult.data.totalPages
+                            };
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+                            }
+                        })
+                    }
+                };
+
+                /*
+                * 清空信息
+                * */
+                $scope.clearSearch = function(){
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+            }
+        ]
+    )
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="rolesListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <!--<span translate="createEnquiries.self.label"></span>-->
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,'all')">
+                        <input type="radio" name="state" checked="checked"/><i></i> 全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state"><i></i> {{ state.label }}
+                    </label>
+                </div>
+                <div class="pull-right">
+                    <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                            ui-sref="workflowEntity.home.profile.info({})">
+                        <i class="fa fa-plus"></i>
+                        新增代理人
+                    </button>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="wrapper">
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入归属部门"
+                                               ng-model="searchInfo.departmentLabel"
+                                               autocomplete="off">
+
+                                        <!--<select type="text" class="form-control"-->
+                                                <!--autocomplete="off"-->
+                                                <!--ng-model="searchInfo.typeCode"-->
+                                                <!--ng-options="item.id as item.label for item in departmentTypes">-->
+                                            <!--<option value="">&#45;&#45;请选择部门&#45;&#45;</option>-->
+                                        <!--</select>-->
+
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入代理人名称"
+                                               ng-model="searchInfo.name"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text" class="form-control"
+                                               placeholder="请输入联系电话"
+                                               ng-model="searchInfo.phoneNumber"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                            <tr>
+                                                <th>代理人名称</th>
+                                                <th>归属部门</th>
+                                                <th>联系电话</th>
+                                                <!--<th>费率</th>-->
+                                                <th>状态</th>
+                                                <th>创建时间</th>
+                                                <th>更新时间</th>
+                                                <th ng-hide="state_code === 'DELETED'">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.name }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.departmentLabel }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.phoneNumber }}
+                                            </td>
+                                            <!--<td class="v-middle">-->
+                                                <!--{{ item.rate }}-->
+                                            <!--</td>-->
+                                            <td class="v-middle">
+                                                {{ item.stateCode | salesmanStateCode}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createdAt ? (item.createdAt | dateSecondTime) : "暂无"}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.lastModifiedAt ? (item.lastModifiedAt | dateSecondTime) : "暂无"}}
+                                            </td>
+                                            <td class="v-middle">
+                                                <button class="btn btn-xs btn-info"
+                                                        ui-sref="workflowEntity.home.profile.info({id: item.id})"
+                                                        ng-hide="item.stateCode === 'DELETED'">修改</button>
+                                                <button class="btn btn-xs btn-danger"
+                                                        ng-hide="item.stateCode === 'DELETED'"
+                                                        ng-if="item.stateCode === 'ENABLED'"
+                                                        ng-click="disabledCompany(item.id)">禁用</button>
+                                                <button class="btn btn-xs btn-success"
+                                                        ng-hide="item.stateCode === 'DELETED'"
+                                                        ng-if="item.stateCode === 'DISABLED' || item.stateCode === 'CREATED'"
+                                                        ng-click="enabledCompany(item.id)">启用</button>
+                                                <button class="btn btn-xs btn-danger"
+                                                        ng-click="deleteSalesman(item.id)"
+                                                        ng-hide="item.stateCode === 'DELETED'">删除</button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

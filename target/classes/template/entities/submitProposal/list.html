@@ -1,0 +1,318 @@
+<script>
+    "use strict";
+    app.controller("submitProposalListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function ($rootScope, $scope, $http, $stateParams,$filter) {
+
+                $scope.list = [];
+                $scope.states = [];
+                $scope.link = {};
+                $scope.entity_key = $stateParams.entity_key;
+
+                //状态栏
+                $scope.getStates = function () {
+                    $http.get("/rest/submitProposalStates/search/findForShow")
+                             .success(function (resResult) {
+                                 $scope.states = resResult._embedded.submitProposalStates;
+
+                                 $scope.states = $scope.states.sort(function (a, b) {
+                                     return a.sort - b.sort;
+                                 });
+
+                             }).error(function(){
+                        $rootScope.toasterWarning("状态读取不正确！")
+                    });
+                };
+
+                $scope.getStates();
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getList = function (page) {
+
+                    $scope.searchInfo = {
+                        stateCode : $scope.state_code
+                    };
+
+                    if($scope.state_code === "all"){
+                        $scope.data = {};
+                    }else if($scope.state_code) {
+                        $scope.data = {stateCode: $scope.state_code};
+                    }else {
+                        $scope.data = {};
+                    }
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/searchSubmitProposal?size=15&page=" +page,
+                        data: $scope.data
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.submitProposals;
+
+                        //当页条数及当前页
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+//                        $scope.entity_key = submitProposals;
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    })
+
+                };
+                $scope.getList(0);
+
+                //获取全部
+                $scope.getAll=function(){
+                    $scope.state_code='all';
+                    $scope.getList(0);
+                };
+
+                //根据搜索框搜索
+                $scope.search = function(page){
+
+                    if($scope.searchInfo.orderId || $scope.searchInfo.licenseNumber || $scope.searchInfo.insuredPhone || $scope.searchInfo.insuranceCompanyName || $scope.searchInfo.insuredName){
+                       if( $scope.searchInfo.stateCode === "all"){
+                           $scope.searchInfo.stateCode = "";
+                       }
+
+                        $http({
+                            method:"POST",
+                            url:"/dafeng/searchSubmitProposal?size=15&page=" +page,
+                            data: $scope.searchInfo
+
+                        }).then(function(resResult){
+
+                            $scope.list = resResult.data.data.submitProposals;
+
+                            $scope.pageList = {
+                                size: resResult.data.data.page.size,
+                                total_elements: resResult.data.data.page.totalElements,
+                                current_page: resResult.data.data.page.number === 0 ? 0 : resResult.data.data.page.number,
+                                num_page: resResult.data.data.page.totalPages,
+                                total_page: resResult.data.data.page.totalPages
+                            };
+
+
+                            if ($scope.list.length > 0) {
+                                $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.search);
+                            }
+                        });
+                    }else{
+                        $rootScope.toasterWarning("失败！","请填写搜索信息！");
+                    }
+
+
+                };
+
+
+                /*
+                * 清除搜索框搜索
+                * */
+                $scope.searchClear = function(){
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+
+                /*
+                * 状态搜索
+                * */
+                $scope.stateSelect = function($event,stateCode){
+                    if($event.target.nodeName === "INPUT"){
+                        $scope.state_code = stateCode;
+                        $scope.getList(0);
+                    }
+                };
+                $scope.$on('ngRepeatFinished', function (ngRepeatFinishedEvent) {
+                    //下面是在table render完成后执行的js
+                    var ths = $('th');
+                    var tds = $('td');
+                    angular.forEach(ths, function(data,index){
+                        data.setAttribute('width', tds[index].offsetWidth);
+                    });
+                });
+            }
+        ]
+    );
+    app.directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+//			    scope.$last(判断条件，这里直接跳过);
+                if (true) {
+                    $timeout(function() {
+                        scope.$emit(attr.onFinishRender);
+                    });
+                }
+            }
+        };
+    });
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="submitProposalListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left">
+                    <!--<span translate="createEnquiries.self.label"></span>-->
+                    状态：
+                </div>
+                <div class="inline pull-left m-r">
+                    <label class="i-checks pull-left m-n">
+                        <input type="radio" name="state" ng-click="getAll()" checked="checked"/><i></i> 全部
+                    </label>
+                </div>
+                <div class="inline pull-left m-r" ng-repeat="state in states">
+                    <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                        <input type="radio" name="state"><i></i> {{ state.label }}
+                    </label>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="wrapper">
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入出单单号"
+                                               ng-model="searchInfo.orderId"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入被保人"
+                                               ng-model="searchInfo.insuredName"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入车牌"
+                                               ng-model="searchInfo.licenseNumber"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入出单人手机号"
+                                               ng-model="searchInfo.insuredPhone"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="w inline m-r">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="请输入投保公司"
+                                               ng-model="searchInfo.insuranceCompanyName"
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="inline">
+                                        <button type="button" class="btn btn-primary m-r" ng-click="search(0)">
+                                            <span>查询</span>
+                                        </button>
+                                        <button type="button" class="btn btn-default" ng-click="searchClear()">
+                                            <span>清除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                        <tr>
+                                            <th>出单单号</th>
+                                            <th>被保人</th>
+                                            <th>投保车牌</th>
+                                            <th>投保公司</th>
+                                            <th>应交保费</th>
+                                            <th>出单人手机号</th>
+                                            <th>出单时间</th>
+                                            <th>核保状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                    <div class="table-responsive" ng-if="list.length > 0" style="max-height: 580px;overflow: auto">
+                                        <table ng-if="list.length>0" class="table table-hover b-t b-light"  on-finish-render="ngRepeatFinished">
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.params.orderId?item.params.orderId:"暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.params.insuredName? item.params.insuredName: "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.licenseNumber?item.licenseNumber:"暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.insuranceCompanyName?item.insuranceCompanyName:"暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.sumPrice? (item.sumPrice | myParseFloat ): "0" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.params.insuredPhone?item.params.insuredPhone:"暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.createTime?(item.createTime|dateSecondTime) : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.stateLabel?item.stateLabel:"暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                <button class="btn btn-xs btn-info"  ui-sref="workflowEntity.home.profile.info({id:item.id, orderId:item.params.orderId})">
+                                                    <a>
+                                                        详情
+                                                    </a>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="wrapper b-t b-light clearfix">
+                            <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"  ng-show="list.length>0"></ul>
+                            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->
+</div>

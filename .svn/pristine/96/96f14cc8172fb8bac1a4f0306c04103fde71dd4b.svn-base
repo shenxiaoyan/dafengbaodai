@@ -1,0 +1,156 @@
+@charset "utf-8";
+html,body,div,p,span,input,label {
+	margin: 0;
+	padding: 0;
+	font-family: "microsoft yahei";
+}
+html,body{
+	width: 100%;
+	min-height: 100%;
+}
+html{
+	font-size: 20px;
+}
+
+.center {
+	text-align: center;
+}
+
+.left {
+	text-align: left;
+}
+
+.wrapper-sm {
+	padding : 10px;
+}
+
+.wrapper {
+	padding : 15px;
+}
+
+.wrapper-md {
+	padding : 20px;
+}
+
+.wrapper-t-t {
+	padding-top: 0;
+}
+
+.wrapper-t-r {
+	padding-right: 0;
+}
+
+.wrapper-t-b {
+	padding-bottom: 0;
+}
+
+.text-xl {
+	font-size : 20px;
+}
+
+.text-md {
+	font-size : 18px;
+}
+
+.text {
+	font-size : 16px;
+}
+
+.text-sm {
+	font-size : 14px;
+}
+
+.text-xs {
+	font-size : 12px;
+}
+
+.text-black {
+	color : #000;
+}
+
+.b-b {
+	border-bottom: 1px solid #dee5e7;
+}
+
+.b-d {
+	border-bottom : 1px dashed #dee5e7;
+}
+
+.mar_auto {
+	margin: 0 auto;
+}
+
+.m-a {
+	margin : 15px;
+}
+
+.m {
+	margin: 15px 0 15px 0;
+}
+
+.m-l {
+	margin: 0 10px 0 0;
+}
+
+
+.m-xs {
+	margin: 5px 0 5px 0;
+}
+
+.m-sm {
+	margin: 10px 0 10px 0 ;
+}
+
+.m-sm-t {
+	margin: 10px 0 0 0 ;
+}
+
+.m-r-md {
+	margin: 0 30px 0 0;
+}
+
+.m-l-xs {
+	padding-left : 5px;
+}
+
+.m-b {
+	padding-bottom : 15px;
+}
+
+.m-t {
+	padding-top : 15px;
+}
+
+.bg_white {
+	background-color: #FFF;
+}
+
+.bg_gray {
+	background-color: #F7F7F7;
+}
+
+.pull-right {
+	float: right !important;
+}
+
+.pull-left {
+	float: left !important;
+}
+
+.quest {
+	background-color: #FCFCFC;
+	width:100%;
+	height:100%;
+	overflow: scroll;
+}
+
+.questT {
+	padding: 15px 37% 15px 37%;
+}
+
+.questContent {
+	width:100%;
+	height:100%;
+	overflow: scroll;
+	margin-bottom : 60px;
+}

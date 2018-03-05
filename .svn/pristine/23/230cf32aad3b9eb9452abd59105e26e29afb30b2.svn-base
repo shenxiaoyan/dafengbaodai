@@ -1,0 +1,177 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/02
+     *学历信息核查信息
+     * */
+    app.controller('academicInfoCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =[
+            {
+                name: '小艳',
+                idCard:'341623199405284821'
+            }
+        ];
+        //数据初始化
+        $scope.info = {
+            name: '小艳',
+            idCard:'341623199405284821'
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.name = '';
+            $scope.info.idCard = '';
+            $scope.resultSwitch = false;
+        };
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //数据信息格式错误时阻止表单提交
+            if (myForm.name) {
+                myForm.name.$dirty = true
+            }
+            if (myForm.idCard) {
+                myForm.idCard.$dirty = true
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+            angular.forEach($scope.mockData,function (obj) {
+                if($scope.info.name===obj.name && $scope.info.idCard===obj.idCard){
+                    $scope.resultSwitch = true;
+                    console.log('aaa')
+                }else{
+                    $scope.resultSwitch = false;
+                    console.log('ccc')
+                }
+
+            })
+        };
+
+        $scope.test =
+            {
+                sheanType:"aa",
+                sheanNum:"bb",
+                sheanLei:"yy",
+                sheanTime:"cc",
+                sheanOrg:"dd",
+                sheanCla:"ee"
+            }
+
+
+
+
+    }]);
+</script>
+<div class="vbox" ng-controller="academicInfoCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading" style="font-size: 16px">学历信息核查</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <div class="form-group validate validate-name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>姓名：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.name" name="name" class="form-control" ng-required="true" pattern="[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.name.$dirty&&myForm.name.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.pattern">姓名格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group validate validate-name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>身份证号：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.idCard" name="idCard" class="form-control" ng-required="true" pattern="(^\d{15}$)|(^\d{17}([0-9]|X)$)">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.idCard.$dirty && myForm.idCard.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.required">身份证号不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.idCard.$error.pattern">身份证号格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>姓名</td><td>刘某</td></tr>
+                                <tr><td>毕业院校</td><td>中央财经大学</td></tr>
+                                <tr><td>学历</td><td>本科</td></tr>
+                                <tr><td>入学年份</td><td>2003</td></tr>
+                                <tr><td>专业</td><td>信息管理与信息系统</td></tr>
+                                <tr><td>毕业时间</td><td>2007</td></tr>
+                                <tr><td>毕业结论</td><td>毕业</td></tr>
+                                <tr><td>学历类型</td><td>普通</td></tr>
+                                <tr><td>毕业院校类型</td><td>1</td></tr>
+                                <tr><td>学校所在城市</td><td>北京</td></tr>
+                                <tr><td>学校性质(公办、民办等)</td><td>公办</td></tr>
+                                <tr><td>学校所属主管单位</td><td>教育部</td></tr>
+                                <tr><td>学校类型(理工、医药、综合等)</td><td>财经</td></tr>
+                                <tr><td>学校类别(211 工程院校)</td><td>985、211工程院校</td></tr>
+                                <tr><td>办学层次</td><td>博士</td></tr>
+                                <tr><td>办学形式(全日制、函授等)</td><td>全日制</td></tr>
+                                <tr><td>是否为 985(Y为是，N为否)</td><td>Y</td></tr>
+                                <tr><td>是否为 211(Y为是，N为否)</td><td>Y</td></tr>
+                                <tr><td>学校创建日期</td><td>1949-11-06</td></tr>
+                                <tr><td>创建年限</td><td>67</td></tr>
+                                <tr><td>学校院士人数</td><td>0</td></tr>
+                                <tr><td>博士后流动站数目</td><td>5</td></tr>
+                                <tr><td>博士点数目</td><td>31</td></tr>
+                                <tr><td>硕士点数目</td><td>89</td></tr>
+                                <tr><td>国家重点学科数目</td><td>11</td></tr>
+                                <tr><td>学习形式</td><td>普通全日制</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td>姓名</td><td>{{ test.sheanCla }}</td></tr>
+                                <tr><td>毕业院校</td><td>{{ test.sheanType }}</td></tr>
+                                <tr><td>学历</td><td>{{ test.sheanCla }}</td></tr>
+                                <tr><td>入学年份</td><td>{{ test.sheanNum }}</td></tr>
+                                <tr><td>专业</td><td>{{ test.sheanOrg }}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

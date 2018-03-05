@@ -1,0 +1,197 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/03
+     *企业不良信息
+     *
+     * */
+    app.controller('businessBadCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData =
+            $scope.mockData = {
+                enterpriseName:"商道科技",
+                creditRegister: [
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/02 17:20:20"
+                    },
+                    {
+                        platformType: 2,
+                        registerTime: "2016/01/08 12:20:20"
+                    }
+                ]
+            };
+        //select
+        $scope.enterprise=[
+            {
+                type:'按企业名称查'
+            },
+            {
+                type:'按企业工商注册号查'
+            }
+        ];
+        $scope.YourOption =$scope.enterprise[0];
+        $scope.$watch("YourOption", function(n){
+            $scope.type = n.type;
+        });
+
+
+        //数据初始化
+        $scope.info = {
+            enterpriseName: "商道科技"
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.enterpriseName = '';
+            $scope.resultSwitch = false;
+        };
+
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+            //数据信息格式错误时阻止表单提交
+            if (myForm.enterpriseName) {
+                myForm.enterpriseName.$dirty = true
+            }
+
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+
+
+            if($scope.info.enterpriseName === $scope.mockData.enterpriseName){
+                $scope.resultSwitch = true;
+                console.log('aaa')
+            }else {
+                $scope.resultSwitch = false;
+                console.log('bbb')
+            }
+
+
+
+
+        };
+
+    }]);
+</script>
+
+<div class="vbox" ng-controller="businessBadCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">企业信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading">企业不良信息</div>
+                        <div class="panel-body">
+                            <form name="myForm" action="" method="post" class="form-horizontal">
+                                <input type="hidden" class="url" value="/transaction/baseInfo">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label label1"><span style="color: #ff0000">*</span>{{type}}:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" ng-model="info.enterpriseName" name="enterpriseName" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.enterpriseName.$dirty && myForm.enterpriseName.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.enterpriseName.$error.required">所填内容不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span style="color: #ff0000">*</span>查询方式:</label>
+                                    <div class="col-sm-4">
+                                        <select ng-model="YourOption" class="form-control" ng-options="enterpriseType.type for enterpriseType in enterprise">
+                                            <!--<option value="name">按企业名称查</option>-->
+                                            <!--<option value="regNo">按企业工商注册号查</option>-->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-8">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th style="background-color: #f6f8f8" colspan="2">失信被执行人信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">被执行人信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">股权冻结历史信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">行政处罚历史信息</th></tr>
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息1</th></tr>
+                                <tr><td>处罚机关</td><td>北京市海淀区工商行政管理局</td></tr>
+                                <tr><td>案由</td><td>2010年6月30日，我所执法人员检查发现当事人涉嫌虚假宣传。建议立案调查。`</td></tr>
+                                <tr><td>处罚决定书签发日期</td><td>2010-07-26</td></tr>
+                                <tr><td>处罚依据</td><td>依据《中华人民共和国反不正当竞争法》第二十四条第一款和《中华人民共和国行政处罚法》第二十七条第一款第（一）项的规定</td></tr>
+                                <tr><td>处罚结果</td><td>罚款</td></tr>
+                                <tr><td>处罚金额(万元)</td><td>1</td></tr>
+                                <tr><td>处罚执行情况</td><td>海工商中关1006222|海淀分局中关村工商所|已结案|京工商海处字（2010）第 2492 号|2010-07-29|2010-07-28</td></tr>
+                                <tr><td>案件类型</td><td>典型案件（公布案件）</td></tr>
+                                <tr><td>主要违法事实</td><td>根据《中华人民共和国反不正当竞争法》第九条第一款的规定依据《中华人民共和国反不正当竞争法》第二十四条第一款和《中华人民共和国行政处罚法》第二十七条第一款第（一）项的规定</td></tr>
+                                <tr><td>处罚种类</td><td>罚款</td></tr>
+                                <tr><td>案发时间</td><td>2010-06-30</td></tr>
+                                <tr><td>处罚决定文书</td><td>京工商海处字（2010）第 2492 号</td></tr>
+                                <tr><td>案值</td><td>1</td></tr>
+                                <tr><td>案件结果</td><td>已处罚</td></tr>
+                                <tr><td>执行类别</td><td>正常执行</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><th style="background-color: #f6f8f8" colspan="2">失信被执行人信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">被执行人信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">股权冻结历史信息</th></tr>
+                                <tr><th style="background-color: #f6f8f8" colspan="2">行政处罚历史信息</th></tr>
+                                <tbody ng-repeat="(index,value) in mockData.creditRegister">
+                                <tr><th colspan="2" style="background-color: #f6f8f8">信息{{index+1}}</th></tr>
+                                <tr><td>处罚机关</td><td>{{value.platformType}}</td></tr>
+                                <tr><td>案由</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>处罚决定书签发日期</td><td>{{value.registerTime}}</td></tr>
+                                <tr><td>处罚依据</td><td>依据《中华人民共和国反不正当竞争法》第二十四条第一款和《中华人民共和国行政处罚法》第二十七条第一款第（一）项的规定</td></tr>
+                                <tr><td>处罚结果</td><td>罚款</td></tr>
+                                <tr><td>处罚金额(万元)</td><td>1</td></tr>
+                                <tr><td>处罚执行情况</td><td>海工商中关1006222|海淀分局中关村工商所|已结案|京工商海处字（2010）第 2492 号|2010-07-29|2010-07-28</td></tr>
+                                <tr><td>案件类型</td><td>典型案件（公布案件）</td></tr>
+                                <tr><td>主要违法事实</td><td>根据《中华人民共和国反不正当竞争法》第九条第一款的规定依据《中华人民共和国反不正当竞争法》第二十四条第一款和《中华人民共和国行政处罚法》第二十七条第一款第（一）项的规定</td></tr>
+                                <tr><td>处罚种类</td><td>罚款</td></tr>
+                                <tr><td>案发时间</td><td>2010-06-30</td></tr>
+                                <tr><td>处罚决定文书</td><td>京工商海处字（2010）第 2492 号</td></tr>
+                                <tr><td>案值</td><td>1</td></tr>
+                                <tr><td>案件结果</td><td>已处罚</td></tr>
+                                <tr><td>执行类别</td><td>正常执行</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,186 @@
+<script type="text/javascript">
+    app.controller("messageListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            function ($rootScope, $scope, $http, $stateParams) {
+
+                $scope.entity_key = $stateParams.entity_key;
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 0,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                $scope.endOpen = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.endOpened = true;
+                };
+                $scope.endDateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+                //单数 例user
+
+                $scope.list = [];
+
+                $scope.getList = function (page) {
+                    $http({
+                        method: 'GET',
+                        url: '/dafeng/advertise/web/all?size=25&page='+page
+                    }).then(function (res) {
+                        res = res.data;
+                        $scope.list = res.data.contents;
+
+                        $scope.pageList = {
+                            size: res.data.page.size,
+                            total_elements: res.data.page.totalElements,
+                            current_page: res.data.page.number,
+                            num_page: res.data.page.totalPages,
+                            total_page: res.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#insureNotices_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+                    };
+
+                $scope.getList(0);
+
+
+
+
+                //搜索条件查询
+                $scope.search=function(){
+                    $http({
+                        method:'POST',
+                        url:'/dafeng/advertise/advertiseSearch',
+                        data:$scope.searchInfo
+                    }).then(function(response){
+                        console.log(response);
+                        $scope.list=response.data.data.content;
+                    });
+                };
+
+                /*
+                * 清空按钮
+                * */
+                $scope.clearSearch = function () {
+                    $scope.searchInfo = {type:1};
+                    $scope.beginTime='';
+                    $scope.endTime='';
+                    $scope.getList(0);
+                };
+
+            }
+        ]
+    );
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="messageListCtrl">
+
+    <div class="row-row">
+        <div class="cell">
+            <div class="cell-inner">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" ng-if="list.length > 0">
+                            消息列表
+                        </div>
+                        <div class="panel-heading" ng-if="list.length < 1">
+                            暂无消息！
+                        </div>
+                        <div class="wrapper">
+                            <div class="w-sm inline_tab input-group">
+                                <input type="text"
+                                       disabled
+                                       class="form-control"
+                                       style="float: none;"
+                                       datepicker-popup="yyyy-MM-dd"
+                                       placeholder="开始日期"
+                                       ng-model="beginTime"
+                                       is-open="opened"
+                                       datepicker-options="dateOptions"
+                                       close-text="关闭"
+                                       clear-text="清空"
+                                       current-text="今天"/>
+                                <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                            </div>
+                            <div class="w-sm inline_tab input-group">
+                                <input type="text"
+                                       disabled
+                                       class="form-control"
+                                       style="float: none;"
+                                       datepicker-popup="yyyy-MM-dd"
+                                       placeholder="结束日期"
+                                       ng-model="endTime"
+                                       is-open="endOpened"
+                                       datepicker-options="endDateOptions"
+                                       close-text="关闭"
+                                       clear-text="清空"
+                                       current-text="今天"/>
+                                <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="endOpen($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                            </div>
+                            <div class="inline">
+                                <button type="button" class="btn btn-primary" ng-click="getList(0)">
+                                    <span>查询</span>
+                                </button>
+                                <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                                    <span>清除</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div ng-if="list.length>0">
+                            <div class="card card-block" style="border:1px solid #DEE5E7;border-radius:10px;padding:10px;margin:10px;display:flex;background-color: #FFFFFF;" ng-repeat="item in list">
+                                <div style="flex:4;">
+                                    <h4 class="card-title" style="word-break:break-all;">{{item.title}}</h4>
+                                    <a class="card-text" style="word-break:break-all;" ng-href="{{item.linkUrl}}">{{item.content}}</a>
+                                </div>
+                                <div style="flex:1;text-align: left;">
+                                    <p class="card-text">创建时间：{{item.createdAt /1000| datetime}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper b-t b-light clearfix" ng-show="list.length>0">
+        <ul id="insureNotices_list_paginator" style="margin:2px 0;float: right;"></ul>
+        <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+    </div>
+</div>

@@ -1,0 +1,307 @@
+<script>
+    "use strict";
+
+    app.controller("messageCtrl",[
+        "$rootScope",
+        "$scope",
+        "$http",
+        function($rootScope, $scope, $http){
+
+            $scope.roleInfo = {};
+            $scope.allInfo = [];
+            $scope.webTypeList = [];
+            $scope.rolesId = [];
+            $scope.selectType = {};
+
+            //获取所有类型名称
+            $scope.getTypeList = function(){
+                $http.get("/dafeng/webAdvType/all").then(function(resResult){
+
+                    $scope.webTypeList = resResult.data.data;
+
+                })
+
+            };
+            $scope.getTypeList();
+
+
+            //根据菜单名称获得现在的状态
+            $scope.typeToState = function(sta) {
+
+                angular.forEach($scope.webTypeList,function(v,i){
+                   if(v.id === sta){
+                       $scope.oneWebInfo = v;
+                       $scope.selectType.stateCode = v.stateCode;
+                   }
+                });
+
+            };
+
+            //获取所有的角色
+            $scope.getAllRoles = function () {
+
+                if($scope.selectType.id && $scope.selectType.stateCode){
+                    $http.get("rest/roles?size=10000").success(function (resResult) {
+                        $scope.allRoles = resResult._embedded["roles"];
+
+                        angular.forEach($scope.allRoles,function(val1,index1){
+
+                            val1.isSelected = false;
+
+                            angular.forEach($scope.oneWebInfo.rolesData,function(val3,index3) {
+
+                                if (val3.id === val1.id) {
+                                    val1.isSelected = true;
+                                }
+                            })
+                        });
+                    });
+
+                    if($scope.selectType.stateCode === "DISABLED"){
+
+                        $scope.isShow = false;
+
+                    }else if($scope.selectType.stateCode === "ENABLED"){
+
+                        $scope.isShow = true;
+
+                    }
+                }else{
+                    $scope.allRoles = {};
+                    $rootScope.toasterWarning("失败！","请选择类型名称和状态！");
+                }
+
+            };
+
+            $scope.changeMessageRole = function (role) {
+
+                $scope.roleInfo = {
+                    id : role.id,
+                    isSelected : role.isSelected
+                };
+
+                $scope.allInfo.push($scope.roleInfo)
+
+            };
+
+
+            //修改用户提交
+            $scope.saveRoleAndWeb = function(){
+
+                angular.forEach($scope.allRoles,function(val,index){
+                   if(val.isSelected === true){
+                       $scope.rolesId.push(val);
+                   }
+                });
+
+
+                    $http({
+                        method : "POST",
+                        url : "/dafeng/webAdvType/update2",
+                        data : {
+                            id : $scope.oneWebInfo.id,
+                            stateCode : $scope.selectType.stateCode,
+                            label : $scope.oneWebInfo.label,
+                            roleIds : $scope.rolesId
+                        }
+                    }).success(function(resResult){
+                        if(resResult.ErrorCode){
+                            $rootScope.toasterError("失败！" ,resResult.ErrorInfo);
+                        }else{
+                            $rootScope.toasterSuccess("成功！" ,"修改成功！");
+                        }
+                    });
+//
+//                    $http({
+//                        method : "GET",
+//                        url : "/dafeng/webAdvType/reverseState",
+//                        data : {
+//                            id : $scope.oneWebInfo.id
+//                        }
+//                    }).success(function(resResult){
+//                        if(resResult.ErrorCode){
+//                            $rootScope.toasterError("失败！" ,resResult.ErrorInfo);
+//                        }else{
+//                            $rootScope.toasterSuccess("成功！" ,"修改状态成功！");
+//                        }
+//                    })
+
+            };
+
+            $scope.clearInfo = function(){
+                $scope.selectType.stateCode = "";
+                $scope.selectType.id = "";
+                $scope.allRoles = {};
+            };
+
+            //新增类型
+            $scope.addWebType = function(){
+
+            }
+        }
+    ]
+    )
+
+</script>
+<div class="hbox hbox-auto-xs bg-light" ng-controller="messageCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div class="inline pull-left h4">
+                    后台通知的角色配置
+                </div>
+                <div class="pull-right">
+                    <button class="btn m-b-xs btn-sm btn-danger btn-addon"
+                            data-target="#role_modal_edit"
+                            data-toggle="modal">
+                        <i class="fa fa-plus"></i>
+                        新增类型
+                    </button>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell scrollable">
+                    <div class="cell-inner">
+                        <div class="wrapper-md">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    act roles
+                                </div>
+                                <div class="panel-body">
+                                    <div>
+                                        <form class="form-horizontal" method="get">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">通知类型名称</label>
+                                                <div class="col-sm-8">
+                                                    <select name="account"
+                                                            class="form-control m-b"
+                                                            ng-model="selectType.id"
+                                                            ng-options="item.id as item.label for item in webTypeList"
+                                                            ng-change="typeToState(selectType.id)">
+                                                        <option value="">--请选择类型--</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">状态</label>
+                                                <div class="col-sm-8">
+                                                    <select name="account"
+                                                            class="form-control m-b"
+                                                            ng-model="selectType.stateCode">
+                                                        <option value="">--请选择状态--</option>
+                                                        <option value="ENABLED">启用</option>
+                                                        <option value="DISABLED">禁用</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-7 col-sm-offset-3">
+                                                   <button type="button" ng-click="clearInfo()" class="btn btn-default">取消</button>
+                                                    <button type="button" ng-click="getAllRoles()" class="btn btn-primary">下一步</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default" ng-if="allRoles.length > 0">
+                                <div class="panel-heading">
+                                    act roles
+                                </div>
+                                <div class="panel-body">
+                                    <div >
+                                        <div class="table-responsive"  ng-if="isShow">
+                                            <table class="table table-striped b-light">
+                                                <thead>
+                                                <tr>
+                                                    <th style="width:40px;">
+                                                        选
+                                                    </th>
+                                                    <th>label</th>
+                                                    <th>code</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr ng-repeat="role in allRoles">
+                                                    <td class="v-middle">
+                                                        <label class="i-checks m-b-none">
+                                                            <input type="checkbox"
+                                                                   ng-model="role.isSelected"
+                                                                   ng-change="changeMessageRole(role);">
+                                                            <i></i>
+                                                        </label>
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        <span class="text-ellipsis">{{role.label}}</span>
+                                                    </td>
+                                                    <td class="v-middle">
+                                                        <span class="text-ellipsis">{{role.roleCode}}</span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div ng-if="!isShow">
+                                            <span class=" text-center text-danger">禁用状态下的类型将不能通知用户！</span>
+                                        </div>
+                                        <div class="form-group b-t">
+                                            <div class="col-sm-7 col-sm-offset-3 m-t">
+                                                <button type="button" ng-click="clearInfo()" class="btn btn-default">取消</button>
+                                                <button type="button" ng-click="saveRoleAndWeb()" class="btn btn-primary">保存</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="add_web_type" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="createDepartModal">新增通知类型</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form name="step1" method="get">
+                            <!--<input type="hidden" ng-model="template.id">-->
+                            <div class="form-group">
+                                <label for="depart_template_name"><span class="text-danger">*</span>名称</label>
+                                <input type="text"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       required
+                                       ng-model="depatmentModalInfo.label">
+                            </div>
+                            <div class="form-group">
+                                <label for="depart_template_name">部门类型</label>
+                                <select type="text" required
+                                        class="form-control"
+                                        autocomplete="off"
+                                        id="addDepartmentType"
+                                        name="addDepartmentType"
+                                        ng-options="departmentType.id as departmentType.label for departmentType in departmentTypes"
+                                        ng-model="depatmentModalInfo.typeId">
+                                </select>
+                                <span class="help-block text-danger" ng-show="step1.addDepartmentType.submitted && step1.addDepartmentType.$error.required">请选择部门类型选项</span>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearSearch()">取消</button>
+                        <button type="button" class="btn btn-primary" ng-click="addDepartment()">确认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

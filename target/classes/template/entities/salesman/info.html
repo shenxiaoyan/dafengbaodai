@@ -1,0 +1,287 @@
+<script>
+
+    app.controller("agentInfoCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$state",
+            function ($rootScope, $scope, $http, $stateParams, $state) {
+
+                $scope.form = {};
+                $scope.name = null;
+                $scope.phoneNumber = null;
+                $scope.departmentId = null;
+                $scope.id = $stateParams.id;
+                $scope.departList = [];
+
+                /*
+                * 获取部门的信息
+                * */
+                $scope.getEnabledDepert = function(){
+                    $http({
+                        method:"GET",
+                        url:"/dafeng/department/search?stateCode=ENABLED&departmentTypeCode=SALESDEPT"
+                    }).then(function(resResult){
+                        $scope.departList = resResult.data.data.content;
+                    });
+
+                };
+                $scope.getEnabledDepert();
+
+                /*
+                * 获取当前代理人的详情
+                * */
+                if($scope.id) {
+                    $http.get("/rest/salesmen/" + $scope.id + "?projection=salesmanProjection").success(function (resResult) {
+                        $scope.idInfo = resResult;
+                        $scope.departmentId = resResult.department.id;
+                        $scope.name = resResult.name;
+                        $scope.phoneNumber = resResult.phoneNumber;
+                        $scope.departLabel = resResult.department.label;
+
+                        $http.get("/dafeng/department/search?stateCode=DISABLED&departmentTypeCode=SALESDEPT").success(function(resResult){
+
+                            angular.forEach(resResult.data.content,function(val,index){
+                                if(val.id === $scope.departmentId){
+                                    $scope.departList.push({
+                                        id: $scope.departmentId,
+                                        label: $scope.departLabel
+                                    });
+                                }
+                            })
+                        });
+
+                    })
+                }
+
+                /*
+                * 保存代理人信息
+                * */
+                $scope.saveInfo = function(){
+
+                    if($scope.id){
+
+                        if($scope.departmentId && $scope.name && $scope.phoneNumber){
+
+                            if($scope.departmentId === $scope.idInfo.department.id && $scope.name === $scope.idInfo.name && $scope.phoneNumber === $scope.idInfo.phoneNumber){
+
+                                $rootScope.toasterWarning("失败！","请修改代理人数据后提交！");
+
+                            }else{
+
+                                if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test($scope.phoneNumber))&&$scope.phoneNumber){
+                                    $rootScope.toasterWarning("失败！","请输入正确的手机号码！");
+                                }else{
+                                    $http({
+                                        method:"POST",
+                                        url: "/dafeng/salesman/update",
+                                        params: {
+                                            id: $scope.id,
+                                            departmentId: $scope.departmentId,
+                                            name: $scope.name,
+                                            phoneNumber: $scope.phoneNumber
+                                        }
+                                    }).success(function(resResult){
+
+                                        if(resResult.ErrorCode === 100){
+
+                                            $rootScope.toasterError("失败！","该部门已有此代理人");
+
+                                        }else{
+                                            $rootScope.toasterSuccess("成功！", "修改代理人成功！");
+
+                                            $scope.form = {};
+
+                                            $state.go("workflowEntity.list",{entity_key:"salesman"},{reload: true});
+                                        }
+
+                                    }).error(function(resResult){
+
+                                        $rootScope.toasterError("失败！",resResult.errorInfo);
+                                    })
+                                }
+
+                            }
+
+                        }else{
+                            $rootScope.toasterWarning("失败！","请填写完整数据！");
+                        }
+
+
+
+                    }else{
+                        if($scope.departmentId && $scope.name && $scope.phoneNumber){
+                            $http({
+                                method: "POST",
+                                url: "/dafeng/salesman/create",
+                                params: {
+                                    departmentId: String($scope.departmentId),
+                                    name: $scope.name,
+                                    phoneNumber: $scope.phoneNumber
+                                },
+                                data:{
+                                    state: "/rest/salesmanStates/3"
+                                }
+                            }).success(function(resResult){
+
+                                if(resResult.ErrorCode === 100){
+
+                                    $rootScope.toasterError("失败！","该部门已有此代理人");
+
+                                }else{
+                                    $rootScope.toasterSuccess("成功！", "新建代理人成功！");
+
+                                    $scope.form = {};
+
+                                    $state.go("workflowEntity.list",{entity_key:"salesman"},{reload: true});
+                                }
+
+                            }).error(function(resResult){
+                                $rootScope.toasterError("失败！",resResult.errorInfo);
+                            })
+                        }else{
+                            $rootScope.toasterWarning("失败！","请填写完整数据！");
+                        }
+                    }
+
+                };
+
+                /*
+                * 清除填写的信息
+                * */
+                $scope.clearInfo = function(){
+
+                    $scope.name = "";
+                    $scope.phoneNumber = "";
+                    $state.go("workflowEntity.list",{entity_key:"salesman"},{reload: true});
+                }
+
+
+            }
+        ]
+    );
+</script>
+
+<div class="wrapper-md" ng-controller="agentInfoCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading font-bold">
+            代理人详情
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal" method="get" name="step">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>代理人名称</label>
+                    <div class="col-sm-10">
+                        <input type="text" required
+                               class="form-control"
+                               placeholder="请输入此代理人的名称"
+                               id="salesMenName"
+                               name="salesMenName"
+                               ng-model="name">
+                        <span class="help-block text-danger"
+                              ng-show="step.salesMenName.$dirty && step.salesMenName.$invalid">
+                              <i class="fa fa-exclamation-circle text-danger"></i>&ensp;姓名为必填
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>手机号</label>
+                    <div class="col-sm-10">
+                        <input type="text" required
+                               class="form-control"
+                               placeholder="请输入此代理人的手机号"
+                               ng-maxlength="11"
+                               id="salesMenPhone"
+                               name="salesMenPhone"
+                               pattern="^(?:13\d|14\d|15\d|17\d|18\d)-?\d{5}(\d{3}|\*{3})$"
+                               ng-model="phoneNumber">
+                        <span class="help-block text-danger"
+                              ng-show="step.salesMenPhone.$dirty && step.salesMenPhone.$invalid">
+                              <i class="fa fa-exclamation-circle text-danger"></i>&ensp;号码为必填且为11位手机号
+                        </span>
+                    </div>
+                </div>
+                <div class="line line-dashed b-b line-lg pull-in"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>归属部门</label>
+                    <div class="col-sm-10">
+                        <select  required
+                                class="form-control m-b"
+                                ng-model="departmentId"
+                                id="salesMenDepartment"
+                                name="salesMenDepartment"
+                                ng-options="item.id as item.label for item in departList"
+                                ng-selected="item.id==departmentId">
+                        </select>
+                        <span class="help-block text-danger" ng-show="step.salesMesalesMenDepartmentnPhone.submitted && step.salesMenDepartment.$error.required">请选择安全选项！</span>
+                    </div>
+                </div>
+                <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-2 control-label"><span class="text-danger">*</span>代理人费率</label>-->
+                    <!--<div class="col-sm-10">-->
+                        <!--<input type="number" required-->
+                               <!--placeholder="请输入此代理人的商业险费率"-->
+                               <!--class="form-control"-->
+                               <!--ng-model="form.rate">-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-2 control-label"><span class="text-danger">*</span>代理人费率</label>-->
+                    <!--<div class="col-sm-10">-->
+                        <!--<input type="number" required-->
+                               <!--placeholder="请输入此代理人的强制险费率"-->
+                               <!--class="form-control"-->
+                               <!--ng-model="form.rate">-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-2 control-label"><span class="text-danger">*</span>代理人费率</label>-->
+                    <!--<div class="col-sm-10">-->
+                        <!--<input type="number" required-->
+                               <!--placeholder="请输入此代理人的车船税费率"-->
+                               <!--class="form-control"-->
+                               <!--ng-model="form.rate">-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div ng-repeat="item in insureComlist">-->
+                    <!--<div class="line line-dashed b-b line-lg pull-in"></div>-->
+                    <!--<div class="form-group">-->
+                        <!--<label class="col-sm-2 control-label" ng-model="form.companyName">{{ item.name }}</label>-->
+                        <!--<div class="col-sm-10">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<input type="text" class="form-control" placeholder="商业险汇率" ng-model="form.insureRate">-->
+                                <!--</div>-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<input type="text" class="form-control" placeholder="强制险汇率" ng-model="form.comRate">-->
+                                <!--</div>-->
+                                <!--<div class="col-md-3">-->
+                                    <!--<input type="text" class="form-control" placeholder="车船税" ng-model="form.taxRate">-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+
+                <div class="line line-dashed b-b line-lg pull-in"></div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <button type="submit" class="btn btn-default" ng-click="clearInfo()">取消</button>
+                        <button type="submit" class="btn btn-info dis" id="eduitBtn" ng-click="saveInfo()">保存</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

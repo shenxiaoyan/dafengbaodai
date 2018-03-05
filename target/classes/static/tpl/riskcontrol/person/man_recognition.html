@@ -1,0 +1,56 @@
+<div class="vbox">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">智能人脸识别验证</div>
+                        <div class="panel-body">
+                            <form name="newfenye" id="form" enctype="multipart/form-data" action="" method="post" class="form-horizontal newfenye col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><span style="color: #ff0000">*</span>人脸照片一：</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="image1" class="image1" accept="image/jpg,image/jpeg,image/png" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label"><span style="color: #ff0000">*</span>人脸照片二：</label>
+                                    <div class="col-sm-8">
+                                        <input type="file" name="image2" class="image2" accept="image/jpg,image/jpeg,image/png" value="">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-sm-8">
+                                        <button type="button"  class="btn btn-info">提交</button>
+                                        <button type="button"  class="btn btn-info">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" style="width:100%; padding:20px 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr ><td width="50%">结果</td><td width="50%">人脸比对成功</td></tr>
+                                <tr><td>比对分值</td><td>75</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

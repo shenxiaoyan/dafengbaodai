@@ -1,0 +1,88 @@
+package com.liyang.controller;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSON;
+import com.liyang.domain.querypayment.RequestPay;
+import com.liyang.helper.ResponseBody;
+import com.liyang.service.QueryPayStateService;
+import com.liyang.util.CommonUtil;
+
+import net.sf.json.JSONObject;
+
+/**
+ * 查询支付结果
+ * @author Administrator
+ *
+ */
+@RestController
+@RequestMapping("/dafeng")
+public class QueryPayStateController {
+	@Autowired
+	private QueryPayStateService queryPayStateService;
+
+	@Value("${xmcxapi.queryPayState.url}")
+	private String xmQueryPayStatUrl;
+
+	@Value("${xmcxapi.apikey}")
+	private String xmcxApiKey;
+	@Value("${tianan.base.url}")
+	private String tiananPayUrl;
+	private final static Logger logger = LoggerFactory.getLogger(QueryPayStateController.class);
+
+	/**
+	 * 查询支付状态接口
+	 */
+	@RequestMapping(value = "/queryPayState", method = RequestMethod.POST)
+	public ResponseBody mobileQueryPayState(@RequestBody Map<String, String> payStatMap, HttpServletRequest request)
+			throws Exception {
+
+		ResponseBody responseBody = queryPayStateService.saveQuePayState(payStatMap, request, xmcxApiKey);
+		logger.info("查询支付直接返回：" + JSONObject.fromObject(responseBody).toString());
+		return responseBody;
+	}
+
+	/**
+	 * 返回支付状态接口
+	 */
+	@RequestMapping(value = "/confirmPay", method = RequestMethod.POST)
+	public String confirmPayResult(@RequestParam(value = "data", required = true) String confirmResult)
+			throws Exception {
+		logger.info("确认支付结果返回了哦..." + confirmResult);
+		return queryPayStateService.doConfirmPay(CommonUtil.handerToMap(confirmResult));
+	}
+
+	/**
+	 * 返回支付结果信息(后端)
+	 * 
+	 * @param
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/confirmPayTianan", method = RequestMethod.GET)
+	public String confirmPayResult(RequestPay requestPay) throws Exception {
+		logger.info("确认支付结果返回了哦..." + JSON.toJSONString(requestPay));
+		return queryPayStateService.doConfirmPayTianan(requestPay);
+	}
+
+	/**
+	 * 请求天安支付接口
+	 */
+	@RequestMapping("/requestPayForMobile")
+	public  ResponseBody requestPayForMobile(){
+		return new ResponseBody(tiananPayUrl);
+	}
+
+}

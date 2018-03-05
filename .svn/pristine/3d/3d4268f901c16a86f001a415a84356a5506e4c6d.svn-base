@@ -1,0 +1,418 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h4">新建产品 网点贷</h1>
+</div>
+<div class="wrapper-md">
+    <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+    <p class="m-b">容儿说：填单要快点</p>
+    <p class="m-b">这里应该来一些说明，指导业务员如何正确填写标的</p>
+
+    <tabset class="tab-container" ng-init="steps={percent:20, step1:true, step2:false, step3:false}">
+        <tab heading="Step 1 主体信息" active="steps.step1" select="steps.percent=10">
+            <div class="alert alert-danger">
+                该主体已存在，信息如下：
+            </div>
+            <form name="step1" class="form-validation form-horizontal">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">主体名称</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="全称" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">选择证件类型</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">营业执照</option>
+                            <option value="">组织机构代码证</option>
+                            <option value="">身份证</option>
+                            <option value="">护照</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">证件号码</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="identify" placeholder="证件号码" class="form-control" ng-model="identify" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">手机号</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="手机号" class="form-control" ng-model="mobile" required>
+                    </div>
+                </div>
+                <div class="m-t m-b">
+                    <button type="submit" class="btn btn-default btn-rounded" ng-click="steps.step2 = true">Next</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 2 标的信息" active="steps.step2" select="steps.percent=30">
+            <form name="step2" class="form-validation form-horizontal">
+                <p class="m-b">容儿说：再快点</p>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">产品线</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">网点贷</option>
+                            <option value="">车抵贷</option>
+                            <option value="">车质贷</option>
+                            <option value="">车按揭</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">月利率</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="月利率" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">借款期限（月/天）</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">1</option>
+                            <option value="">3</option>
+                            <option value="">6</option>
+                            <option value="">12</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">所属门店</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">容儿店</option>
+                            <option value="">北京新店</option>
+                            <option value="">桐庐小店</option>
+                            <option value="">海口美店</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">还款日期</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="m-t m-b">
+                    <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step1 = true">Prev</button>
+                    <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step3 = true">Next</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 3 费用" active="steps.step3" select="steps.percent=60">
+            <p class="m-b">容儿：可以收钱了</p>
+            <div class="m-b">
+                <button type="button" class="btn btn-default btn-rounded">新增费用</button>
+            </div>
+
+            <table class="table table-striped bg-white b-a">
+                <thead>
+                    <tr>
+                        <th style="width: 180px">费用类别</th>
+                        <th>费用名称</th>
+                        <th class="text-center">渠道</th>
+                        <th class="text-center">门店</th>
+                        <th class="text-center">总部</th>
+                        <th class="text-center">资方代理</th>
+                        <th>金额</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>  
+                            <select class="form-control" >
+                                <option value="">请选择</option>
+                                <option value="">GPS</option>
+                                <option value="">平台服务费</option>
+                                <option value="">手续费</option>
+                            </select>
+                        </td>
+                        <td>蓝牙GPS无线、有线共三个</td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td>1200.00</td>
+                    </tr>
+                    <tr>
+                        <td>  
+                            <select class="form-control" >
+                                <option value="">请选择</option>
+                                <option value="">GPS</option>
+                                <option value="">平台服务费</option>
+                                <option value="">手续费</option>
+                            </select>
+                        </td>
+                        <td>蓝牙GPS无线、有线共三个</td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td>1200.00</td>
+                    </tr>
+                    <tr>
+                        <td>  
+                            <select class="form-control" >
+                                <option value="">请选择</option>
+                                <option value="">GPS</option>
+                                <option value="">平台服务费</option>
+                                <option value="">手续费</option>
+                            </select>
+                        </td>
+                        <td>蓝牙GPS无线、有线共三个</td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td>1200.00</td>
+                    </tr>
+                    <tr>
+                        <td>  
+                            <select class="form-control" >
+                                <option value="">请选择</option>
+                                <option value="">GPS</option>
+                                <option value="">平台服务费</option>
+                                <option value="">手续费</option>
+                            </select>
+                        </td>
+                        <td>蓝牙GPS无线、有线共三个</td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td>1200.00</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="6" class="text-right"><strong>费用总计</strong></td>
+                        <td>$1607.00</td>
+                    </tr>
+                </tbody>
+            </table>   
+            <div class="m-t m-b">
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step2 = true">Prev</button>
+                <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step4 = true">Next</button>
+            </div>
+        </tab>
+        <tab heading="Step 4 分期"  active="steps.step4" select="steps.percent=80">
+            <p class="m-b">容儿：居然要分期给我</p>
+            <table class="table table-striped bg-white b-a" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th class="b-r w"></th>
+
+                        <th colspan="3" class="text-center b-r">资金</th>
+                        <th colspan="4" class="text-center">分配</th>
+                        <th class="text-center"></th>
+                    </tr>
+                    <tr>
+                        <th class="text-center b-r">期别</th>
+                        <th class="text-center">本金</th>
+                        <th class="text-center">利息</th>
+                        <th class="text-center b-r">费用</th>                        
+                        <th class="text-center">渠道</th>
+                        <th class="text-center">门店</th>
+                        <th class="text-center">总部</th>
+                        <th class="text-center">资方代理</th>
+                        <th class="text-center">校验</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="b-r">  
+                            立即收取
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            第1期
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            第2期
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            第3期
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            第4期
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            第5期
+                        </td>
+                        <td><input type="text" class="form-control text-center" value='8900' /></td>
+                        <td><input type="text" class="form-control text-center" value='400' /></td>
+                        <td class="b-r"><input type="text" class="form-control text-center" value='80' /></td>
+                        <td><input type="text" class="form-control text-center" value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50'/></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><input type="text" class="form-control text-center"  value='50' /></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td class="b-r">  
+                            校验
+                        </td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td  class="b-r"><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                        <td><a href="" class="active" ui-toggle-class=""><i class="fa fa-check text-success text-active"></i><i class="fa fa-times text-danger text"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>   
+            <div class="m-t m-b">
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step3 = true">Prev</button>
+                <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step5 = true">Next</button>
+                <button type="button" class="btn btn-success btn-rounded pull-right" ng-click="steps.percent = 90">Click me to Finish</button>
+            </div>
+        </tab>
+        <tab heading="Step 5 资产"  active="steps.step5" select="steps.percent=90">
+            <form name="step2" class="form-validation form-horizontal">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">选择资产类型</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">请选择</option>
+                            <option value="">房产</option>
+                            <option value="">机动车</option>
+                            <option value="">股权</option>
+                            <option value="">债权</option>
+                            <option value="">其它</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">资产主标识</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="通常是房产证或行驶证里的唯一标识" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">资产从标识</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="第二标识" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">该资产其它说明</label>
+                    <div class="col-sm-10">
+                        <textarea  placeholder="其它说明" class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">输入GPS设备ID</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="GPS设备1" class="form-control m-b" ng-model="realname" required>
+                        <input type="text" name="realname" placeholder="GPS设备2" class="form-control m-b" ng-model="realname" required>
+                        <input type="text" name="realname" placeholder="GPS设备3" class="form-control m-b" ng-model="realname" required>
+                    </div>
+                </div>
+
+                <div class="m-t m-b">
+                    <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step4 = true">Prev</button>
+                    <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step6 = true">Next</button>
+                    <button type="button" class="btn btn-success btn-rounded  pull-right" ng-click="steps.percent = 95">Click me to Finish</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 6 渠道/推荐人"  active="steps.step6" select="steps.percent=90">
+            <form name="step2" class="form-validation form-horizontal">
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">选择渠道</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">请选择</option>
+                            <option value="">汽车城4S店</option>
+                            <option value="">汽车城4S店2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">选择销售员</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" >
+                            <option value="">请选择</option>
+                            <option value="">容儿</option>
+                            <option value="">容儿2</option>
+                            <option value="">容儿3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="m-t m-b">
+                    <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step5 = true">Prev</button>
+                    <button type="button" class="btn btn-success btn-rounded  pull-right" ng-click="steps.percent = 100">Click me to Finish</button>
+                </div>
+            </form>
+        </tab>
+    </tabset>
+</div>

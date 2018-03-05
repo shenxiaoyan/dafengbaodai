@@ -1,0 +1,38 @@
+<div class="vbox">
+    <div class="wrapper b-b">
+        {{module_entity_type}} / {{state_code}}
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>aaa</th>
+                                <th>bbbb</th>
+                                <th>ccc</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in list">
+                                <th scope="row">1</th>
+                                <td>
+                                    <img ng-src="img/a10.jpg" src="img/a10.jpg">
+                                    <a ui-sref="workflowEntity.home.profile.info({module_entity_id:1,entity_type:'users',view_type:'profile'})">容儿</a></td>
+                                <td>{{item.createdAt}}</td>
+                                <td>{{item.nickname}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>Limit the maximum visible buttons <span class="text-sm">(Page: {{number}} / {{totalPages}})</span></div>
+                    <pagination total-items="totalElements" ng-change="pageChanged()" ng-model="number" max-size="size" class="pagination-sm m-t-none m-b" boundary-links="true" rotate="false" num-pages="totalPages"></pagination>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

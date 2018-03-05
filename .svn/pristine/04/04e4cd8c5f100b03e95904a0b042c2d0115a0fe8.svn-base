@@ -1,0 +1,31 @@
+<div class="wrapper-md" ng-controller="workflowEntityProfileController">
+    <div class="panel panel-default" draggable="true">
+        <div class="panel-heading">
+            属性        
+        </div>
+        <div class="panel-body">
+            <div  ng-repeat="(key,value) in profile">
+                <div class="col-sm-3 text-right">{{key}}：</div>
+                <div class="col-sm-9">
+                    {{value}}
+                </div>
+                <div class="line line-dashed b-b line-lg pull-in"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default" draggable="true">
+        <div class="panel-heading">
+            外键        
+        </div>
+        <div class="panel-body">
+            <div  ng-repeat="(key,value) in links">
+                <div class="col-sm-3 text-right">{{key}}：</div>
+                <div class="col-sm-9">
+                    {{value.href}}
+                </div>
+                <div class="line line-dashed b-b line-lg pull-in"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,270 @@
+<script>
+    "use strict";
+    /*
+     *创建人：沈小艳
+     *创建时间：2017/08/02
+     *银联消费报告信息
+     * */
+    app.controller('cardPresentationCheck', ['$scope', function ($scope) {
+        //没有接口 自己模拟的数据
+        $scope.mockData = [
+            {
+                name: '小艳',
+                bank:'123456'
+            }
+        ];
+        //数据初始化
+        $scope.info = {
+            name: '小艳',
+            bank:'123456'
+        };
+
+        //结果与样例的切换初始化
+        $scope.resultSwitch = false;
+
+        //重置数据
+        $scope.resetInfo = function () {
+            $scope.info.name = '';
+            $scope.info.idCard = '';
+            $scope.resultSwitch = false;
+        };
+
+        //提交
+        $scope.submitInfo = function (myForm) {
+
+            //数据信息格式错误时阻止表单提交
+            if (myForm.name) {
+                myForm.name.$dirty = true
+            }
+            if (myForm.bank) {
+                myForm.bank.$dirty = true
+            }
+            if (!myForm.$valid) {
+                $scope.resultSwitch = false;
+                return
+            }
+            angular.forEach($scope.mockData,function (obj) {
+
+                if($scope.info.name===obj.name && $scope.info.bank===obj.bank){
+                    $scope.resultSwitch = true;
+                    console.log('aaa')
+                }else{
+                    $scope.resultSwitch = false;
+                    console.log('ccc')
+                }
+
+            })
+        }
+
+        $scope.test =
+            {
+                sheanType:"aa",
+                sheanNum:"bb",
+                sheanLei:"yy",
+                sheanTime:"cc",
+                sheanOrg:"dd",
+                sheanCla:"ee"
+            }
+
+
+    }]);
+</script>
+
+<div class="vbox" ng-controller="cardPresentationCheck">
+    <div class="wrapper b-b">
+        <div class="font-thin h4">个人信息查询</div>
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-info input-panel" style="margin-bottom: 0">
+                        <div class="panel-heading" style="font-size: 16px">银联消费报告</div>
+                        <div class="panel-body">
+                            <form name="myForm" method="post" class="form-horizontal">
+                                <div class="form-group validate validate-name">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>银行卡号：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.bank" name="bank" class="form-control" ng-required="true">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align: left" ng-show="myForm.bank.$dirty && myForm.bank.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.bank.$error.required">银行卡号不能为空</span>
+                                    </div>
+                                </div>
+                                <div class="form-group validate validate-mobile">
+                                    <label class="col-sm-4 col-md-2 control-label"><span style="color: #ff0000">*</span>持卡人姓名：</label>
+                                    <div class="col-sm-8 col-md-4">
+                                        <input type="text" ng-model="info.name" name="name" class="form-control" ng-required="true" pattern="[\u4E00-\u9FA5]{2,5}(?:·[\u4E00-\u9FA5]{2,5})*">
+                                    </div>
+                                    <div class="col-sm-offset-4 col-sm-8 col-md-offset-0 col-md-3 control-label padder" style="text-align:left" ng-show="myForm.name.$dirty&&myForm.name.$invalid">
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.required">姓名不能为空</span>
+                                        <span style="color: #ff0000" ng-show="myForm.name.$error.pattern">姓名格式错误</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-offset-4 col-md-offset-2 col-sm-8" style="padding-left: 20px">
+                                        <button type="button"  class="btn btn-info" ng-click="submitInfo(myForm)">提交</button>
+                                        <button type="button"  class="btn btn-info" ng-click="resetInfo()">重置</button>
+                                        <button type="button" class="btn btn-danger"><i class="fa fa-file-pdf-o"></i> 生成PDF</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="wrapper-md" ng-show="!resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                            <span style="color: red;">样例</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr><td width="40%">卡性质</td><td width="60%">贷记卡</td></tr>
+                                <tr><td>首次交易日期</td><td>20160514</td></tr>
+                                <tr><td>消费总金额</td><td>4590.00</td> </tr>
+                                <tr><td>消费总笔数</td><td>18</td></tr>
+                                <tr><td>取现总金额</td><td>未知</td></tr>
+                                <tr><td>取现总笔数</td><td>未知</td></tr>
+                                <tr><td>还款总金额</td><td>0.00</td></tr>
+                                <tr><td>还款总笔数</td><td>0</td></tr>
+                                <tr><td>刚需类消费占比</td><td>13%</td></tr>
+                                <tr><td>常住城市</td><td>北京市</td></tr>
+                                <tr><td>近 12 月没有发生交易的周数占比</td><td>81%</td></tr>
+                                <tr><td>最大单月消费金额</td><td>3280.00</td></tr>
+                                <tr><td rowspan="13">消费金额</td></tr>
+                                <tr><td>1610_770.00</td></tr>
+                                <tr><td>1609_3280.00</td></tr>
+                                <tr><td>1608_50.00</td></tr>
+                                <tr><td>1607_450.00</td></tr>
+                                <tr><td>1606_未知</td></tr>
+                                <tr><td>1605_30.00</td></tr>
+                                <tr><td>1604_未知</td></tr>
+                                <tr><td>1603_未知</td></tr>
+                                <tr><td>1602_未知</td></tr>
+                                <tr><td>1601_未知</td></tr>
+                                <tr><td>1512_未知</td></tr>
+                                <tr><td>1511_未知</td></tr>
+                                <tr><td rowspan="13">消费金额在本市的排名</td></tr>
+                                <tr><td>1610_55%</td></tr>
+                                <tr><td>1609_30%</td></tr>
+                                <tr><td>1608_95%</td></tr>
+                                <tr><td>1607_65%</td></tr>
+                                <tr><td>1606_100%</td></tr>
+                                <tr><td>1605_100%</td></tr>
+                                <tr><td>1604_100%</td></tr>
+                                <tr><td>1603_100%</td></tr>
+                                <tr><td>1602_100%</td></tr>
+                                <tr><td>1601_100%</td></tr>
+                                <tr><td>1512_100%</td> </tr>
+                                <tr><td>1511_100%</td></tr>
+                                <tr><td rowspan="13">消费笔数</td></tr>
+                                <tr><td>1610_3</td></tr>
+                                <tr><td>1609_10</td></tr>
+                                <tr><td>1608_1</td></tr>
+                                <tr><td>1607_4</td> </tr>
+                                <tr><td>1606_未知</td> </tr>
+                                <tr><td>1605_1</td></tr>
+                                <tr><td>1604_未知</td></tr>
+                                <tr><td>1603_未知</td></tr>
+                                <tr><td>1602_未知</td></tr>
+                                <tr><td>1601_未知</td></tr>
+                                <tr><td>1512_未知</td></tr>
+                                <tr><td>1511_未知</td></tr>
+                                <tr><td rowspan="13">消费笔数在本市的排名</td></tr>
+                                <tr><td>1610_50%</td></tr>
+                                <tr><td>1609_10%</td></tr>
+                                <tr><td>1608_100%</td></tr>
+                                <tr><td>1607_40%</td></tr>
+                                <tr><td>1606_100%</td></tr>
+                                <tr><td>1605_100%</td></tr>
+                                <tr><td>1604_100%</td></tr>
+                                <tr><td>1603_100%</td></tr>
+                                <tr><td>1602_100%</td></tr>
+                                <tr><td>1601_100%</td></tr>
+                                <tr><td>1512_100%</td></tr>
+                                <tr><td>1511_100%</td></tr>
+                                <tr><td rowspan="2">取现金额</td></tr>
+                                <tr><td>未知</td></tr>
+                                <tr><td rowspan="2">取现笔数</td></tr>
+                                <tr><td>未知</td></tr>
+                                <tr></tr><tr><td rowspan="7">消费金额分布</td></tr>
+                                <tr><td>21_54%</td></tr>
+                                <tr><td>14_26%</td></tr>
+                                <tr><td>29_9%</td></tr>
+                                <tr><td>12_9%</td></tr>
+                                <tr><td>11_0%</td></tr>
+                                <tr><td>其他行业_2%</td></tr>
+                                <tr><td rowspan="7"> 消费笔数分布</td></tr>
+                                <tr><td>21_54%</td></tr>
+                                <tr><td>14_26%</td></tr>
+                                <tr><td>12_9%</td></tr>
+                                <tr><td>29_9%</td></tr>
+                                <tr><td>11_0%</td></tr>
+                                <tr><td>其他行业_2%</td></tr>
+                                <tr><td rowspan="7">消费金额分布 </td></tr>
+                                <tr><td>1000_80%</td></tr>
+                                <tr><td>1460_12%</td></tr>
+                                <tr><td>5620_3%</td></tr>
+                                <tr><td>4520_1%</td></tr>
+                                <tr><td>5840_0%</td></tr>
+                                <tr><td>其他行业_4%</td></tr>
+                                <tr><td rowspan="7">消费笔数分布</td></tr>
+                                <tr><td>1000_78%</td></tr>
+                                <tr><td>1460_5%</td></tr>
+                                <tr><td>4520_5%</td></tr>
+                                <tr><td>5620_5%</td></tr>
+                                <tr><td>5840_5%</td></tr>
+                                <tr><td>其他行业_2%</td></tr>
+                                <tr><td>有无出差</td><td>有</td></tr>
+                                <tr><td>有无婚庆消费</td><td>有</td></tr>
+                                <tr><td>有无家庭特征</td><td>有</td></tr>
+                                <tr><td>有无境外消费</td><td>无</td></tr>
+                                <tr><td>有无夜消费</td><td>有</td> </tr>
+                                <tr><td>有无博彩业消费</td><td>无</td></tr>
+                                <tr><td>有无无业特征</td><td>无</td></tr>
+                                <tr><td>公共事业缴费金额</td><td>1190.00</td></tr>
+                                <tr><td>公共事业缴费笔数</td><td>2</td></tr>
+                                <tr><td>纳税金额</td><td>未知</td></tr>
+                                <tr><td>纳税笔数</td><td>未知</td></tr>
+                                <tr><td>夜消费金额</td><td>80.00</td></tr>
+                                <tr><td>夜消费笔数</td><td>1</td></tr>
+                                <tr><td>博彩业消费金额</td><td>未知</td></tr>
+                                <tr><td>博彩业消费笔数</td><td>未知</td></tr>
+                                <tr><td>网上消费金额</td><td>0.00</td></tr>
+                                <tr><td>网上消费笔数</td><td>0</td></tr>
+                                <tr><td>近一年疑似套现金额</td><td>未知</td></tr>
+                                <tr><td>近一年疑似套现笔数</td><td>未知</td></tr>
+                                <tr><td>近一年套现高危行业交易金额占比</td><td>0%</td></tr>
+                                <tr><td>近一年套现高危行业交易笔数占比</td><td>0%</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wrapper-md" ng-show="resultSwitch" style="width:100%; padding:0 20px 0 20px;">
+                    <div class="panel panel-info input-panel">
+                        <div class="panel-heading">
+                            <span style="color: #474747;">查询结果</span>
+                        </div>
+                        <div>
+                            <table class="table-border-style">
+                                <tr ><td width="50%">卡性质</td><td width="50%">{{ test.sheanType }}</td></tr>
+                                <tr><td>首次交易日期</td><td>{{ test.sheanTime }}</td></tr>
+                                <tr><td>消费总金额</td><td>{{ test.sheanNum }}</td></tr>
+                                <tr><td>消费总笔数</td><td>{{ test.sheanLei }}</td></tr>
+                                <tr><td>取现总金额</td><td>{{ test.sheanOrg }}</td></tr>
+                                <tr><td>取现总笔数</td><td>{{ test.sheanCla }}</td></tr>
+                                <tr><td>还款总金额</td><td>{{ test.sheanLei }}</td></tr>
+                                <tr><td>还款总笔数</td><td>{{ test.sheanLei }}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

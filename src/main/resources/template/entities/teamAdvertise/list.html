@@ -1,0 +1,260 @@
+<script type="text/javascript">
+	app.controller("teamAdvertiseListCtrl",
+	    [
+	        "$rootScope",
+	        "$scope",
+	        "$http",
+	        "$stateParams",
+	        function ($rootScope, $scope, $http, $stateParams) {
+	        	//状态栏
+	        	$scope.states    = [];
+                $scope.byState = 'all';
+                $scope.state_code = $stateParams.state_code;
+                $scope.list = {};
+                $scope.searchInfo = {stateCode:$scope.state_code};
+
+				$scope.entity_key = $stateParams.entity_key;
+
+	            $scope.pageList = {
+	                size: 0,
+	                total_elements: 0,
+	                current_page: 0,
+	                num_page: 1,
+	                total_page: 1
+	            };
+
+                //时间控件开始
+                //控制点击日历图表弹出选择框
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+
+                //时间控件属性设置 参考http://www.cnblogs.com/pilixiami/p/5611346.html
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                $scope.endOpen = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.endOpened = true;
+                };
+                $scope.endDateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+                //时间控件结束
+
+                //获取全部状态
+                $scope.getStates = function () {
+                    $http.get("/rest/teamAdvertiseStates").success(function (resResult) {
+
+                        $scope.states = resResult._embedded.teamAdvertiseStates;
+
+                    });
+                };
+
+                $scope.getStates();
+
+                //获取全部的列表
+				$scope.getList = function(page){
+				    $http({
+						method : "POST",
+						url : "/dafeng/team/advertise/query?size=15&page=" +page,
+						data : $scope.searchInfo
+
+				    }).then(function(resResult){
+
+				  		$scope.list = resResult.data.data.advertises;
+
+                        $scope.pageList = {
+                            size: resResult.data.data.page.size,
+                            total_elements: resResult.data.data.page.totalElements,
+                            current_page: resResult.data.data.page.number === 0 ? 0 : resResult.data.data.page.number,
+                            num_page: resResult.data.data.page.totalPages,
+                            total_page: resResult.data.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+                        }
+					})
+				};
+                $scope.getList(0);
+
+                //删除团队公告
+				$scope.todelete = function(id){
+				    var de = function(){
+                        $http.get("/dafeng/team/advertise/delete?id=" + id).then(function(resResult){
+							if(resResult.ErrorCode){
+							    $rootScope.toasterError("失败!",resResult.ErrorInfo);
+							}else{
+                                $rootScope.toasterInfo("成功!","删除成功！");
+                                $scope.getList(0);
+                            }
+                        })
+					};
+					$rootScope.sweetConfirm("确认删除这条公告吗？",de);
+				};
+
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+
+                    if(stateCode === "all"){
+                        $scope.state_code = "";
+
+                    }else{
+                        $scope.state_code = stateCode;
+
+                    }
+
+                    if(stateCode === "all"){
+                        $scope.searchInfo = {};
+                        $scope.getList(0);
+                    }else if($event.target.nodeName === "INPUT"){
+                        $scope.searchInfo = {
+                            stateCode : stateCode
+                        };
+                        $scope.getList(0);
+                    }
+                };
+
+				/*清空数据*/
+				$scope.clearSearch = function(){
+                    $scope.searchInfo = {
+                        stateCode : $scope.state_code
+					};
+                    $scope.getList(0);
+				}
+
+	        }
+	    ]
+	);
+</script>
+
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="teamAdvertiseListCtrl">
+	
+	<div class="wrapper b-b b-light clearfix">
+        <div class="inline pull-left">
+            <!--<span translate="createEnquiries.self.label"></span>-->
+            状态：
+        </div>
+		<div class="inline pull-left m-r">
+			<label class="i-checks pull-left m-n">
+				<input type="radio" name="state" ng-click="stateSelect($event,'all')" checked="checked"/><i></i> 全部
+			</label>
+		</div>
+        <div class="inline pull-left m-r" ng-repeat="state in states">
+            <label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">
+                <input type="radio" name="state"/><i></i> {{ state.label }}
+            </label>
+        </div>
+   </div>
+
+	<div class="row-row">
+		<div class="cell">
+			<div class="cell-inner">
+				<div class="wrapper b-b">
+					<div class="panel panel-default">
+						<div class="panel-heading" ng-if="list.length > 0">
+							查询结果
+						</div>
+						<div class="panel-heading" ng-if="list.length < 1">
+							暂无数据！
+						</div>
+						<div class="wrapper">
+							<div class="w inline_tab input-group">
+								<input type="text"
+									   disabled
+									   class="form-control"
+									   style="float: none;"
+									   datepicker-popup="yyyy-MM-dd"
+									   placeholder="开始日期"
+									   ng-model="searchInfo.createdAtBegin"
+									   is-open="opened"
+									   datepicker-options="dateOptions"
+									   close-text="关闭"
+									   clear-text="清空"
+									   current-text="今天"/>
+								<span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+							</div>
+							<div class="w inline_tab input-group">
+								<input type="text"
+									   disabled
+									   class="form-control"
+									   style="float: none;"
+									   datepicker-popup="yyyy-MM-dd"
+									   placeholder="结束日期"
+									   ng-model="searchInfo.createdAtEnd"
+									   is-open="endOpened"
+									   datepicker-options="endDateOptions"
+									   close-text="关闭"
+									   clear-text="清空"
+									   current-text="今天"/>
+								<span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="endOpen($event)">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+							</div>
+							<div class="inline">
+								<button type="button" class="btn btn-primary" ng-click="getList(0)">
+									<span>查询</span>
+								</button>
+								<button type="button" class="btn btn-default" ng-click="clearSearch()">
+									<span>清除</span>
+								</button>
+							</div>
+						</div>
+						<div ng-if="list.length>0">
+							<div class="card card-block" style="border:1px solid #DEE5E7;border-radius:10px;padding:10px;margin:10px;display:flex;background-color: #FFFFFF;" ng-repeat="item in list">
+								<div style="flex:4;">
+									<h4 class="card-title" style="word-break:break-all;">
+										{{item.title ? item.title : "暂无"}}
+										（团队名称：{{item.teamLabel ? item.teamLabel : "暂无"}}）
+									</h4>
+									<span class="card-text" style="word-break:break-all;">
+										{{item.content ? item.content : "暂无"}}
+									</span>
+								</div>
+								<div style="flex:1;text-align: left;">
+									<div class="card-text">
+										创建时间：
+										{{item.createdAt ? (item.createdAt | dateSecondTime) : "暂无"}}
+									</div>
+									<div class="card-text" ng-if="byState==='all'">
+										状态：
+										{{item.stateCode ? (item.stateCode | teamAdvState) : "暂无"}}
+									</div>
+									<div ng-if="item.stateCode !== 'DELETED'">
+										<button type="button"
+												class="btn btn-xs btn-danger"
+												ng-click="todelete(item.id)"
+												ng-if="state_code !== 'DELETED'">
+											<span>删除</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="wrapper b-t b-light clearfix" ng-show="list.length>0">
+	    <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;"></ul>
+	    <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+	</div>
+</div>

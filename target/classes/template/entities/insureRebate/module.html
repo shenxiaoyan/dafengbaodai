@@ -1,0 +1,48 @@
+<script>
+    "use strict";
+
+    app.controller("insureRebateModuleCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            function ($rootScope, $scope, $http, $stateParams) {
+
+                $scope.entity_key = $stateParams.entity_key;//单数 例user
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="hbox hbox-auto-xs bg-light" ng-controller="insureRebateModuleCtrl">
+    <div class="col lter w-md">
+        <div class="vbox">
+            <div class="b-b clearfix" style="padding: 12px 15px 10px 15px;">
+                <div class="pull-left inline">
+                    <ul class="nav nav-pills nav-sm">
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.list({type:'1'})">车险</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.profile.page({entity_key:'ordercdd',view_type:'file'})">非车险</a>
+                        </li>
+                        <li ui-sref-active="active">
+                            <a ui-sref="workflowEntity.home.profile.page({entity_key:'ordercdd',view_type:'log'})">寿险</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="inline pull-right">
+                    <button class="btn btn-info" ui-sref="workflowEntity.home.profile.info({})">
+                        产品所在公司管理
+                    </button>
+                </div>
+                <!--<h4 class="pull-left  m-t-none">{{module_entity_type}}</h4>-->
+            </div>
+            <div class="row-row bg-white" ui-view="">
+            </div>
+        </div>
+    </div>
+</div>

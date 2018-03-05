@@ -1,0 +1,79 @@
+<script>
+    app.controller("departmentProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state, $filter) {
+
+                $scope.id = $stateParams.id;
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                $scope.getProfile = function (page) {
+
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/enduser/search?size=15&page=" + page,
+                        data : {
+                            departmentId : $scope.id
+                        }
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.content;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+                        }
+                    });
+
+                    $http.get("/rest/departments/" + $scope.id).success(function(resResult){
+                        $scope.depart = resResult;
+                    });
+
+
+
+                };
+                $scope.getProfile(0);
+
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="departmentProfileCtrl">
+    <div class="b-light clearfix">
+        <!--<button class="pull-left btn btn-md btn-primary">-->
+        <!--<i class="fa fa-plus">取消询价</i>-->
+        <!--</button>-->
+        <!--<div class="font-thin h4 pull-left" style="padding: 8.5px 0">询价详情</div>-->
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+</div>

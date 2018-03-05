@@ -1,0 +1,265 @@
+<script>
+    /*
+    * LYQ
+    * 收益列表
+    * 2018/2/1
+    *
+    * */
+    "use strict";
+    app.controller("profitListCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$stateParams",
+            "$filter",
+            function($rootScope, $scope, $http, $stateParams, $filter){
+
+                $scope.list = [];
+                $scope.role = {};
+                $scope.teamId = "";
+
+                $scope.searchInfo = {};
+
+                //获取当前接口
+                $scope.entity_key = $stateParams.entity_key;
+
+                $scope.state_code = $stateParams.state_code;
+
+                //状态栏
+                $scope.states    = [];
+
+                $scope.open = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.opened = true;
+                };
+                $scope.dateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+                $scope.endOpen = function ($event) {
+                    $event.preventDefault();
+                    $event.stopPropagation();
+                    $scope.endOpened = true;
+                };
+                $scope.endDateOptions = {
+                    formatYear: "yy",
+                    startingDay: 1,
+                    class: "datepicker"
+                };
+
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+                //获取所有代理人状态
+                $scope.getState = function(){
+                    $http.get("/rest/teamStates").success(function(resResult){
+                        $scope.states = resResult._embedded.teamStates;
+                    })
+                };
+                $scope.getState();
+
+                //获取所有产品公司
+                $scope.getPC = function(){
+                    $http.post("dafeng/product/company/query",{stateCode:"ENABLED"}).success(function(resResult){
+                        $scope.productCompany = resResult.data.productCompanies;
+                    })
+                };
+                $scope.getPC();
+
+                //当前列表
+                $scope.getList = function (page) {
+
+                    //传递参数 状态，条数，页码
+                    $http({
+                        method: "POST",
+                        url : "/dafeng/journal/journalList?size=15&page=" + page,
+                        data: $scope.searchInfo
+                    }).success(function(resResult){
+
+                        $scope.list = resResult.data.journals;
+
+                        $scope.pageList = {
+                            size: resResult.data.page.size,
+                            total_elements: resResult.data.page.totalElements,
+                            current_page: resResult.data.page.number === 0 ? 0 : resResult.data.page.number,
+                            num_page: resResult.data.page.totalPages,
+                            total_page: resResult.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#"+ $scope.entity_key +"_list_paginator", $scope.pageList, $scope.getList);
+
+                        }
+                    })
+                };
+                $scope.getList(0);
+
+                //状态栏搜索
+                $scope.stateSelect = function($event,stateCode){
+
+                    if(stateCode === "all"){
+                        $scope.state_code = "";
+                        $scope.searchInfo = {};
+                        $scope.getList(0);
+                    }else{
+                        $scope.state_code = stateCode;
+                        $scope.searchInfo = {
+                            stateCode : stateCode
+                        };
+                        $scope.getList(0);
+                    }
+
+                };
+
+                /*
+                * 清空信息
+                * */
+                $scope.clearSearch = function(){
+                    $scope.searchInfo = {};
+                    $scope.getList(0);
+                };
+            }
+        ]
+    )
+</script>
+
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light" ng-controller="profitListCtrl">
+    <!-- column -->
+    <div class="col w-md lter b-l">
+        <div class="vbox">
+            <div class="wrapper b-b b-light clearfix">
+                <div>
+                    <div class="w inline m-r">
+                        <input type="text" class="form-control"
+                               placeholder="请输入前端用户姓名"
+                               ng-model="searchInfo.customerRealname"
+                               autocomplete="off">
+                    </div>
+                    <div class="w inline m-r">
+                        <input type="text" class="form-control"
+                               placeholder="请输入联系电话"
+                               ng-model="searchInfo.customerPhone"
+                               autocomplete="off">
+                    </div>
+                    <div class="w inline m-r">
+                        <select name="productType"
+                                class="form-control"
+                                ng-model="searchInfo.insuranceType"
+                                id="productType">
+                            <option value="">请选择产品类型</option>
+                            <option value="AUTO_INSURANCE">车险</option>
+                            <option value="NON_AUTO_INSURANCE">非车险</option>
+                            <option value="LIFE_INSURANCE">寿险</option>
+                        </select>
+                    </div>
+                    <div class="w inline m-r">
+                        <input type="text" class="form-control"
+                               placeholder="请输入险种名称"
+                               ng-model="searchInfo.productLabel"
+                               autocomplete="off">
+                    </div>
+                    <div class="w inline m-r">
+                        <select name="" id="insureCompany"
+                                ng-model="searchInfo.productCompanyLabel"
+                                ng-options="item.label as item.label for item in productCompany"
+                                class="form-control">
+                            <option value="">请选择保险公司</option>
+                        </select>
+                    </div>
+                    <div class="inline">
+                        <button type="button" class="btn btn-primary m-r" ng-click="getList(0)">
+                            <span>查询</span>
+                        </button>
+                        <button type="button" class="btn btn-default" ng-click="clearSearch()">
+                            <span>清除</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row-row">
+                <div class="cell">
+                    <div class="cell-inner">
+                        <div class="wrapper">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" ng-if="list.length > 0">
+                                    查询结果
+                                </div>
+                                <div class="panel-heading" ng-if="list.length < 1">
+                                    暂无数据！
+                                </div>
+                                <div class="table-responsive" ng-if="list.length > 0">
+                                    <table class="table table-hover b-t b-light">
+                                        <thead>
+                                            <tr>
+                                                <th>前端用户姓名</th>
+                                                <th>联系电话</th>
+                                                <th>产品类型</th>
+                                                <th>险种名称</th>
+                                                <th>保险公司</th>
+                                                <th>承保时间</th>
+                                                <th>返佣金额(元)</th>
+                                                <th>返佣比例(商业险、交强险、车船税)</th>
+                                                <th>状态</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="item in list">
+                                            <td class="v-middle">
+                                                {{ item.customerRealname ? item.customerRealname : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.customerPhone ? item.customerPhone : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.insuranceType ? (item.insuranceType | profitProductType) : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.productLabel ? item.productLabel : "0" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.productCompanyLabel ? item.productCompanyLabel : "暂无" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.insureTime ? (item.insureTime | dateSecondTime)  : "暂无"}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.commission ? item.commission : "0" }}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.compulsoryCommissionRate ? item.compulsoryCommissionRate : "0" }}%、
+                                                {{ item.commercialCommissionRate ? item.commercialCommissionRate : "0" }}%、
+                                                {{ item.vehicleCommissionRate ? item.vehicleCommissionRate : "0" }}%
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.stateCode ? (item.stateCode | profitState) : "0"}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper b-t b-light clearfix">
+                <ul id="{{ entity_key }}_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+                <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+            </div>
+        </div>
+    </div>
+    <!-- /column -->
+</div>
+<!-- /hbox layout -->

@@ -1,0 +1,935 @@
+package com.liyang.service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.jpa.query.expression.QueryExpSpecificationBuilder;
+import com.jpa.query.expression.generic.GenericQueryExpSpecification;
+import com.liyang.client.CreateEnquiryJsonParseFactory;
+import com.liyang.client.IClient;
+import com.liyang.client.ICreateEnquiryJsonParseAdapter;
+import com.liyang.client.IServiceObserve;
+import com.liyang.client.strategy.SecurityInfoXiaoma;
+import com.liyang.client.tianan.enums.ApiSupplierEnums;
+import com.liyang.client.xiaoma.ClientXiaoma;
+import com.liyang.client.xiaoma.MessageSubmitProposal;
+import com.liyang.client.xiaoma.ResultSubmitProposal;
+import com.liyang.client.xiaoma.ServiceObserveDbPersistSubmitProposal;
+import com.liyang.client.xiaoma.ServiceSubmitProposal;
+import com.liyang.domain.base.AbstractAuditorAct.ActGroup;
+import com.liyang.domain.base.AbstractWorkflowAct.ActType;
+import com.liyang.domain.base.ActRepository;
+import com.liyang.domain.base.AuditorEntityRepository;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.createenquiry.CreateEnquiry;
+import com.liyang.domain.createenquiry.CreateEnquiryRepository;
+import com.liyang.domain.createenquiry.CreateEnquiryStateRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.customer.CustomerRepository;
+import com.liyang.domain.insuranceresult.InsuranceResult;
+import com.liyang.domain.insuranceresult.InsuranceResultData;
+import com.liyang.domain.offerresult.OfferResult;
+import com.liyang.domain.offerresult.OfferResultData;
+import com.liyang.domain.offerresult.OfferResultDataResult;
+import com.liyang.domain.offerresult.OfferResultRepository;
+import com.liyang.domain.platform.Platform;
+import com.liyang.domain.role.Role;
+import com.liyang.domain.role.RoleRepository;
+import com.liyang.domain.submitproposal.SubProParamsContactAddress;
+import com.liyang.domain.submitproposal.SubmitProposal;
+import com.liyang.domain.submitproposal.SubmitProposalAct;
+import com.liyang.domain.submitproposal.SubmitProposalActRepository;
+import com.liyang.domain.submitproposal.SubmitProposalFile;
+import com.liyang.domain.submitproposal.SubmitProposalForSearch;
+import com.liyang.domain.submitproposal.SubmitProposalLog;
+import com.liyang.domain.submitproposal.SubmitProposalLogRepository;
+import com.liyang.domain.submitproposal.SubmitProposalRepository;
+import com.liyang.domain.submitproposal.SubmitProposalState;
+import com.liyang.domain.submitproposal.SubmitProposalStateRepository;
+import com.liyang.domain.submitproposal.SubmitProposalWorkflow;
+import com.liyang.domain.submitproposal.SubmitProposalWorkflowRepository;
+import com.liyang.domain.underwritingresult.UnderwritingResult;
+import com.liyang.domain.underwritingresult.UnderwritingResultData;
+import com.liyang.enums.ExceptionResultEnum;
+import com.liyang.helper.ResponseBody;
+import com.liyang.util.CityCodeUtil;
+import com.liyang.util.FailReturnObject;
+
+/**
+ * 提交核保接口，第三方平台带上applicationId标示，自家平台请求头中存在
+ *
+ * @author Administrator
+ */
+
+/**
+ * @author Administrator
+ */
+@Service
+public class SubmitProposalService extends
+		AbstractWorkflowService<SubmitProposal, SubmitProposalWorkflow, SubmitProposalAct, SubmitProposalState, SubmitProposalLog, SubmitProposalFile> {
+
+	@Autowired
+	SubmitProposalActRepository submitProposalActRepository;
+	@Autowired
+	SubmitProposalStateRepository submitProposalStateRepository;
+	@Autowired
+	SubmitProposalLogRepository submitProposalLogRepository;
+	@Autowired
+	RoleRepository roleRepository;
+	@Autowired
+	SubmitProposalWorkflowRepository submitProposalWorkflowRepository;
+	@Autowired
+	SubmitProposalRepository submitProposalRepository;
+	@Autowired
+	OfferResultRepository offerResultRepository;
+	@Autowired
+	AuthorityJudgeService authorityJudgeService;
+	@Autowired
+	CustomerRepository customerRepository;
+	@Autowired
+	CreateEnquiryStateRepository createEnquiryStateRepository;
+	@Autowired
+	CreateEnquiryRepository createEnquiryRepository;
+
+	public ResponseBody saveSubProResultAndForward(Platform platform, Map<String, Object> subProMap,
+			HttpServletRequest request, String xmcxApiKey) throws Exception {
+		String token = request.getHeader("token");
+		MessageSubmitProposal message = new MessageSubmitProposal(platform, subProMap, token);
+		IClient client = new ClientXiaoma();
+		IServiceObserve serviceObserve = new ServiceObserveDbPersistSubmitProposal(submitProposalRepository);
+		SecurityInfoXiaoma securityInfo = new SecurityInfoXiaoma(xmcxApiKey);
+		ServiceSubmitProposal service = new ServiceSubmitProposal(securityInfo, client, serviceObserve,
+				customerRepository, offerResultRepository, createEnquiryStateRepository, createEnquiryRepository,
+				submitProposalStateRepository, submitProposalActRepository, submitProposalRepository);
+		ResultSubmitProposal result = (ResultSubmitProposal) service.callService(message);
+		// parseSubmitProposalParameters(message);
+
+		// // 将数据提交到小马接口
+		// String responseResult = HttpUtil.postForm(postToXiaoMaUrl,
+		// message.getFormParams());
+		// {"errorMsg":{"code":"success","message":"操作成功"},"data":true,"time":null,"successful":true}
+		// {"errorMsg":{"code":"error.invalid.offerstate","message":"该报价状态不能下单"},"data":null,"time":null,"successful":false}
+		// SubmitProposal submitProposal = parseSubmitProposalResult(message,
+		// responseResult);
+		// // 保存提交核保数据
+		// submitProposalRepository.save(submitProposal);
+
+		return new ResponseBody(ExceptionResultEnum.SUCCESS);
+
+		/**
+		 * Original Code 5 reconstru 20171123
+		 */
+		// // 将原数据转换成小马接口需要的标准数据
+		// Map<String, String> formParams = new HashMap<String, String>();
+		// HashMap<String, Object> reslutMap = (HashMap<String, Object>)
+		// subProMap.get("params");
+		// ObjectMapper objectMapper = new ObjectMapper();
+		// String ownerName = null;
+		// if (null == reslutMap || reslutMap.isEmpty()) {
+		// throw new
+		// FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_NULLINFO_ERROR);
+		// }
+		// formParams.put("params",
+		// JSONObject.fromObject(reslutMap).toString());
+		//
+		// // 将数据提交到小马接口
+		// String responseResult = HttpUtil.postForm(postToXiaoMaUrl,
+		// formParams);
+		// //
+		// {"errorMsg":{"code":"success","message":"操作成功"},"data":true,"time":null,"successful":true}
+		// //
+		// {"errorMsg":{"code":"error.invalid.offerstate","message":"该报价状态不能下单"},"data":null,"time":null,"successful":false}
+		// if (responseResult == null) {
+		// throw new
+		// FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_RETURN_DATA_ERROR);
+		// }
+		// @SuppressWarnings("unchecked")
+		// Map<String, Object> originalResponseDataMap =
+		// objectMapper.readValue(responseResult, Map.class);
+		// Object errorMsg;
+		//
+		// if (null == originalResponseDataMap || null == (errorMsg =
+		// originalResponseDataMap.get("errorMsg"))
+		// || !(errorMsg.toString().contains("success"))) {
+		// throw new
+		// FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_RETURN_DATA_ERROR);
+		// }
+		//
+		// // String responseResult
+		// //
+		// ="{\"errorMsg\":{\"code\":\"success\",\"message\":\"操作成功\"},\"data\":true,\"time\":null,\"successful\":true}";
+		// // 将提交核保数据转换成对象
+		// SubmitProposal submitProposal = TransUtils.mapTransObject(subProMap,
+		// SubmitProposal.class);
+		// // 保存提交核保结果
+		// submitProposal.setResponseResult(responseResult);
+		// // 关联平台
+		// submitProposal.setPlatform(platform);
+		// // 关联用户
+		// Customer customer =
+		// customerRepository.findByToken(request.getHeader("token"));
+		// submitProposal.setCustomer(customer);
+		// // 关联报价结果
+		// String orderId = (String) reslutMap.get("orderId");
+		// List<OfferResult> offerResultList =
+		// OfferResultRepository.findByDataResultOfferId(orderId);
+		// if (null == offerResultList || offerResultList.isEmpty()) {
+		// throw new
+		// FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_OFFERRES_DATA_MIS_ERROR);
+		// }
+		// submitProposal.setOfferResult(offerResultList.get(0));
+		//
+		// // 设置提交核保的时间
+		// submitProposal.setCreateTime(new Date());
+		// CreateEnquiryState state3 =
+		// createEnquiryStateRepository.findByStateCode("SUBMIT_ALREADY");
+		// CreateEnquiry cee = offerResultList.get(0).getCreateEnquiry();
+		// cee.setState(state3);
+		// createEnquiryRepository.save(cee);
+		//
+		// // 设置工作流的初始状态：核保中
+		// submitProposal.setState(submitProposalStateRepository.findByStateCode("HENBAO"));
+		//
+		// // 设置工作流：出单管理流程
+		// submitProposal.setWorkflow(submitProposalActRepository.findByActCode("create").getStartWorkflow());
+		//
+		// List<SubmitProposal> submitProposalList =
+		// submitProposalRepository.findByParamsOrderId(orderId);
+		// if (null != submitProposalList && (!submitProposalList.isEmpty())) {
+		// submitProposal.setId(submitProposalList.get(0).getId());
+		// }
+		// // 保存提交核保数据
+		// submitProposalRepository.save(submitProposal);
+		//
+		// return new ResponseBody(ExceptionResultEnum.SUCCESS);
+
+		/*
+		 * Original Code 4 Reconstru
+		 */
+		// //获取平台的applicationId,并判断applicationId是否具有访问权限
+		// String applicationId=(String)subProMap.get("applicationId");
+		// if(applicationId==null) {
+		// applicationId=request.getHeader("applicationId");
+		// }else {
+		// //转换成请求小马接口标准数据，去处applicationId
+		// subProMap.remove("applicationId");
+		// }
+		// platform=authorityJudgeService.authorityJudge(applicationId);
+		//
+		// //将原数据转换成小马接口需要的标准数据
+		// Map<String, String> formParams=new HashMap<String, String>();
+		// HashMap<String, Object> reslutMap=(HashMap<String,
+		// Object>)subProMap.get("params");
+		// String ownerName=null;
+		// if(reslutMap==null) {
+		// throw new FailReturnObject(600, "提交核保信息为空，请正确提交");
+		// }else {
+		// if(reslutMap.get("ownerName")==null) {
+		// throw new FailReturnObject(100, "提交核保信息,请传入车辆所有人姓名");
+		// }else {
+		// ownerName=(String)reslutMap.get("ownerName");
+		// //去除车主姓名,小马接口不需要此字段
+		// reslutMap.remove("ownerName");
+		// }
+		// }
+		// formParams.put("params",JSONObject.fromObject(reslutMap).toString());
+		//
+		//
+		// //将数据提交到小马接口
+		// String responseResult=HttpUtil.postForm(postToXiaoMaUrl,formParams);
+		//
+		//
+		// //返回结果处理
+		// ResponseBody responseBody=new ResponseBody();
+		// ObjectMapper objectMapper=new ObjectMapper();
+		// if(responseResult==null){
+		// throw new FailReturnObject(700,"提交核保失败，请重新提交核保");
+		// }else{
+		// //将提交核保数据转换成对象
+		// SubmitProposal
+		// submitProposal=TransUtils.mapTransObject(subProMap,SubmitProposal.class);
+		//
+		// //保存提交核保结果
+		// submitProposal.setResponseResult(responseResult);
+		//
+		// //关联平台
+		// submitProposal.setPlatform(platform);
+		//
+		// //关联用户
+		// Customer
+		// customer=customerRepository.findByToken(request.getHeader("token"));
+		// submitProposal.setCustomer(customer);
+		//
+		// //关联报价结果
+		// String orderId=(String)reslutMap.get("orderId");
+		// OfferResult
+		// offerResult=OfferResultRepository.findOfferResultByOfferId(orderId);
+		// submitProposal.setOfferResult(offerResult);
+		//
+		//
+		// //设置提交核保的时间
+		// submitProposal.setCreateTime(new Date());
+		// CreateEnquiryState state3 =
+		// createEnquiryStateRepository.findByStateCode("SUBMIT_ALREADY");
+		// CreateEnquiry cee = offerResult.getCreateEnquiry();
+		// cee.setState(state3);
+		// createEnquiryRepository.save(cee);
+		//
+		// //设置工作流的初始状态：核保中
+		// submitProposal.setState(submitProposalStateRepository.findByStateCode("HENBAO"));
+		//
+		// //设置工作流：出单管理流程
+		// submitProposal.setWorkflow(submitProposalActRepository.findByActCode("create").getStartWorkflow());
+		//
+		// //设置车辆所有人姓名
+		// submitProposal.getParams().setOwnerName(ownerName);
+		//
+		// SubmitProposal listt =
+		// submitProposalRepository.findByOrderId(orderId);
+		// if(listt != null){
+		// Integer idd = listt.getId();
+		// submitProposal.setId(idd);
+		// }
+		// //保存提交核保数据
+		// submitProposalRepository.save(submitProposal);
+		//
+		//
+		// //将数据封装成指定格式返回
+		// Map<String, Object> handerMap=objectMapper.readValue(responseResult,
+		// Map.class);
+		// if((Boolean)handerMap.get("successful")){
+		// responseBody.setErrorCode(0);
+		// responseBody.setErrorInfo("OK");
+		// responseBody.setData(null);
+		// }else {
+		// responseBody.setErrorCode(100);
+		// responseBody.setData(null);
+		// responseBody.setErrorInfo(JSONObject.fromObject(handerMap.get("errorMsg")).getString("message"));
+		// }
+		//
+		// return responseBody;
+		// }
+	}
+
+	@Override
+	@PostConstruct
+	public void sqlInit() {
+		System.out.println("submitProposalService初始化");
+		if (submitProposalActRepository.count() <= 0) {
+			SubmitProposalWorkflow submitProposalApplyWorkflow = new SubmitProposalWorkflow();
+			submitProposalApplyWorkflow.setLabel("出单管理流程");
+			// 初始化化时工作流的初始化
+			submitProposalApplyWorkflow = submitProposalWorkflowRepository.save(submitProposalApplyWorkflow);
+			// 动作的定义
+			SubmitProposalAct createActSave = submitProposalActRepository
+					.save(new SubmitProposalAct("创建", "create", 10, ActGroup.UPDATE));
+			SubmitProposalAct readActSave = submitProposalActRepository
+					.save(new SubmitProposalAct("读取", "read", 20, ActGroup.READ));
+			SubmitProposalAct updateActSave = submitProposalActRepository
+					.save(new SubmitProposalAct("更新", "update", 30, ActGroup.UPDATE));
+			SubmitProposalAct deleteActSave = submitProposalActRepository
+					.save(new SubmitProposalAct("删除", "delete", 40, ActGroup.UPDATE));
+			// 状态的定义
+			SubmitProposalState hebaoState = new SubmitProposalState("核保中", 0, "HENBAO");
+			// 核保中状态具有什么什么动作，事先规定
+			hebaoState.setActs(Arrays.asList(createActSave, readActSave, updateActSave, deleteActSave).stream()
+					.collect(Collectors.toSet()));
+			hebaoState = submitProposalStateRepository.save(hebaoState);
+			// SubmitProposalState hebaoByPersonState = new
+			// SubmitProposalState("人工核保中", 100, "HENBAOING");
+			// hebaoByPersonState.setActs(Arrays.asList(createActSave,
+			// readActSave, updateActSave, deleteActSave).stream()
+			// .collect(Collectors.toSet()));
+			// hebaoByPersonState =
+			// submitProposalStateRepository.save(hebaoByPersonState);
+			SubmitProposalState hebaoFailedState = new SubmitProposalState("核保失败", 100, "HENBAO_FAILED");
+			hebaoFailedState.setActs(Arrays.asList(createActSave, readActSave, updateActSave, deleteActSave).stream()
+					.collect(Collectors.toSet()));
+			hebaoFailedState = submitProposalStateRepository.save(hebaoFailedState);
+
+			// SubmitProposalState henbaoWaitConfrimState = new
+			// SubmitProposalState("核保通过待确认", 300, "HEBAO_WAIT_CONFRIM");
+			// henbaoWaitConfrimState.setActs(
+			// Arrays.asList(createActSave, readActSave,
+			// deleteActSave).stream().collect(Collectors.toSet()));
+			// submitProposalStateRepository.save(henbaoWaitConfrimState);
+
+			SubmitProposalState henbaoSuccessState = new SubmitProposalState("核保通过待付款", 200, "HENBAO_SUCCESS_PAYMENT");
+			henbaoSuccessState.setActs(
+					Arrays.asList(createActSave, readActSave, deleteActSave).stream().collect(Collectors.toSet()));
+			submitProposalStateRepository.save(henbaoSuccessState);
+
+			SubmitProposalState paidSuccessState = new SubmitProposalState("支付成功", 300, "PAYMENT_SUCCESS");
+			paidSuccessState.setActs(
+					Arrays.asList(createActSave, readActSave, deleteActSave).stream().collect(Collectors.toSet()));
+			submitProposalStateRepository.save(paidSuccessState);
+
+			SubmitProposalState paidFaildState = new SubmitProposalState("支付失败", 400, "PAYMENT_FAILD");
+			paidFaildState.setActs(
+					Arrays.asList(createActSave, readActSave, deleteActSave).stream().collect(Collectors.toSet()));
+			submitProposalStateRepository.save(paidFaildState);
+
+			SubmitProposalState paidCancelState = new SubmitProposalState("支付取消", 500, "PAYMENT_CANCEL");
+			paidCancelState.setActs(
+					Arrays.asList(createActSave, readActSave, deleteActSave).stream().collect(Collectors.toSet()));
+			submitProposalStateRepository.save(paidCancelState);
+
+			SubmitProposalState chengbaoSuccessState = new SubmitProposalState("承保成功", 600, "CHENGBAO_SUCCESS");
+			chengbaoSuccessState.setActs(Arrays.asList(createActSave, readActSave, updateActSave, deleteActSave)
+					.stream().collect(Collectors.toSet()));
+			submitProposalStateRepository.save(chengbaoSuccessState);
+
+			SubmitProposalState chengbaoFaildState = new SubmitProposalState("承保失败", 700, "CHENGBAO_FAILD");
+			chengbaoFaildState.setActs(Arrays.asList(createActSave, readActSave, updateActSave, deleteActSave).stream()
+					.collect(Collectors.toSet()));
+			submitProposalStateRepository.save(chengbaoFaildState);
+			// 该工作流下具有所有的状态
+			submitProposalApplyWorkflow.setStates(new HashSet<SubmitProposalState>(
+					Arrays.asList(hebaoState, hebaoFailedState, henbaoSuccessState, paidSuccessState, paidFaildState,
+							paidCancelState, chengbaoFaildState, chengbaoFaildState)));
+			submitProposalApplyWorkflow = submitProposalWorkflowRepository.save(submitProposalApplyWorkflow);
+
+			// createActSave创建动作下，具有的状态、工作流、动作类、角色
+			createActSave.setActType(ActType.START);
+			createActSave.setStartWorkflow(submitProposalApplyWorkflow);
+			createActSave.setTargetState(hebaoState);
+
+			// Role role =
+			// roleRepository.findByRoleCode(Role.RoleCode.valueOf("USER"));
+			Role role = roleRepository.findByRoleCode("USER");
+			if (role != null) {
+				createActSave.setRoles(new HashSet<Role>(Arrays.asList(role)));
+			}
+			submitProposalActRepository.save(createActSave);
+
+			// 核保中状态码改为HENBAOING
+			SubmitProposalState henbaoState = submitProposalStateRepository.findByStateCode("HENBAO");
+			if (henbaoState != null) {
+				henbaoState.setStateCode("HENBAOING");
+				henbaoState = submitProposalStateRepository.save(henbaoState);
+			}
+			// 添加人工核保和核保通过待确认状态
+			SubmitProposalState henbaoingState = submitProposalStateRepository.findByStateCode("HENBAO_PERSON");
+			if (henbaoingState == null) {
+				henbaoingState = new SubmitProposalState("人工核保中", 50, "HENBAO_PERSON");
+				henbaoingState = submitProposalStateRepository.save(henbaoingState);
+			}
+			SubmitProposalState hebaoWaitConfrimState = submitProposalStateRepository
+					.findByStateCode("HEBAO_WAIT_CONFRIM");
+			if (hebaoWaitConfrimState == null) {
+				hebaoWaitConfrimState = new SubmitProposalState("核保通过待确认", 150, "HEBAO_WAIT_CONFRIM");
+				hebaoWaitConfrimState = submitProposalStateRepository.save(hebaoWaitConfrimState);
+			}
+
+		}
+		// 修改：将1，核保成功待付款 变更为 待付款 2，核保通过待确认 变更为 待确认
+		SubmitProposalState henbaoSuccessState = submitProposalStateRepository
+				.findByStateCode("HENBAO_SUCCESS_PAYMENT");
+		if (henbaoSuccessState != null && ("核保通过待付款").equals(henbaoSuccessState.getLabel())) {
+			henbaoSuccessState.setLabel("待付款");
+			henbaoSuccessState = submitProposalStateRepository.save(henbaoSuccessState);
+		}
+		SubmitProposalState hebaoWaitConfrimState = submitProposalStateRepository.findByStateCode("HEBAO_WAIT_CONFRIM");
+		if (hebaoWaitConfrimState != null && ("核保通过待确认").equals(hebaoWaitConfrimState.getLabel())) {
+			hebaoWaitConfrimState.setLabel("待确认");
+			hebaoWaitConfrimState = submitProposalStateRepository.save(hebaoWaitConfrimState);
+		}
+
+	}
+
+	@Override
+	public LogRepository<SubmitProposalLog> getLogRepository() {
+		return submitProposalLogRepository;
+	}
+
+	@Override
+	public SubmitProposalLog getLogInstance() {
+		return new SubmitProposalLog();
+	}
+
+	@Override
+	public AuditorEntityRepository<SubmitProposal> getAuditorEntityRepository() {
+		return submitProposalRepository;
+	}
+
+	@Override
+	public ActRepository<SubmitProposalAct> getActRepository() {
+		return submitProposalActRepository;
+	}
+
+	@Override
+	@PostConstruct
+	public void injectEntityService() {
+		new SubmitProposal().setService(this);
+	}
+
+	@Override
+	@PostConstruct
+	public void injectLogRepository() {
+		new SubmitProposal().setLogRepository(submitProposalLogRepository);
+	}
+
+	@Override
+	public SubmitProposalFile getFileLogInstance() {
+		return new SubmitProposalFile();
+	}
+
+	/**
+	 * 显示承保成功的订单,并分页显示
+	 *
+	 * @param spfs
+	 * @param token
+	 * @param pageable
+	 * @return
+	 */
+	public Page<SubmitProposal> getSuccess(final SubmitProposalForSearch spfs, String token, Pageable pageable) {
+		Page<SubmitProposal> submitProposalPage = submitProposalRepository.findAll(new Specification<SubmitProposal>() {
+
+			@Override
+			public Predicate toPredicate(Root<SubmitProposal> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+
+				List<Predicate> predicateList = new ArrayList<Predicate>();
+				Predicate tokenInfo = cb.equal(root.get("customer").get("token"), token);
+				predicateList.add(tokenInfo);
+				if (spfs != null) {
+					Predicate isShowEqual = cb.equal(root.get("isShow"), 0);
+					predicateList.add(isShowEqual);
+					// 状态
+
+					Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"), "CHENGBAO_SUCCESS");
+					predicateList.add(stateCodeEqual);
+
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+				}
+				return null;
+			}
+
+		}, pageable);
+
+		return submitProposalPage;
+	}
+
+	/**
+	 * @param spfs
+	 * @param token
+	 * @param pageable
+	 *            分页
+	 * @return 订单分页搜索显示
+	 * @author nlj
+	 */
+
+	public Page<SubmitProposal> seniorMultiConditionSearch(final SubmitProposalForSearch spfs, String token,
+			Pageable pageable) {
+		Page<SubmitProposal> submitProposalPage = submitProposalRepository.findAll(new Specification<SubmitProposal>() {
+
+			@Override
+			public Predicate toPredicate(Root<SubmitProposal> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+
+				List<Predicate> predicateList = new ArrayList<Predicate>();
+				Predicate tokenInfo = cb.equal(root.get("customer").get("token"), token);
+				predicateList.add(tokenInfo);
+				if (spfs != null) {
+					Predicate isShowEqual = cb.equal(root.get("isShow"), 0);
+					predicateList.add(isShowEqual);
+					// Sort sort = null;
+					// if ("auto".equals(sortType)) {
+					// sort = new Sort(Direction.DESC, "createTime");
+					// 出单单号
+					if (!StringUtils.isEmpty(spfs.getOrderId())) {
+						Predicate orderIdEqual = cb.equal(root.get("params").get("orderId"), spfs.getOrderId());
+						predicateList.add(orderIdEqual);
+					}
+					// 被保人
+					if (!StringUtils.isEmpty(spfs.getInsuredName())) {
+						Predicate insuredNameEqual = cb.equal(root.get("params").get("insuredName"),
+								spfs.getInsuredName());
+						predicateList.add(insuredNameEqual);
+					}
+					// 车牌
+					if (!StringUtils.isEmpty(spfs.getLicenseNumber())) {
+						Predicate licenseNumberEquals = cb.equal(
+								root.get("offerResult").get("createEnquiry").get("licenseNumber"),
+								spfs.getLicenseNumber());
+						predicateList.add(licenseNumberEquals);
+					}
+					// 车主
+					if (!StringUtils.isEmpty(spfs.getOwnerName())) {
+						Predicate ownerNameEqual = cb.equal(root.get("offerResult").get("createEnquiry")
+								.get("createEnquiryParams").get("ownerName"), spfs.getOwnerName());
+						predicateList.add(ownerNameEqual);
+					}
+					// 被保人(下单人)手机号
+					if (!StringUtils.isEmpty(spfs.getInsuredPhone())) {
+						Predicate insuredPhoneEqual = cb.equal(root.<String>get("params").<String>get("insuredPhone"),
+								spfs.getInsuredPhone());
+						predicateList.add(insuredPhoneEqual);
+					}
+					// 投保公司
+					if (!StringUtils.isEmpty(spfs.getInsuranceCompanyName())) {
+						Predicate insuranceCompanyNameLike = cb.equal(
+								root.get("offerResult").get("data").get("result").get("insuranceCompanyName"),
+								spfs.getInsuranceCompanyName());
+						predicateList.add(insuranceCompanyNameLike);
+					}
+					// 状态
+					if (!StringUtils.isEmpty(spfs.getStateCode())) {
+						Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"), spfs.getStateCode());
+						predicateList.add(stateCodeEqual);
+					}
+					// 车主
+					if (!StringUtils.isEmpty(spfs.getOwnerName())) {
+						Predicate ownerNameEqual = cb.equal(root.get("offerResult").get("createEnquiry")
+								.get("createEnquiryParams").get("ownerName"), spfs.getOwnerName());
+						predicateList.add(ownerNameEqual);
+					}
+					query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+				}
+				return null;
+			}
+
+		}, pageable);
+
+		return submitProposalPage;
+	}
+
+	/**
+	 * 根据客户id显示核保订单
+	 *
+	 * @param spfs
+	 * @param pageable
+	 * @param
+	 * @return
+	 */
+	public Page<SubmitProposal> multiConditionSearchById(final SubmitProposalForSearch spfs, Pageable pageable) {
+		Customer one = customerRepository.getOne(spfs.getCustomerId());
+		if (one != null) {
+			Page<SubmitProposal> submitProposalPage = submitProposalRepository
+					.findAll(new Specification<SubmitProposal>() {
+
+						@Override
+						public Predicate toPredicate(Root<SubmitProposal> root, CriteriaQuery<?> query,
+								CriteriaBuilder cb) {
+							List<Predicate> predicateList = new ArrayList<Predicate>();
+							if (spfs != null) {
+								// 客户编号
+								if (!StringUtils.isEmpty(spfs.getCustomerId())) {
+									Predicate customer = cb.equal(root.get("customer").<Integer>get("id"),
+											spfs.getCustomerId());
+									predicateList.add(customer);
+								}
+								// 出单单号
+								if (!StringUtils.isEmpty(spfs.getOrderId())) {
+									Predicate orderIdEqual = cb.equal(root.get("params").get("orderId"),
+											spfs.getOrderId());
+									predicateList.add(orderIdEqual);
+								}
+								// 被保人
+								if (!StringUtils.isEmpty(spfs.getInsuredName())) {
+									Predicate insuredNameEqual = cb.equal(root.get("params").get("insuredName"),
+											spfs.getInsuredName());
+									predicateList.add(insuredNameEqual);
+								}
+								// 车牌
+								if (!StringUtils.isEmpty(spfs.getLicenseNumber())) {
+									Predicate licenseNumberEquals = cb.equal(
+											root.get("offerResult").get("createEnquiry").get("licenseNumber"),
+											spfs.getLicenseNumber());
+									predicateList.add(licenseNumberEquals);
+								}
+								// 车主
+								if (!StringUtils.isEmpty(spfs.getOwnerName())) {
+									Predicate ownerNameEqual = cb.equal(
+											root.get("offerResult").get("createEnquiry").get("ownerName"),
+											spfs.getOwnerName());
+									predicateList.add(ownerNameEqual);
+								}
+								// 投保公司
+								if (!StringUtils.isEmpty(spfs.getInsuranceCompanyName())) {
+									Predicate insuranceCompanyNameLike = cb.equal(root.get("offerResult").get("data")
+											.get("result").get("insuranceCompanyName"), spfs.getInsuranceCompanyName());
+									predicateList.add(insuranceCompanyNameLike);
+								}
+								// 状态
+								if (!StringUtils.isEmpty(spfs.getStateCode())) {
+									Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"),
+											spfs.getStateCode());
+									predicateList.add(stateCodeEqual);
+								}
+
+							}
+							// query.multiselect(cb.array(root.get("customer").<Integer>get("id")));
+							query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+							return null;
+
+						}
+					}, pageable);
+			return submitProposalPage;
+
+		}
+		return null;
+	}
+
+	public Page<SubmitProposal> multiConditionSearch( SubmitProposalForSearch spfs, Pageable pageable) {
+		Page<SubmitProposal> submitProposalPage = submitProposalRepository
+				.findAll(new Specification<SubmitProposal>() {
+
+					@Override
+					public Predicate toPredicate(Root<SubmitProposal> root, CriteriaQuery<?> query,
+												 CriteriaBuilder cb) {
+						List<Predicate> predicateList = new ArrayList<Predicate>();
+						if (spfs != null) {
+							// 出单单号
+							if (!StringUtils.isEmpty(spfs.getOrderId())) {
+								Predicate orderIdEqual = cb.equal(root.get("params").get("orderId"),
+										spfs.getOrderId());
+								predicateList.add(orderIdEqual);
+							}
+							// 被保人
+							if (!StringUtils.isEmpty(spfs.getInsuredName())) {
+								Predicate insuredNameEqual = cb.equal(root.get("params").get("insuredName"),
+										spfs.getInsuredName());
+								predicateList.add(insuredNameEqual);
+							}
+							// 车牌
+							if (!StringUtils.isEmpty(spfs.getLicenseNumber())) {
+								Predicate licenseNumberEquals = cb.equal(
+										root.get("offerResult").get("createEnquiry").get("licenseNumber"),
+										spfs.getLicenseNumber());
+								predicateList.add(licenseNumberEquals);
+							}
+							// 车主
+							if (!StringUtils.isEmpty(spfs.getOwnerName())) {
+								Predicate ownerNameEqual = cb.equal(
+										root.get("offerResult").get("createEnquiry").get("ownerName"),
+										spfs.getOwnerName());
+								predicateList.add(ownerNameEqual);
+							}
+							// 投保公司
+							if (!StringUtils.isEmpty(spfs.getInsuranceCompanyName())) {
+								Predicate insuranceCompanyNameLike = cb.equal(root.get("offerResult").get("data")
+										.get("result").get("insuranceCompanyName"), spfs.getInsuranceCompanyName());
+								predicateList.add(insuranceCompanyNameLike);
+							}
+							// 状态
+							if (!StringUtils.isEmpty(spfs.getStateCode())) {
+								Predicate stateCodeEqual = cb.equal(root.get("state").get("stateCode"),
+										spfs.getStateCode());
+								predicateList.add(stateCodeEqual);
+							}
+							// 出单人手机号
+							if (!StringUtils.isEmpty(spfs.getInsuredPhone())) {
+								Predicate insuredPhoneEqual = cb.equal(root.get("customer").get("phone"), spfs.getInsuredPhone());
+								predicateList.add(insuredPhoneEqual);
+							}
+
+						}
+						// query.multiselect(cb.array(root.get("customer").<Integer>get("id")));
+						query.where(predicateList.toArray(new Predicate[predicateList.size()]));
+						return null;
+
+					}
+				}, pageable);
+		return submitProposalPage;
+//		GenericQueryExpSpecification<SubmitProposal> queryExpression = new GenericQueryExpSpecification<>(new String[] {
+//				"id", "params", "offerResult", "state", "isShow", "createTime", "createdAt", "lastModifiedAt" });
+//		queryExpression.add(QueryExpSpecificationBuilder.eq("params.orderId", spfs.getOrderId(), true))
+//				.add(QueryExpSpecificationBuilder.eq("params.insuredName", spfs.getInsuredName(), true))
+//				.add(QueryExpSpecificationBuilder.eq("offerResult.createEnquiry.licenseNumber", spfs.getLicenseNumber(), true))
+//				.add(QueryExpSpecificationBuilder.eq("params.ownerName", spfs.getOwnerName(), true))
+//				.add(QueryExpSpecificationBuilder.eq("params.insuredPhone", spfs.getInsuredPhone(), true))
+//				.add(QueryExpSpecificationBuilder.eq("offerResult.data.result.insuranceCompanyName",
+//						spfs.getInsuranceCompanyName(), true))
+//				.add(QueryExpSpecificationBuilder.eq("state.stateCode", spfs.getStateCode(), true));
+//		Page<SubmitProposal> submitProposalPage = submitProposalRepository.findAll(queryExpression, pageable);
+
+	}
+
+	/**
+	 * 移动端订单列表
+	 *
+	 * @param token
+	 * @param status
+	 * @return
+	 */
+	public List<Map<String, Object>> getSubmitProposalListForMobile(String token, String status) {
+		List<SubmitProposal> subProList = new ArrayList<>();
+		if (null == status) {
+			subProList = submitProposalRepository.findSubmitProposalByToken(token);
+		} else if ("HENBAO_SUCCESS_PAYMENT".equals(status)) {
+			subProList = submitProposalRepository.findSubmitProposalByTokenAndStatus(token, status);
+		} else if ("CHENGBAO_SUCCESS".equals(status)) {
+			subProList = submitProposalRepository.getFinishedByToken(token);
+		}
+		List<Map<String, Object>> returnList = new ArrayList<>();
+		for (SubmitProposal submitProposal : subProList) {
+			Map<String, Object> subProMap = new HashMap<>();
+			subProMap.put("id", submitProposal.getId());
+			subProMap.put("createTime", submitProposal.getCreateTime());
+			OfferResult offerResult = submitProposal.getOfferResult();
+			subProMap.put("params", submitProposal.getParams());
+			if (null != offerResult) {
+				OfferResultDataResult dataResult = offerResult.getData().getResult();
+				subProMap.put("insuranceCompanyName", dataResult.getInsuranceCompanyName());
+				subProMap.put("insuranceCompanyId", dataResult.getInsuranceCompanyId());
+//				Double originalPrice = dataResult.getOriginalPrice().doubleValue() / 100;
+//				Double forcePremium = dataResult.getForcePremium().doubleValue() / 100;
+//				Double taxPrice = dataResult.getTaxPrice().doubleValue() / 100;
+//				subProMap.put("sumPrice", originalPrice + forcePremium + taxPrice);
+				subProMap.put("sumPrice", OfferResultService.getSumPriceFromDataResult(dataResult));
+				subProMap.put("offerId", dataResult.getOfferId());
+				ICreateEnquiryJsonParseAdapter adapter = new CreateEnquiryJsonParseFactory(
+						offerResult.getCreateEnquiry()).createAdapter();
+				subProMap.put("licenseNumber", adapter.getLicenseNumber());
+			}
+			if (null != submitProposal.getUnderwritingResult()) {
+				subProMap.put("underwrittingJson",
+						submitProposal.getUnderwritingResult().getData().getUnderwritingJson());
+			}
+			if (null != submitProposal.getState()) {
+				subProMap.put("status", submitProposal.getState().getLabel());
+			}
+			returnList.add(subProMap);
+		}
+		return returnList;
+	}
+
+	public ResponseBody getResultInfo(String orderId) {
+		// TODO Auto-generated method stub
+		List<SubmitProposal> subProList = submitProposalRepository.findByOrderId2(orderId);
+
+		return new ResponseBody(subProList);
+	}
+
+	public ResponseBody getSubmitProposalDetail(Integer id, String orderId) {
+		Map<String, Object> returnMap = new HashMap<>();
+		SubmitProposal submitProposal = submitProposalRepository.getById(id);
+		if (submitProposal != null) {
+			if (submitProposal.getParams() != null) {
+				returnMap.put("params", submitProposal.getParams());
+				returnMap.put("ownerIdCard", submitProposal.getParams().getOwnerIdCard());
+				returnMap.put("ownerIdCard", submitProposal.getParams().getOwnerIdCard());
+
+			}
+			returnMap.put("createTime", submitProposal.getCreateTime());
+			Map<String, Object> customerMap = new HashMap<>();
+			Customer customer = submitProposal.getCustomer();
+			if (customer != null) {
+				customerMap.put("nickname", customer.getNickname());
+				customerMap.put("stateCode", customer.getStateCode());
+				returnMap.put("customer", customerMap);
+			}
+
+			UnderwritingResult underwritingResult = submitProposal.getUnderwritingResult();
+			UnderwritingResultData underwritingResultData = underwritingResult.getData();
+			returnMap.put("underwritingResultData", underwritingResultData);
+
+			List<OfferResultDataResult> resultList = new ArrayList<>();
+			OfferResult offerResult = submitProposal.getOfferResult();
+			CreateEnquiry createEnquiry = offerResult.getCreateEnquiry();
+			OfferResultData data = offerResult.getData();
+			if (offerResult != null) {
+				if (data != null) {
+					OfferResultDataResult result = data.getResult();
+					resultList.add(result);
+					returnMap.put("resultList", resultList);
+				}
+				if (createEnquiry != null) {
+					Map<String, Object> createEnquiryMap = new HashMap<>();
+					createEnquiryMap.put("createEnquiryParams", createEnquiry.getCreateEnquiryParams());
+					if (ApiSupplierEnums.TIANAN.equals(createEnquiry.getApiSupplier())) {
+						String cityName = CityCodeUtil
+								.getCityName((String) createEnquiry.getCreateEnquiryParams().get("cityCode"));
+						returnMap.put("cityName", cityName);
+					}
+					returnMap.put("ownerName", createEnquiry.getCreateEnquiryParams().get("ownerName"));
+					returnMap.put("licenseNumber", createEnquiry.getCreateEnquiryParams().get("licenseNumber"));
+					returnMap.put("createEnquiry", createEnquiryMap);
+				}
+			}
+
+			InsuranceResult insuranceResult = submitProposal.getInsuranceResult();
+			if (insuranceResult != null) {
+				InsuranceResultData insuranceResultData = insuranceResult.getData();
+				returnMap.put("insuranceResultData", insuranceResultData);
+			}
+
+		}
+		// returnMap.put("createEnquiry", );
+		// returnMap.put("offerResult", );
+		// returnMap.put("state", submitProposal.getState());
+		return new ResponseBody(returnMap);
+	}
+
+	/**
+	 * 修改大蜂配送地址
+	 * 
+	 * @param
+	 * @param dafengAddress
+	 * @return
+	 */
+	@Transactional
+	public ResponseBody updateDafengAddress(String orderId, String dafengContactName, String dafengContactPhone,
+			String dafengAddress) {
+		SubmitProposal subProposal = submitProposalRepository.findByOrderId(orderId);
+		if (null == subProposal) {
+			throw new FailReturnObject(ExceptionResultEnum.SUBPROPOSAL_ORDERID_ERROR);
+		}
+		Date addExpTime = subProposal.getParams().getAddressExpireTime();
+		if (addExpTime != null && addExpTime.compareTo(new Date()) < 0) {
+			throw new FailReturnObject(ExceptionResultEnum.INSURANCE_ADDRESS_EXPIRE_ERROR);
+		}
+		if (null != subProposal.getParams().getAddressMofied() && subProposal.getParams().getAddressMofied()) {
+			throw new FailReturnObject(ExceptionResultEnum.INSURANCE_ADDRESS_HAS_MODIFIED_ERROR);
+		}
+		subProposal.getParams().setDafengContactName(dafengContactName);
+		subProposal.getParams().setDafengContactPhone(dafengContactPhone);
+		subProposal.getParams().setDafengAddress(dafengAddress);
+		subProposal.getParams().setAddressMofied(true);
+		submitProposalRepository.save(subProposal);
+		return new ResponseBody("修改成功");
+	}
+
+	/**
+	 * 临时方法，更新大蜂配送信息是空的记录
+	 * 
+	 * @return
+	 */
+	public ResponseBody updateEmptyDafengAddress() {
+		List<SubmitProposal> subProposalList = submitProposalRepository.findByParams_DafengContactNameIsNull();
+		for (SubmitProposal sp : subProposalList) {
+			sp.getParams().setDafengContactName(sp.getParams().getContactName());
+			sp.getParams().setDafengContactPhone(sp.getParams().getContactPhone());
+			if (null == sp.getParams().getContactAddress().getAcceptProvince()) {
+				sp.getParams().setDafengAddress(sp.getParams().getContactAddress().getContactAddressDetail());
+			} else {
+				SubProParamsContactAddress contactAddress = sp.getParams().getContactAddress();
+				sp.getParams().setDafengAddress(contactAddress.getProvinceName() + "省" + contactAddress.getCityName()
+						+ "市" + contactAddress.getAreaName() + "区（县）" + contactAddress.getContactAddressDetail());
+			}
+		}
+		submitProposalRepository.save(subProposalList);
+		return new ResponseBody("成功更新" + subProposalList.size() + "条数据");
+	}
+
+}

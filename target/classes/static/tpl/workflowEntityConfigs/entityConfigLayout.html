@@ -1,0 +1,31 @@
+<!-- hbox layout -->
+<div class="hbox hbox-auto-xs bg-light h-full">
+	<div class="col w-md b-r ">
+		<div class="vbox">
+			<div class="wrapper-md b-b">
+				<div class="font-thin h4">{{entity_key}}</div>
+			</div>
+			<div class="row-row">
+				<div class="cell scrollable">
+					<div class="cell-inner">
+						<div class="wrapper-md">
+							<ul class="nav nav-pills nav-stacked nav-sm">
+								<li ui-sref-active="active"><a
+									ui-sref="workflowEntityConfig.acts({})">行为</a>
+								</li>
+								<li ui-sref-active="active"><a
+									ui-sref="workflowEntityConfig.states({})">状态</a>
+								</li>
+								<li ui-sref-active="active"><a
+									ui-sref="workflowEntityConfig.workflows({})">工作流</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col lter" ui-view></div>
+</div>
+<!-- /hbox layout -->

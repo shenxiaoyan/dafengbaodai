@@ -1,0 +1,207 @@
+xmcxapi.queryLatestPolicy.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/queryLatestPolicy
+xmcxapi.createEnquiry.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/createEnquiry
+xmcxapi.submitProposal.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/submitProposal
+xmcxapi.queryPayState.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/confirmPay
+xmcxapi.confirmunderwriting.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/confirmChengbao
+xmcxapi.licenseOcr.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/licenseOcr
+xmcxapi.createEnquirySync.url:http://182.92.24.162:8088/xmcxapi/webService/enquiry/createEnquirySync
+
+
+xmcxapi.queryLatestPolicy.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/queryLatestPolicy
+xmQueryLatestPolicyUrl
+{
+    "errorMsg": {
+        "code": "success",
+        "message": "操作成功"
+    },
+    "data": {
+        "biInfo": {
+            "policyNo": "PDAA201632090000014156",
+            "licenseNumber": "苏 JUA230",
+            "companyId": 2,
+            "companyName": "人保保险",
+            "insuranceBeginTime": "2016-02-19 00:00:00",
+            "insuranceEndTime": "2017-02-19 00:00:00",
+            "insuranceJson": [
+                {
+                    "insuranceId": 1,
+                    "insuranceName": "车辆损失险",
+                    "type": 2,
+                    "isToubao": "1",
+                    "compensation": false,
+                    "price": 1,
+                    "options": "",
+                    "englishName": "车损",
+                    "state": 1,
+                    "retCode": 0,
+                    "remark": "",
+                    "amountStr": "投保",
+                    "isSupported": true,
+                    "weixinSource": "xiaoma"
+                },
+                {
+                    "insuranceId": 2,
+                    "insuranceName": "第三者责任险",
+                    "type": 3,
+                    "isToubao": "1",
+                    "compensation": false,
+                    "price": 1000000,
+                    "options": "50000,100000,200000,300000,500000,1000000",
+                    "englishName": "三者",
+                    "state": 1,
+                    "retCode": 0,
+                    "remark": "",
+                    "amountStr": "100万",
+                    "isSupported": true,
+                    "weixinSource": "xiaoma"
+                }
+            ]
+        },
+        "ciInfo": {
+            "policyNo": "PDAA201632090000014156",
+            "licenseNumber": "苏JUA230",
+            "companyId": 2,
+            "companyName": "人保保险",
+            "insuranceBeginTime": "2016-02-1900: 00: 00",
+            "insuranceEndTime": "2017-02-1900: 00: 00"
+        }
+    },
+    "time": null,
+    "successful": true
+}
+
+
+xmcxapi.createEnquiry.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/createEnquiry
+xmCreateEnquiry_url
+请求数据
+{
+    "createEnquiryParams": {
+        "licenseNumber": "浙G786VL",
+        "idCard": "33072219880329281X",
+        "ownerName": "方辉",
+        "insuranceStartTime": 1499914422,
+        "forceInsuranceStartTime": 1499914422,
+        "carTypeCode": "02",
+        "cityName": "阿坝州",
+        "cityCode": "513200",
+        "insuranceCompanyName": "1",
+        "requestHeader": "111",
+        "insurancesList": [
+            {
+                "schemeName": "方案1",
+                "forcePremium": {
+                    "isToubao": "1"
+                },
+                "insurances": [
+                    {
+                        "insuranceId": 1,
+                        "compensation": true,
+                        "price": "1",
+                        "isToubao": 1
+                    },
+                    {
+                        "insuranceId": 2,
+                        "compensation": true,
+                        "price": "1000000",
+                        "isToubao": 1
+                    }
+                ]
+            }
+        ],
+        "transferDate": 0
+    },
+    "mobilePhone": "18900000000"
+}
+
+xmcxapi.submitProposal.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/submitProposal
+xmSubPropsalUrl
+{
+    "params": {
+        "orderId": "102-00220170804114511-ece",
+        "insuredName": "刘家福",
+        "insuredIdNo": "330402199003033919",
+        "insuredPhone": "15251659873",
+        "customerName": "徐龙雨",
+        "customerPhone": "15251659873",
+        "customerIdNo": "330402199003033919",
+        "contactName": "徐龙雨 zz",
+        "contactPhone": "15251659873",
+        "ownerIdCard": "330402199003033919",
+        "ownerMobilePhone": "15251659873",
+        "contactAddress": {
+            "acceptProvince": "310000",
+            "acceptProvinceName": "上海",
+            "address": "郭守敬路 498 号",
+            "contactAddressDetail": "上海 上海市 静安区郭守敬路 498 号"
+        },
+        "imageJson": {
+            "idCardImage": {
+                "name": "车主证件照片",
+                "images": [
+                    {
+                        "path": "109-20170105224938-9bac6_SG71SRV2.png",
+                        "desc": "证件照正面"
+                    }
+                ]
+            }
+        },
+        "invoiceInfo": {
+            "isInvoice": 0
+        }
+    }
+}
+{
+    "licenseImage": {
+        " name": " 行驶证证件照片",
+        "images": [
+            {
+                "path": " 图片绝对路径",
+                " desc": " 行驶证照正页"
+            }
+        ]
+    },
+    "idCardImage": {
+        " name": " 车主证件照片",
+        "images": [
+            {
+                "path": " 图片绝对路径",
+                " desc": " 证件照正面"
+            }
+        ]
+    }
+}
+
+xmcxapi.queryPayState.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/confirmPay
+xmQueryPayStatUrl
+{
+"orderId" : "109-20161129170215-70d41"
+}
+
+xmcxapi.confirmunderwriting.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/confirmChengbao
+xmConfUnderWritingUrl
+orderId=109-20161129170215-70d41
+
+xmcxapi.licenseOcr.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/licenseOcr
+licenseOcr_url
+
+xmcxapi.createEnquirySync.url
+http://182.92.24.162:8088/xmcxapi/webService/enquiry/createEnquirySync
+xmCreateEnquirySync_url
+
+
+
+xmCreateEnquiry_url	*
+xmQueryLatestPolicyUrl	*
+xmCreateEnquirySync_url *
+licenseOcr_url	*
+xmSubPropsalUrl	*
+xmQueryPayStatUrl	*
+xmConfUnderWritingUrl	*
+handleUploadProcess
+modifyEnquiryCarModel	*

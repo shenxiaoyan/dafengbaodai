@@ -1,0 +1,31 @@
+<script>
+
+    "use strict";
+    app.controller("riskspersonCtrl", [
+        "$scope",
+        function ( $scope) {
+            $scope.risksList = [
+            ]
+        }
+    ]);
+</script>
+
+<div class="hbox hbox-auto-xs hbox-auto-sm bg-light" ng-controller="riskspersonCtrl">
+    <div class="col w-md bg-light b-r bg-auto hidden-sm hidden-xs">
+        <div class="wrapper-md b-b">
+            <div class="font-thin h4">
+                车险询价管理
+            </div>
+        </div>
+        <div class="wrapper-md">
+            <ul class="nav nav-pills nav-stacked nav-sm">
+                <li ui-sref-active="active" ng-repeat="list in risksList">
+                    <a ui-sref="{{ list.sref }}">{{list.name}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="hbox hbox-auto-xs lter" ui-view></div>
+    </div>
+</div>

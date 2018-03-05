@@ -1,0 +1,53 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h4">新建门店</h1>
+</div>
+<div class="wrapper-md">
+    <progressbar value="steps.percent" class="progress-xs" type="success"></progressbar>
+    <p class="m-b">这里应该来一些说明，指导业务员如何正确填写标的</p>
+
+    <tabset class="tab-container" ng-init="steps={percent:20, step1:true, step2:false, step3:false}">
+        <tab heading="Step 1 门店名称" active="steps.step1" select="steps.percent=10">
+            <form name="step1" class="form-validation form-horizontal">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">门店名称</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="全称" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">选择店主</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="用手机号识别" class="form-control" ng-model="realname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">加盟金比例</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="realname" placeholder="1%" class="form-control" value="1%" required>
+                    </div>
+                </div>
+                <div class="m-t m-b">
+                    <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step2 = true">Next</button>
+                </div>
+            </form>
+        </tab>
+        <tab heading="Step 2 产品授权与配置" active="steps.step2" select="steps.percent=30">
+
+            <p class="m-b">容儿说：再快点</p>
+
+            <div class="m-t m-b">
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step1 = true">Prev</button>
+                <button type="submit"  class="btn btn-default btn-rounded" ng-click="steps.step3 = true">Next</button>
+            </div>
+        </tab>
+        <tab heading="Step 3 账户配置" active="steps.step3" select="steps.percent=60">
+            <p class="m-b">容儿：可以收钱了</p>
+
+            <div class="m-t m-b">
+                <button type="button" class="btn btn-default btn-rounded" ng-click="steps.step2 = true">Prev</button>
+                <button type="button" class="btn btn-success btn-rounded  pull-right" ng-click="steps.percent = 100">Click me to Finish</button>
+            </div>
+
+        </tab>
+    </tabset>
+</div>

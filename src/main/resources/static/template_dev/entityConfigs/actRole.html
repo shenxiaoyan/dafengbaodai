@@ -1,0 +1,40 @@
+<div class="vbox">
+    <div class="wrapper-md b-b">
+        {{entity_key}} /  act / role
+    </div>
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div class="wrapper-md">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            act roles
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped b-t b-light">
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px;">
+                                           选
+                                        </th>
+                                        <th>label</th>
+                                        <th>code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="role in allRoles">
+                                        <td><label class="i-checks m-b-none"><input type="checkbox" ng-model="role.isSelected" ng-change="changeActRole(role);"><i></i></label></td>
+                                        <td><span class="text-ellipsis">{{role.label}}</span></td>
+                                        <td><span class="text-ellipsis">{{role.roleCode}}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
