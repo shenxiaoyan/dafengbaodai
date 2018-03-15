@@ -42,6 +42,17 @@
                     total_page: 1
                 };
 
+//                团队增益的设置
+                $scope.setRatio=[
+                    {
+                        ratioStatus:"开启",
+                        value:1
+                    },
+                    {
+                        ratioStatus:"关闭",
+                        value:0
+                    }
+                ]
                 //获取所有代理人状态
                 $scope.getState = function(){
                     $http.get("/rest/teamStates").success(function(resResult){
@@ -52,6 +63,8 @@
 
                 //当前列表
                 $scope.getList = function (page,icon) {
+
+                    $scope.loading = true;
 
                     if(icon){
                         if($scope.state_code === "all"){
@@ -72,8 +85,10 @@
                         url : "/dafeng/team/query?size=15&page=" + page,
                         data: $scope.searchInfo
                     }).success(function(resResult){
+                        $scope.loading = false;
 
                         $scope.list = resResult.data.teams;
+
 
                         $scope.pageList = {
                             size: resResult.data.page.size,
@@ -193,7 +208,8 @@
                 /*
                 * 新增团队
                 * */
-
+                //初始化收益比例
+                $scope.teamAddModal.teamIncomeOpenStatus=1;
                 $scope.confirmAdd = function(){
 
                     $http({
@@ -202,8 +218,9 @@
                         data : {
                             cityCode : 330100,
                             captainId : $scope.teamAddModal.id,
-                            label : $scope.teamAddModal.label
-
+                            label : $scope.teamAddModal.label,
+                            revenueRatio:$scope.teamAddModal.revenueRatio,
+                            teamIncomeOpenStatus :$scope.teamAddModal.teamIncomeOpenStatus
                         }
                     }).success(function (resResult) {
 
@@ -240,6 +257,7 @@
                         }
                     }).success(function(resResult){
 
+                        console.log(resResult,'modal')
                         $scope.teamEduitModal = resResult.data.teams[0];
 
                     });
@@ -305,7 +323,6 @@
                 /*
                  * 团队的修改
                  * */
-
                 $scope.eduitTeam = function(id){
 
                     $scope.editTeamInfo = function(){
@@ -315,7 +332,9 @@
                             data : {
                                 id : $scope.teamId,
                                 captainId : $scope.teamEduitModal.captainId,
-                                label : $scope.teamEduitModal.label
+                                label : $scope.teamEduitModal.label,
+                                revenueRatio : $scope.teamEduitModal.revenueRatio,
+                                teamIncomeOpenStatus : $scope.teamEduitModal.teamIncomeOpenStatus
 
                             }
                         }).success(function (resResult) {
@@ -335,7 +354,7 @@
                         });
                     };
 
-                    if($scope.teamIn.label === $scope.teamEduitModal.label  && $scope.teamIn.realName === $scope.teamEduitModal.teamLader && $scope.teamIn.phone === $scope.teamEduitModal.phone){
+                    if($scope.teamIn.label === $scope.teamEduitModal.label  && $scope.teamIn.realName === $scope.teamEduitModal.teamLader && $scope.teamIn.phone === $scope.teamEduitModal.phone && $scope.teamIn.revenueRatio === $scope.teamEduitModal.revenueRatio && $scope.teamIn.teamIncomeOpenStatus === $scope.teamEduitModal.teamIncomeOpenStatus){
                         $rootScope.toasterWarning("失败！","请修改信息后提交！");
                     }else{
                         $scope.editTeamInfo();
@@ -498,6 +517,23 @@
     <!-- column -->
     <div class="col w-md lter b-l">
         <div class="vbox">
+            <div  ng-if="loading">
+                <div id="loading">
+                    <div id="loading-center">
+                        <div id="loading-center-absolute">
+                            <div class="object" id="object_one"></div>
+                            <div class="object" id="object_two"></div>
+                            <div class="object" id="object_three"></div>
+                            <div class="object" id="object_four"></div>
+                            <div class="object" id="object_five"></div>
+                            <div class="object" id="object_six"></div>
+                            <div class="object" id="object_seven"></div>
+                            <div class="object" id="object_eight"></div>
+                        </div>
+                        <!--<div class="text-center m-t">加载中请稍后</div>-->
+                    </div>
+                </div>
+            </div>
             <div class="wrapper b-b b-light clearfix">
                 <div class="inline pull-left">
                     <!--<span translate="createEnquiries.self.label"></span>-->
@@ -575,6 +611,7 @@
                                                 <th>当月非车险业绩/万</th>
                                                 <th>当月非车险目标业绩/万</th>
                                                 <th>非车险业绩完成率/%</th>
+                                                <th>团队收益比例</th>
                                                 <th>状态</th>
                                                 <th ng-if="state_code ==='REJECTED' ">审核拒绝理由</th>
                                                 <th ng-hide="state_code === 'REJECTED' || state_code === 'DELETED'">操作</th>
@@ -608,6 +645,9 @@
                                             </td>
                                             <td class="v-middle">
                                                 {{ item.currentLifeCompletion ? (item.currentLifeObjective ? (((item.currentLifeCompletion/100) / item.currentLifeObjective) | number : 2) : "0") : "0"}}
+                                            </td>
+                                            <td class="v-middle">
+                                                {{ item.revenueRatio ? (item.revenueRatio | number : 2) : "0" }}
                                             </td>
                                             <td class="v-middle">
                                                 {{ item.stateCode ? (item.stateCode | teamStateCode) : "暂无" }}
@@ -709,6 +749,29 @@
                                            disabled
                                            ng-model="teamAddModal.teamLader">
                                 </div>
+                                <div class="form-group">
+                                    <label for="team_modal_revenueRatio">团队收益比例</label>
+                                    <div class="form-control col-sm-12" style="border: none;padding: 6px 0;">
+                                        <input type="text" required
+                                               id="team_template_revenueRatio"
+                                               class=" col-sm-8"
+                                               style="height: 34px;margin-right: 10px"
+                                               placeholder="请输入大于0的数字"
+                                               autocomplete="off"
+                                               ng-model="teamAddModal.revenueRatio">
+                                        <select class="input-sm ng-pristine ng-valid ng-empty ng-touched col-sm-3"
+                                                id="team_template_teamIncomeOpenStatus"
+                                                style="height: 34px;"
+                                                ng-model="teamAddModal.teamIncomeOpenStatus"
+                                                ng-options="item.value as item.ratioStatus for item in setRatio"
+                                        >
+                                        </select>
+
+                                    </div>
+                                    <div style="height:45px;"></div>
+                                </div>
+
+
                             </form>
                         </div>
                         <div class="modal-footer">
@@ -764,6 +827,27 @@
                                            autocomplete="off"
                                            disabled
                                            ng-model="teamEduitModal.contactName">
+                                </div>
+                                <div class="form-group">
+                                    <label for="team_modal_revenueRatio">团队收益比例</label>
+                                    <div class="form-control col-sm-12" style="border: none;padding: 6px 0;">
+                                        <input type="text" required
+                                               id="team_modal_revenueRatio"
+                                               class=" col-sm-8"
+                                               style="height: 34px;margin-right: 10px"
+                                               placeholder="请输入大于0的数字"
+                                               autocomplete="off"
+                                               ng-model="teamEduitModal.revenueRatio">
+                                        <select class="input-sm ng-pristine ng-valid ng-empty ng-touched col-sm-3"
+                                                id="team_modal_teamIncomeOpenStatus"
+                                                style="height: 34px;"
+                                                ng-model="teamEduitModal.teamIncomeOpenStatus"
+                                                ng-options="item.value as item.ratioStatus for item in setRatio"
+                                        >
+                                        </select>
+
+                                    </div>
+                                    <div style="height:45px;"></div>
                                 </div>
                             </form>
                         </div>

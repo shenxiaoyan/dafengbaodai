@@ -36,11 +36,15 @@
 
                 $scope.getList = function (page) {
 
+                    $scope.loading = true;
+
                     //传递参数 状态，条数，页码
                 	$http({
                 	    method: "GET",
                         url : "/rest/" + $scope.entity_key + "/search/getByStateCode?stateCode=" + $scope.state_code + "&size=15&page=" + page
                     }).success(function(resResult){
+
+                        $scope.loading = false;
 
                         $scope.list = resResult._embedded.createEnquiries;
                         console.log($scope.list)
@@ -94,6 +98,23 @@
 
 <div class="vbox" ng-controller="createEnquiriesListCtrl">
     <div class="wrapper-md b-b clearfix">
+        <div  ng-if="loading">
+            <div id="loading">
+                <div id="loading-center">
+                    <div id="loading-center-absolute">
+                        <div class="object" id="object_one"></div>
+                        <div class="object" id="object_two"></div>
+                        <div class="object" id="object_three"></div>
+                        <div class="object" id="object_four"></div>
+                        <div class="object" id="object_five"></div>
+                        <div class="object" id="object_six"></div>
+                        <div class="object" id="object_seven"></div>
+                        <div class="object" id="object_eight"></div>
+                    </div>
+                    <!--<div class="text-center m-t">加载中请稍后</div>-->
+                </div>
+            </div>
+        </div>
         <div class="font-thin h4">
             <div>
                 <form class="clearfix">

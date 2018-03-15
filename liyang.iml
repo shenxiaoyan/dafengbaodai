@@ -191,8 +191,10 @@
     <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.38" level="project" />
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.0.1B" level="project" />
-    <orderEntry type="library" name="Maven: com.baidu.aip:java-sdk:4.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-configuration-processor:1.4.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20140107" level="project" />
+    <orderEntry type="library" name="Maven: com.baidu.aip:java-sdk:4.1.1" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.6" level="project" />
   </component>
 </module>

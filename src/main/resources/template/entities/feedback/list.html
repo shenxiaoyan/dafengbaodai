@@ -28,14 +28,15 @@
                 };
 
                 $scope.getList = function (page) {
+                    $scope.loading = true;
                     $scope.link = "/dafeng/feedback/search?beginDate=" + $('#startTime').val()+ "&endDate="+ $('#endTime').val() +"&size=15&page=" + page;
 
 
                     $http({method: "GET", url: $scope.link}).success(function (resResult) {
 
-                        $scope.list = resResult.data.feedbacks;
-                        console.log($scope.list);
+                        $scope.loading = false;
 
+                        $scope.list = resResult.data.feedbacks;
 
                         $scope.pageList = {
                             size: resResult.data.size,
@@ -132,6 +133,23 @@
     <!-- column -->
     <div class="col w-md lter b-l">
         <div class="vbox">
+            <div  ng-if="loading">
+                <div id="loading">
+                    <div id="loading-center">
+                        <div id="loading-center-absolute">
+                            <div class="object" id="object_one"></div>
+                            <div class="object" id="object_two"></div>
+                            <div class="object" id="object_three"></div>
+                            <div class="object" id="object_four"></div>
+                            <div class="object" id="object_five"></div>
+                            <div class="object" id="object_six"></div>
+                            <div class="object" id="object_seven"></div>
+                            <div class="object" id="object_eight"></div>
+                        </div>
+                        <!--<div class="text-center m-t">加载中请稍后</div>-->
+                    </div>
+                </div>
+            </div>
             <div class="row-row">
                 <div class="cell">
                     <div class="cell-inner">

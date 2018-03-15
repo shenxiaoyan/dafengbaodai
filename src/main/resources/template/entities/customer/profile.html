@@ -12,16 +12,58 @@
 
                 console.log($stateParams);
 
+                $scope.customerInfo = {};
+
+                //获取用户信息
+                $scope.getcustomerInfo = function () {
+                    $http.get("/rest/customers/search/getById?id=" + $stateParams.id + "&projection=customerProjection")
+                    .success(function (resResult) {
+                        console.log(resResult);
+                        $scope.customerInfo = resResult;
+                        console.log($scope.customerInfo);
+
+                    }).error(function(){
+                        $rootScope.toasterWarning("状态读取不正确！")
+                    });
+                };
+                $scope.getcustomerInfo();
+
             }
         ]
     );
 
 </script>
 <div class="vbox bg-white" ng-controller="workflowEntityProfileController">
-    
     <div class="row-row">
         <div class="cell scrollable">
             <div class="cell-inner">
+                <div style="background:url(img/c4.jpg) center center; background-size:cover">
+                    <div class="wrapper-lg bg-white-opacity">
+                        <div class="row m-t">
+                            <div class="col-sm-7">
+                                <a href="" class="thumb-lg pull-left m-r">
+                                    <img ng-src="{{ customerInfo.headimgurl?customerInfo.headimgurl:'img/userHead.png' }}" class="img-circle">
+                                </a>
+                                <div class="clear m-b">
+                                    <div class="m-b m-t-sm">
+                                        <span class="h3 text-black">{{ customerInfo.nickname }}</span>
+                                        <small class="m-l">{{ customerInfo.phone }}</small>
+                                        <!--<small class="m-l">{{ customerInfo.grade }}</small>-->
+                                        <small class="m-l">状态：{{ customerInfo.state.label }}</small>
+                                    </div>
+                                    <div class="m-b m-t-sm">
+                                        <span class="text-black col-sm-5">真实姓名：{{customerInfo.account.realName ? customerInfo.account.realName : "暂无"}}</span>
+                                        <small class="text-black m-l">开户银行：{{customerInfo.account.subbranch ? customerInfo.account.subbranch : "暂无"}}</small>
+                                    </div>
+                                    <div class="m-b m-t-sm">
+                                        <span class="text-black col-sm-5">身份证号：{{customerInfo.account.identity ? customerInfo.account.identity : "暂无"}}</span>
+                                        <small class="text-black m-l">银行卡号：{{customerInfo.account.bankcardNo ? customerInfo.account.bankcardNo : "暂无"}}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div ui-view></div>
             </div>
         </div>

@@ -1,0 +1,500 @@
+package com.liyang.util;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.persistence.Transient;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.MapDifference.ValueDifference;
+import com.google.common.collect.Maps;
+import com.liyang.domain.base.AbstractAuditorEntity;
+import com.liyang.domain.base.AbstractWorkflowFile;
+import com.liyang.domain.base.BaseEntity;
+import com.liyang.domain.department.Department;
+import com.liyang.domain.user.User;
+import com.liyang.message.BaseMsgElement;
+import com.liyang.message.CustomContent;
+import com.liyang.message.CustomContent.Ext;
+import com.liyang.message.EnumOperationMessageType;
+import com.liyang.message.Message;
+
+/**
+ * @author Administrator
+ *
+ */
+public class CommonUtil {
+
+	private final static Pattern EMOJI = Pattern.compile(
+			"[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
+			Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+
+	public static Message customElemMessageWrapper(Object data, Ext ext, String fromAccount, String toAccount,
+			Integer syncOtherMachine) {
+		Message message = new Message();
+		BaseMsgElement customElement = new BaseMsgElement();
+		CustomContent customContent = new CustomContent();
+		customContent.setData(data);
+		customContent.setExt(ext);
+		customElement.setMsgType(EnumOperationMessageType.TIMCustomElem);
+		customElement.setMsgContent(customContent);
+		message.setMsgBody(new BaseMsgElement[] { customElement });
+		message.setToAccount(toAccount);
+		message.setFromAccount(fromAccount);
+		message.setSyncOtherMachine(syncOtherMachine);
+		message.setMsgRandom(new Random().nextInt(30000000));
+		return message;
+	}
+	// public static Message customElemMessageWrapper(Object data, Ext ext,
+	// String toAccount, Integer syncOtherMachine) {
+	// Message message = new Message();
+	// BaseMsgElement customElement = new BaseMsgElement();
+	// CustomContent customContent = new CustomContent();
+	// customContent.setData(data);
+	// customContent.setExt(ext);
+	// customElement.setMsgType(EnumOperationMessageType.TIMCustomElem);
+	// customElement.setMsgContent(customContent);
+	// message.setMsgBody(new BaseMsgElement[] { customElement });
+	// message.setToAccount(toAccount);
+	// message.setSyncOtherMachine(syncOtherMachine);
+	// message.setMsgRandom(new Random().nextInt(30000000));
+	// return message;
+	// }
+
+	public static String template(String entityName, String viewType) {
+		// String defaultStr = "default";
+		String prefix = "template/entities/";
+		String split = "/";
+		if (getCurrentUserDepartment() == null) {
+			ClassPathResource resource = new ClassPathResource(prefix + viewType + ".html");
+			if (!resource.exists()) {
+				throw new FailReturnObject(800, "实体模板不存在");
+			}
+		}
+		String departmentType = getCurrentUserDepartment().getType().getCode().toLowerCase();
+		String departmentId = getCurrentUserDepartment().getId().toString().toLowerCase();
+		String roleCode = CommonUtil.getCurrentUserRoleCode().toString().toLowerCase();
+		String targetFile = entityName + split + departmentType + split + departmentId + split + roleCode + split
+				+ viewType;
+		ClassPathResource resource = new ClassPathResource(prefix + targetFile + ".html");
+		if (!resource.exists()) {
+			targetFile = entityName + split + departmentType + split + departmentId + split + viewType;
+			resource = new ClassPathResource(prefix + targetFile + ".html");
+			if (!resource.exists()) {
+
+				targetFile = entityName + split + departmentType + split + roleCode + split + viewType;
+				resource = new ClassPathResource(prefix + targetFile + ".html");
+				if (resource.exists()) {
+					return "entities" + split + targetFile;
+				} else {
+					targetFile = entityName + split + departmentType + split + viewType;
+					resource = new ClassPathResource(prefix + targetFile + ".html");
+					if (!resource.exists()) {
+						targetFile = entityName + split + viewType;
+						resource = new ClassPathResource(prefix + targetFile + ".html");
+						if (!resource.exists()) {
+							targetFile = viewType;
+							resource = new ClassPathResource(prefix + targetFile + ".html");
+							if (!resource.exists()) {
+								throw new FailReturnObject(801, "实体模板不存在");
+							}
+						}
+					}
+				}
+
+			}
+		}
+
+		return "entities" + split + targetFile;
+	}
+
+	public static String getCurrentUserRoleCode() {
+		String authority;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (null == authentication) {
+			authority = "USER";
+		} else {
+			if (authentication.getAuthorities().isEmpty()) {
+				throw new FailReturnObject(640, "没有角色授权");
+			}
+			authority = authentication.getAuthorities().toArray()[0].toString();
+		}
+		return authority;
+	}
+
+	public static Department getCurrentUserDepartment() {
+		Department department = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (null != authentication && authentication.getPrincipal() instanceof User) {
+			department = ((User) authentication.getPrincipal()).getDepartment();
+		}
+		return department;
+	}
+	
+	public static String prettyPrint(Object o) {
+		ObjectMapper mapper = new ObjectMapper();
+		String s = null;
+		// 读取JSON数据
+		try {
+			s = mapper.writeValueAsString(o);
+		} catch (JsonProcessingException e) {
+			throw new FailReturnObject(2000, "json解析错误");
+		}
+		return s;
+	}
+
+	public static List<Department> ownAndChildrenDepartments(Department node) {
+		if (node == null) {
+			return new ArrayList<Department>();
+		}
+		ArrayList<Department> departments = new ArrayList<Department>();
+		departments.add(node);
+		if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+			for (Department department : node.getChildren()) {
+				departments.addAll(ownAndChildrenDepartments(department));
+			}
+		}
+
+		return departments;
+	}
+
+	public static List<TreeNodeImpl> listToTree(Collection listItems) {
+		List<TreeNodeImpl> treeNodes = new ArrayList<TreeNodeImpl>();
+		for (Object t : listItems) {
+			TreeNodeImpl<TreeNodeImpl> treeNodeImpl = new TreeNodeImpl<TreeNodeImpl>();
+			BeanUtils.copyProperties(t, treeNodeImpl, "children", "parent");
+			treeNodes.add(treeNodeImpl);
+		}
+		// Collections.sort(treeNodes);
+		return TreeBuilder.bulid(treeNodes);
+
+	}
+
+	public static User getPrincipal() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return null;
+		}
+
+		if (authentication.getPrincipal() instanceof User) {
+			return (User) authentication.getPrincipal();
+		} else {
+			return null;
+		}
+	}
+
+	public static void validate(Object object, Class<?> group) {
+
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<ConstraintViolation<Object>> validates = validator.validate(object, group);
+		if (!validates.isEmpty()) {
+			throw new FailReturnObject(400, validates, FailReturnObject.Level.DISPLAY);
+		}
+
+	}
+
+	public static Map<String, Object> transBean2Map(Object obj) {
+
+		if (obj == null) {
+			return null;
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		BeanInfo beanInfo;
+		try {
+			beanInfo = Introspector.getBeanInfo(obj.getClass());
+
+			PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+			for (PropertyDescriptor property : propertyDescriptors) {
+				String key = property.getName();
+
+				// 过滤class属性
+				if (!"class".equals(key) && !"enum".contentEquals(key)) {
+					// 得到property对应的getter方法
+					Method getter = property.getReadMethod();
+					if (getter != null && !getter.getName().equals("getLastModifiedAt")
+							&& !getter.getName().equals("getLastModifiedBy") && !getter.getName().equals("getLastAct")
+							&& !getter.getName().equals("getCreatedAt")) {
+						Class<?> returnType = property.getReadMethod().getReturnType();
+						Transient annotation = property.getReadMethod().getAnnotation(Transient.class);
+						if (!returnType.equals(Map.class) && !returnType.equals(List.class)
+								&& !returnType.equals(Set.class) && annotation == null) {
+							Object value = getter.invoke(obj);
+							map.put(key, value);
+						}
+					}
+
+				}
+
+			}
+		} catch (IntrospectionException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new FailReturnObject(1900, "bean2map失败");
+		}
+
+		return map;
+
+	}
+
+	public static Map<String, String> mapStringToMap(String str) {
+		str = str.substring(1, str.length() - 1);
+		String[] strs = str.split(",");
+		Map<String, String> map = new HashMap<String, String>();
+		for (String string : strs) {
+			String key = string.split("=")[0];
+			String value = string.split("=")[1];
+			map.put(key, value);
+		}
+		return map;
+	}
+
+	public static Map entityToDiffMap(AbstractAuditorEntity entity, Object linked) {
+
+		if (entity.getMap() == null) {
+			entity.setupMap();
+		}
+		MapDifference diffHadle = Maps.difference(entity.getMap(), CommonUtil.transBean2Map(entity));
+		Map<String, ValueDifference> entriesDiffering = diffHadle.entriesDiffering();
+		Set<Entry<String, ValueDifference>> entrySet = entriesDiffering.entrySet();
+		HashMap<String, Map> hashMap = new HashMap<String, Map>();
+
+		if (linked != null) {
+
+			String linkedKey = entity.getLinkedKey();
+
+			HashMap<String, Object> hashMap2 = new HashMap<String, Object>();
+
+			BeanWrapperImpl beanWrapperImpl = new BeanWrapperImpl(entity);
+			if (!beanWrapperImpl.isReadableProperty(linkedKey)) {
+				throw new FailReturnObject(2110, "没有属性" + linkedKey);
+			}
+			Object propertyValue = new BeanWrapperImpl(entity).getPropertyValue(linkedKey);
+			if (propertyValue == null) {
+				throw new FailReturnObject(2100, "没有属性" + linkedKey);
+			}
+
+			Set newSet = (Set) propertyValue;
+			Object set1 = newSet.stream().map(e -> new B(((BaseEntity) e).getId(), ((BaseEntity) e).getLabel()))
+					.collect(Collectors.toSet());
+			Set set2 = entity.getLinkedSet();
+			hashMap2.put("old", set2);
+			hashMap2.put("new", set1);
+			hashMap.put(linkedKey, hashMap2);
+		} else {
+			for (Entry<String, ValueDifference> entry : entrySet) {
+				String key = entry.getKey();
+				ValueDifference value = entry.getValue();
+				HashMap<String, Object> hashMap2 = new HashMap<String, Object>();
+				if (value.leftValue() != null) {
+					hashMap2.put("old",
+							value.leftValue().toString().startsWith("{")
+									? CommonUtil.mapStringToMap(value.leftValue().toString())
+									: value.leftValue().toString());
+				} else {
+					hashMap2.put("old", null);
+				}
+				if (value.rightValue() != null) {
+					hashMap2.put("new",
+							value.rightValue().toString().startsWith("{")
+									? CommonUtil.mapStringToMap(value.rightValue().toString())
+									: value.rightValue().toString());
+				} else {
+					hashMap2.put("new", null);
+				}
+				hashMap.put(key, hashMap2);
+			}
+
+		}
+		return hashMap;
+	}
+
+	public static String toUpperCaseFirstOne(String s) {
+		if (Character.isUpperCase(s.charAt(0))) {
+			return s;
+		} else {
+			return (new StringBuilder()).append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).toString();
+		}
+	}
+
+	public static String getlinkedKeyFromRequest(HttpServletRequest request) {
+		String str = null;
+		if (request.getMethod().equals("DELETE") && request.getRequestURI().matches(".*/\\d+/(\\w+)/\\d+")) {
+			str = request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf("/"));
+			str = str.substring(str.lastIndexOf("/") + 1);
+		} else {
+			if (request.getHeader("Content-Type") != null
+					&& request.getHeader("Content-Type").equals("text/uri-list")) {
+				str = request.getRequestURI().substring(request.getRequestURI().lastIndexOf("/") + 1);
+			}
+		}
+		return str;
+	}
+
+	public static Map<?, ?> fileCategoryToTree(Set<AbstractWorkflowFile> files) {
+
+		return files.stream().collect(Collectors.groupingBy(AbstractWorkflowFile::getTopcategory,
+				Collectors.groupingBy(AbstractWorkflowFile::getSubcategory, Collectors.counting())));
+	}
+
+	/**
+	 * 字符串转Map
+	 * 
+	 * @param handerStr
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<String, Object> handerToMap(String handerStr) throws Exception {
+		String handerOffResStr = handerStr.replaceAll("\\s*|\t|\r|\n", "");
+		ObjectMapper objectMapper = new ObjectMapper();
+		Map<String, Object> resultMap = objectMapper.readValue(handerOffResStr, Map.class);
+		return resultMap;
+	}
+
+	private static class B {
+		private Integer id;
+		private String label;
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+
+		public B(Integer id, String label) {
+			super();
+			this.id = id;
+			this.label = label;
+		}
+
+	}
+
+	public static String filter(String name) {
+		Matcher matcher = EMOJI.matcher(name);
+		while (matcher.find()) {
+			name = matcher.replaceAll("");
+		}
+		System.out.println(name + "--------------");
+		return name;
+	}
+
+	// public static String[] getNullPropertyNames (Object source) {
+	// final BeanWrapper src = new BeanWrapperImpl(source);
+	// java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+	//
+	// Set<String> emptyNames = new HashSet<String>();
+	// for(java.beans.PropertyDescriptor pd : pds) {
+	// Object srcValue = src.getPropertyValue(pd.getName());
+	// if (srcValue == null) emptyNames.add(pd.getName());
+	// }
+	// String[] result = new String[emptyNames.size()];
+	// return emptyNames.toArray(result);
+	// }
+
+	/**
+	 * 获取对象中空property name 数组
+	 * 
+	 * @param source
+	 * @return
+	 * @author Adam
+	 */
+	// TODO 获取审计类时，linkedSet属性会报错---djh
+	public static String[] getNullPropertyNames(Object source) {
+		final BeanWrapper src = new BeanWrapperImpl(source);
+		PropertyDescriptor[] pds = src.getPropertyDescriptors();
+		Set<String> emptyNames = new HashSet<String>();
+		for (PropertyDescriptor pd : pds) {
+			Object propertyValue = src.getPropertyValue(pd.getName());
+			if (propertyValue == null) {
+				emptyNames.add(pd.getName());
+			}
+		}
+		String[] result = new String[emptyNames.size()];
+		return emptyNames.toArray(result);
+	}
+
+	/**
+	 * 复制集合中元素属性
+	 * 
+	 * @param sourceList
+	 * @param clazz
+	 * @return
+	 * @author Adam
+	 */
+	public static <S, T> List<T> copyListProperties(List<S> sourceList, Class<T> clazz) {
+		List<T> targetList = new ArrayList<>();
+		for (S source : sourceList) {
+			try {
+				T target = clazz.newInstance();
+				BeanUtils.copyProperties(source, target);
+				targetList.add(target);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		return targetList;
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

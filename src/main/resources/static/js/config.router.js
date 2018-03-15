@@ -184,7 +184,7 @@ angular.module('app')
                 //开发与配置
                 $stateProvider
                     .state('workflowEntity', {
-                        url: '/workflowEntity/{entity_key}',
+                        url: '/workflowEntity/{entity_key}/{type}',
                         cache: false,
                         templateUrl: function ($stateParams) {
                             return "template/" + $stateParams.entity_key + "/module.html";
@@ -197,7 +197,6 @@ angular.module('app')
                             entity_key:null
                         },
                         templateUrl: function ($stateParams) {
-                            console.log($stateParams.entity_key)
                             return "template/" + $stateParams.entity_key + "/list.html";
                         },
                         resolve: load(['bootstrapPaginator'])
@@ -214,7 +213,7 @@ angular.module('app')
                         resolve: load(['bootstrapPaginator'])
                     })
                     .state('workflowEntity.home', {
-                        url: '/{id}/{orderId}/{entityName}/{actCode}/{entityId}',
+                        url: '/{id}/{orderId}/{entityName}/{actCode}/{entityId}/{phone}',
                         cache: false,
                         templateUrl: function ($stateParams) {
                             //return "template/entities/home.html";
@@ -307,6 +306,18 @@ angular.module('app')
                         templateUrl: function ($stateParams) {
                             return "template/" + $stateParams.entity_key + "/form.html";
                         }
+                    })
+                    .state('workflowEntity.home.profile.page', {
+                        url: '/{entity_key}/{view_type}',
+                        cache: false,
+                        params:{
+                            id:null
+                        },
+                        templateUrl: function ($stateParams) {
+                            return "template/" + $stateParams.entity_key + "/" + $stateParams.view_type + ".html";
+                            // return  "template/entities/user/list.html";
+                        },
+                        resolve: load(['bootstrapPaginator'])
                     })
                     .state('workflowEntity.home.page', {
                         url: '/{entity_key}/{view_type}',

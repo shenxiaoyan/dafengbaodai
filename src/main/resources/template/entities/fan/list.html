@@ -48,6 +48,7 @@ app.controller("fanListCtrl",
                 };
 
 	            $scope.getList = function (page) {
+	                $scope.loading = true;
 	               	if($scope.byState==='state'){
 	               		$scope.link = "/rest/customers/search/getByGradeAndStateCode?grade=2&projection=showFans&size=15&page=" + page+"&stateCode="+$scope.state_code;
 	               	}
@@ -55,6 +56,7 @@ app.controller("fanListCtrl",
 	               		$scope.link='/rest/customers/search/getByGrade?grade=2&projection=showFans&size=15&page='+page;
 	               	}
 	                $http({method: "GET", url: $scope.link}).success(function (resResult) {
+	                    $scope.loading = false;
 	                    $scope.list = resResult._embedded["customers"];
 	                    $scope.allList=$scope.list;
 
@@ -152,6 +154,23 @@ app.controller("fanListCtrl",
 <div class="hbox hbox-auto-xs bg-light" ng-controller="fanListCtrl">
 	
 	<div class="wrapper b-b b-light clearfix">
+		<div  ng-if="loading">
+			<div id="loading">
+				<div id="loading-center">
+					<div id="loading-center-absolute">
+						<div class="object" id="object_one"></div>
+						<div class="object" id="object_two"></div>
+						<div class="object" id="object_three"></div>
+						<div class="object" id="object_four"></div>
+						<div class="object" id="object_five"></div>
+						<div class="object" id="object_six"></div>
+						<div class="object" id="object_seven"></div>
+						<div class="object" id="object_eight"></div>
+					</div>
+					<!--<div class="text-center m-t">加载中请稍后</div>-->
+				</div>
+			</div>
+		</div>
         <div class="inline pull-left">
             <!--<span translate="createEnquiries.self.label"></span>-->
             状态：

@@ -102,6 +102,7 @@
                 $scope.state_code = $stateParams.state_code;
 
                 $scope.getList = function (page) {
+                    $scope.loading = true;
                 	if($scope.byState==='state'){
                 		if($scope.state_code=='ONSHELF'){
                 			$scope.link="/dafeng/banner/search?size=15&sort=weight&sort=lastModifiedAt,desc&page=" + page+"&stateCode="+$scope.state_code;
@@ -118,6 +119,7 @@
                         method: "GET",
                         url : $scope.link
                     }).success(function(resResult){
+                        $scope.loading = false;
                         $scope.list = resResult.data.content;
                         $scope.pageList = {
                             size: resResult.data.size,
@@ -375,6 +377,23 @@
 <div class="hbox hbox-auto-xs bg-light" ng-controller="bannerListCtrl">
 	
 	<div class="wrapper b-b b-light clearfix">
+		<div  ng-if="loading">
+			<div id="loading">
+				<div id="loading-center">
+					<div id="loading-center-absolute">
+						<div class="object" id="object_one"></div>
+						<div class="object" id="object_two"></div>
+						<div class="object" id="object_three"></div>
+						<div class="object" id="object_four"></div>
+						<div class="object" id="object_five"></div>
+						<div class="object" id="object_six"></div>
+						<div class="object" id="object_seven"></div>
+						<div class="object" id="object_eight"></div>
+					</div>
+					<!--<div class="text-center m-t">加载中请稍后</div>-->
+				</div>
+			</div>
+		</div>
         <div class="inline pull-left">状态：</div>
         <div class="inline pull-left m-r">
             <label class="i-checks pull-left m-n">

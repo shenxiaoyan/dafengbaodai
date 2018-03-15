@@ -70,9 +70,11 @@
                     }
                 );
                 $scope.getList = function (page) {
+                    $scope.loading = true;
                     $scope.link = "/dafeng/moments/queryAllMoments?size=15&page=" + page;
 
                     $http({method: "POST", url: $scope.link,data: $scope.searchInfo}).success(function (resResult) {
+                        $scope.loading = false;
                         $scope.list = resResult.data.moments;
 
                         $scope.pageList = {

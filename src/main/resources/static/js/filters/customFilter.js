@@ -201,6 +201,27 @@ app.filter("myJson", function () {
                 case "SURRENDERED" :
                     typeName = "退保取消";
                     break;
+                case "WITHDRAWING" :
+                    typeName = "提现中";
+                    break;
+                case "WITHDRAW_SUCCESS" :
+                    typeName = "提现成功";
+                    break;
+                case "WITHDRAW_FAILED" :
+                    typeName = "提现失败";
+                    break;
+                case 1 :
+                    typeName = "返佣";
+                    break;
+                case 2 :
+                    typeName = "团队收益";
+                    break;
+                case 3 :
+                    typeName = "鼓励金";
+                    break;
+                case 4 :
+                    typeName = "提现";
+                    break;
             }
             return typeName;
         }

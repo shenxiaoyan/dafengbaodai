@@ -40,6 +40,7 @@
         </script>
     </head>
     <body ng-controller="AppCtrl">
+
         <div class="app" id="app" ng-class="{
                     'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container'
                         :app.settings.container}">
@@ -124,13 +125,30 @@
                 <a class="off-screen-toggle hide" ui-toggle-class="off-screen" data-target=".app-aside" ></a>
                 <div id="common_container" class="app-content-body app-content-full fade-in-up h-full" ui-view>
 
-                    <div class="spinner">
-                        <div class="rect1"></div>
-                        <div class="rect2"></div>
-                        <div class="rect3"></div>
-                        <div class="rect4"></div>
-                        <div class="rect5"></div>
+                    <!--<div class="spinner">-->
+                        <!--<div class="rect1"></div>-->
+                        <!--<div class="rect2"></div>-->
+                        <!--<div class="rect3"></div>-->
+                        <!--<div class="rect4"></div>-->
+                        <!--<div class="rect5"></div>-->
+                    <!--</div>-->
+
+                    <div id="loading">
+                        <div id="loading-center">
+                            <div id="loading-center-absolute">
+                                <div class="object" id="object_one"></div>
+                                <div class="object" id="object_two"></div>
+                                <div class="object" id="object_three"></div>
+                                <div class="object" id="object_four"></div>
+                                <div class="object" id="object_five"></div>
+                                <div class="object" id="object_six"></div>
+                                <div class="object" id="object_seven"></div>
+                                <div class="object" id="object_eight"></div>
+                            </div>
+                            <!--<div class="text-center m-t">加载中请稍后</div>-->
+                        </div>
                     </div>
+
 
                 </div>
 
@@ -2077,6 +2095,9 @@
         <script src="libs/layer/layer.js"></script>
         <!--autocomplete-->
         <script src="libs/jquery/autocomplete/jquery.autocomplete.js"></script>
+        <!--loading-->
+        <script src="libs/jquery/jquery.shCircleLoader-min.js"></script>
+
 
         <script>
             toastr.options = {
@@ -2179,6 +2200,7 @@
         <script src="js/config.router.js"></script>
         <script src="js/main.js"></script>
         <script src="js/filters/customFilter.js"></script>
+        <script src="js/services/customService.js"></script>
         <script src="js/services/imService.js"></script>
         <script src="js/services/ui-load.js"></script>
         <script src="js/filters/fromNow.js"></script>

@@ -1,0 +1,175 @@
+<script type="text/javascript">
+    app.controller('accountCtrl',
+        [
+            "$rootScope",
+            "$stateParams",
+            "$scope",
+            "$http",
+            "$filter",
+            function($rootScope,$stateParams,$scope,$http,$filter){
+
+                console.log($stateParams)
+
+                $scope.gradeText=['普通用户','粉丝'];
+                var id = $stateParams.id;
+                $scope.initSearch = function () {
+                    $scope.underwritingSearch = {
+                        customerId:id,
+                        stateCode: "",
+                        orderId: "",
+                        licenseNumber: "",
+                        insuranceCompanyName: "",
+                        insuredName: ""
+                    };
+                };
+                $scope.initSearch();
+
+                //设置页数
+                $scope.pageList = {
+                    size: 0,
+                    total_elements: 0,
+                    current_page: 1,
+                    num_page: 1,
+                    total_page: 1
+                };
+
+
+                //获取用户信息
+                $scope.getcustomerInfo = function () {
+                    $http.get("/rest/customers/search/getById?id=" + $stateParams.id + "&projection=customerProjection")
+                    .success(function (resResult) {
+                        $scope.customerInfo = resResult.account;
+                        console.log($scope.customerInfo);
+
+                    }).error(function(){
+                        $rootScope.toasterWarning("状态读取不正确！")
+                    });
+                };
+                $scope.getcustomerInfo();
+
+
+                //获取核保列表
+                $scope.getUnderwritting = function (page,type) {
+                    $http({
+                        method:'POST',
+                        url:"/dafeng/journal/journalList?size=15&page=" + page ,
+                        data : {
+                            customerPhone : $stateParams.phone,
+                            type : type
+                        }
+                    }).then(function(response){
+
+                        console.log(response)
+
+                        $scope.list=response.data.data.journals;
+
+                        $scope.pageList = {
+                            size: response.data.data.page.size,
+                            total_elements: response.data.data.page.totalElements,
+                            current_page: response.data.data.page.number,
+                            num_page: response.data.data.page.totalPages,
+                            total_page: response.data.data.page.totalPages
+                        };
+
+                        if ($scope.list.length > 0) {
+                            $rootScope.setPaginator("#hebao_list_paginator", $scope.pageList, $scope.getUnderwritting);
+                        }
+                    });
+                };
+                $scope.getUnderwritting(0);
+
+            }
+        ]
+    );
+
+</script>
+<div ng-controller="accountCtrl">
+    <div class="wrapper">
+        <div class="wrapper b-b b-light clearfix">
+            <div class="inline pull-left m-r">
+                累计收益：
+                {{ customerInfo.totalBalance ? customerInfo.totalBalance : "0" }}元
+            </div>
+            <div class="inline pull-left m-r">
+                已提现金额：
+                {{ customerInfo.balance ? customerInfo.balance : "0" }}元
+            </div>
+            <div class="inline pull-left m-r">
+                结算中金额：
+                {{ customerInfo.sumWithdrawed ? customerInfo.sumWithdrawed : "0" }}元
+            </div>
+            <div class="inline pull-left m-r">
+                可提现：
+                {{ customerInfo.sumSetting ? customerInfo.sumSetting : "0" }}元
+            </div>
+            <div class="inline pull-left m-r">
+                累计团队收益：
+                {{ customerInfo.sumTeamProfit ? customerInfo.sumTeamProfit : "0" }}元
+            </div>
+        </div>
+        <div class="wrapper b-b b-light clearfix">
+            <div class="inline pull-left">
+                流水分类：
+            </div>
+            <div class="inline pull-left m-r">
+                <label class="i-checks pull-left m-n">
+                    <input type="radio" id="hebaoALL" name="hebaoALLState" ng-click="getUnderwritting(0)" checked="checked"/><i></i> 全部
+                </label>
+            </div>
+            <div class="inline pull-left m-r">
+                <label class="i-checks pull-left m-n">
+                    <input type="radio" id="tixian" name="hebaoALLState" ng-click="getUnderwritting(0,4)"/><i></i> 提现
+                </label>
+            </div>
+            <div class="inline pull-left m-r">
+                <label class="i-checks pull-left m-n">
+                    <input type="radio" id="fanyong" name="hebaoALLState" ng-click="getUnderwritting(0,1)"/><i></i> 返佣
+                </label>
+            </div>
+            <div class="inline pull-left m-r">
+                <label class="i-checks pull-left m-n">
+                    <input type="radio" id="profit" name="hebaoALLState" ng-click="getUnderwritting(0,2)"/><i></i> 团队收益
+                </label>
+            </div>
+            <div class="inline pull-left m-r">
+                <label class="i-checks pull-left m-n">
+                    <input type="radio" id="bount" name="hebaoALLState" ng-click="getUnderwritting(0,3)"/><i></i> 鼓励金
+                </label>
+            </div>
+            <!--<div class="inline pull-left m-r" ng-repeat="state in underwrittingStates">-->
+                <!--<label class="i-checks pull-left m-n" ng-click="stateSelect($event,state.stateCode)">-->
+                    <!--<input type="radio" name="hebaoALLState"><i></i> {{ state.label }}-->
+                <!--</label>-->
+            <!--</div>-->
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" ng-if="list.length < 1">
+                暂无数据！
+            </div>
+            <div class="table-responsive" ng-if="list.length > 0">
+                <table class="table table-hover b-t b-light">
+                    <thead>
+                    <tr>
+                        <th>分类</th>
+                        <th>更新时间</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in list">
+                        <td class="v-middle">{{ item.type ? (item.type | profitState) : "暂无"  }}</td>
+                        <td class="v-middle">{{ item.createdAt ? (item.createdAt | dateSecondTime) : "暂无" }}</td>
+                        <td class="v-middle">{{ item.amount ? item.amount : "0" }}</td>
+                        <td class="v-middle">{{ item.stateCode ? (item.stateCode | profitState) : "暂无" }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="wrapper b-t b-light clearfix">
+            <ul id="hebao_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+            <small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+        </div>
+    </div>
+</div>

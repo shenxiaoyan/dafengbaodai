@@ -78,7 +78,7 @@
         </div>
         <div class="col-sm-6">
             <div class="panel panel-default">
-                <div class="panel-heading font-bold">出单投保日期</div>
+                <div class="panel-heading font-bold">出单投保信息</div>
                 <div class="panel-body">
                     <ul class="col-xs-6" style="list-style: none">
                         <li>
@@ -464,11 +464,12 @@
                         <ul class="col-xs-12" style="list-style: none" ng-hide="insuranceResult" ng-if="submitUnderWriting.underwritingJson.payJson.payQrcode">
                             <li>
                                 <label class="text-info-color">
-                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.name }}&ensp;
-                                    ({{ submitUnderWriting.underwritingJson.payJson.payQrcode.desc }})：
+                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.name }} &ensp;
+                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.desc }}：
                                 </label>
                                 <span>
-                                    {{ submitUnderWriting.underwritingJson.payJson.payQrcode.content }}
+                                    <img ng-src="{{ submitUnderWriting.underwritingJson.payJson.payQrcode.content }}" style="height: 100px; width: 100px;" alt="">
+                                    <!--{{ submitUnderWriting.underwritingJson.payJson.payQrcode.content }}-->
                                 </span>
                             </li>
                         </ul>

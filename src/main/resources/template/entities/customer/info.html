@@ -7,7 +7,6 @@
 			"$http",
 			function($rootScope,$stateParams,$scope,$http){
 			$scope.gradeText=['普通用户','粉丝'];
-            $scope.customerInfo = {};
 			var id = $stateParams.id;
 
 			//设置页数
@@ -21,22 +20,22 @@
 
 
 				//获取用户信息
-                $scope.getcustomerInfo = function () {
-                    $http.get("/rest/customers/search/getById?id="+id+"&projection=customerProjection")
-                        .success(function (resResult) {
-                            console.log(resResult);
-                            $scope.customerInfo = {
-                                headimgurl:resResult.headimgurl,
-                                nickname:resResult.nickname,
-                                phone:resResult.phone,
-                                grade:$scope.gradeText[resResult.grade],
-                                stateCode:resResult.state.label
-                            }
-                        }).error(function(){
-                        $rootScope.toasterWarning("状态读取不正确！")
-                    });
-                };
-                $scope.getcustomerInfo();
+                // $scope.getcustomerInfo = function () {
+                 //    $http.get("/rest/customers/search/getById?id="+id+"&projection=customerProjection")
+                 //        .success(function (resResult) {
+                 //            console.log(resResult);
+                 //            $scope.customerInfo = {
+                 //                headimgurl:resResult.headimgurl,
+                 //                nickname:resResult.nickname,
+                 //                phone:resResult.phone,
+                 //                grade:$scope.gradeText[resResult.grade],
+                 //                stateCode:resResult.state.label
+                 //            }
+                 //        }).error(function(){
+                 //        $rootScope.toasterWarning("状态读取不正确！")
+                 //    });
+                // };
+                // $scope.getcustomerInfo();
 
 			//获取邀请列表
 			$scope.getInvite = function (page) {
@@ -93,67 +92,75 @@
 
 </script>
 <div ng-controller="customerInfoCtrl">
-	<div style="background:url(img/c4.jpg) center center; background-size:cover">
-	      <div class="wrapper-lg bg-white-opacity">
-	        <div class="row m-t">
-	          <div class="col-sm-7">
-	            <a href="" class="thumb-lg pull-left m-r">
-	              <img ng-src="{{customerInfo.headimgurl?customerInfo.headimgurl:'img/userHead.png'}}" class="img-circle">
-	            </a>
-	            <div class="clear m-b">
-	              <div class="m-b m-t-sm">
-	                <span class="h3 text-black">{{customerInfo.nickname}}</span>
-	                <small class="m-l">{{customerInfo.phone}}</small>
-	                <small class="m-l">{{customerInfo.grade}}</small>
-	                <small class="m-l">{{customerInfo.stateCode}}</small>
-	              </div>
-	            </div>
-	          </div>
-	        </div>
-	      </div>
-	    </div>
-				<div class="wrapper">
-					<div class="panel panel-default">
-						<div class="panel-heading" ng-if="list.length < 1">
-							暂无数据！
-						</div>
-						<div class="table-responsive" ng-if="list.length > 0">
-							<table ng-if="list.length>0" class="table table-hover b-t b-light">
-								<caption style="font-weight:900;font-size:20px;">{{listType}}</caption>
-								<thead>
-								<tr>
-									<th>ID</th>
-									<th>邀请码</th>
-									<th>头像</th>
-									<th>昵称</th>
-									<th>手机号</th>
-									<th>等级</th>
-									<th>创建时间</th>
-									<th>更新时间</th>
-								</tr>
-								</thead>
-								<tbody>
-									<tr ng-repeat="item in list">
-										<td class="v-middle">{{item.id}}</td>
-										<td class="v-middle">{{item.myInvite}}</td>
-										<td class="v-middle">
-										<span class="pull-left thumb avatar m-r">
-										<img ng-src="{{ item.headimgurl?item.headimgurl:'img/userHead.png' }}">
-										</span>
-										</td>
-										<td class="v-middle">{{item.nickname}}</td>
-										<td class="v-middle">{{item.phone}}</td>
-										<td class="v-middle">{{gradeText[item.grade-1]}}</td>
-										<td class="v-middle">{{item.createdAt/1000 | datetime}}</td>
-										<td class="v-middle">{{item.lastModifiedAt/1000 | datetime}}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-					<div class="wrapper b-t b-light clearfix">
-						<ul id="invite_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
-						<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
-					</div>
+	<!--<div style="background:url(img/c4.jpg) center center; background-size:cover">-->
+	      <!--<div class="wrapper-lg bg-white-opacity">-->
+	        <!--<div class="row m-t">-->
+	          <!--<div class="col-sm-7">-->
+	            <!--<a href="" class="thumb-lg pull-left m-r">-->
+	              <!--<img ng-src="{{customerInfo.headimgurl?customerInfo.headimgurl:'img/userHead.png'}}" class="img-circle">-->
+	            <!--</a>-->
+	            <!--<div class="clear m-b">-->
+	              <!--<div class="m-b m-t-sm">-->
+	                <!--<span class="h3 text-black">{{customerInfo.nickname}}</span>-->
+	                <!--<small class="m-l">{{customerInfo.phone}}</small>-->
+	                <!--<small class="m-l">{{customerInfo.grade}}</small>-->
+	                <!--<small class="m-l">{{customerInfo.stateCode}}</small>-->
+	              <!--</div>-->
+					<!--<div class="m-b m-t-sm">-->
+						<!--<span class="h3 text-black">真实姓名：{{customerInfo.nickname}}</span>-->
+						<!--<small class="m-l">开户银行：{{customerInfo.phone}}</small>-->
+					<!--</div>-->
+					<!--<div class="m-b m-t-sm">-->
+						<!--<span class="h3 text-black">身份证号：{{customerInfo.nickname}}</span>-->
+						<!--<small class="m-l">银行卡号：{{customerInfo.phone}}</small>-->
+					<!--</div>-->
+	            <!--</div>-->
+	          <!--</div>-->
+	        <!--</div>-->
+	      <!--</div>-->
+	    <!--</div>-->
+		<div class="wrapper">
+			<div class="panel panel-default">
+				<div class="panel-heading" ng-if="list.length < 1">
+					暂无数据！
 				</div>
+				<div class="table-responsive" ng-if="list.length > 0">
+					<table ng-if="list.length>0" class="table table-hover b-t b-light">
+						<caption style="font-weight:900;font-size:20px;">{{listType}}</caption>
+						<thead>
+						<tr>
+							<th>ID</th>
+							<th>邀请码</th>
+							<th>头像</th>
+							<th>昵称</th>
+							<th>手机号</th>
+							<th>等级</th>
+							<th>创建时间</th>
+							<th>更新时间</th>
+						</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in list">
+								<td class="v-middle">{{item.id}}</td>
+								<td class="v-middle">{{item.myInvite}}</td>
+								<td class="v-middle">
+								<span class="pull-left thumb avatar m-r">
+								<img ng-src="{{ item.headimgurl?item.headimgurl:'img/userHead.png' }}">
+								</span>
+								</td>
+								<td class="v-middle">{{item.nickname}}</td>
+								<td class="v-middle">{{item.phone}}</td>
+								<td class="v-middle">{{item.grade?gradeText[item.grade-1] : "暂无"}}</td>
+								<td class="v-middle">{{item.createdAt/1000 | datetime}}</td>
+								<td class="v-middle">{{item.lastModifiedAt/1000 | datetime}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="wrapper b-t b-light clearfix">
+				<ul id="invite_list_paginator" style="margin:2px 0;float: right;" ng-show="list.length>0"></ul>
+				<small class="m-l-md pull-right text-muted inline m-t-sm m-b-sm m-r">总共 {{ pageList.total_elements }} 条</small>
+			</div>
+		</div>
 </div>

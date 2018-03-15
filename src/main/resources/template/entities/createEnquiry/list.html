@@ -9,6 +9,8 @@
             "$filter",
             function ($rootScope, $scope, $http, $stateParams,$filter) {
 
+
+
                 //状态栏
                 $scope.states    = [];
                 $scope.list = [];
@@ -57,6 +59,7 @@
 
                 $scope.getList = function (page) {
 
+                    $scope.loading = true;
 
                     if($scope.stateCode){
                         if($scope.stateCode === "ALL"){
@@ -81,6 +84,9 @@
                         url : $scope.link,
                         data: $scope.searchInfo
                     }).success(function(resResult){
+
+                        $scope.loading = false;
+
                         console.log(resResult);
                         $scope.list = resResult.createEnquiries;
 
@@ -183,6 +189,23 @@
     <!-- column -->
     <div class="col w-md lter b-l">
         <div class="vbox">
+            <div  ng-if="loading">
+                <div id="loading">
+                    <div id="loading-center">
+                        <div id="loading-center-absolute">
+                            <div class="object" id="object_one"></div>
+                            <div class="object" id="object_two"></div>
+                            <div class="object" id="object_three"></div>
+                            <div class="object" id="object_four"></div>
+                            <div class="object" id="object_five"></div>
+                            <div class="object" id="object_six"></div>
+                            <div class="object" id="object_seven"></div>
+                            <div class="object" id="object_eight"></div>
+                        </div>
+                        <!--<div class="text-center m-t">加载中请稍后</div>-->
+                    </div>
+                </div>
+            </div>
             <div class="wrapper b-b b-light clearfix">
                 <div class="inline pull-left">
                     状态：
@@ -203,10 +226,10 @@
                     <div class="cell-inner">
                         <div class="wrapper">
                             <div class="panel panel-default">
-                                <div class="panel-heading" ng-if="list.length > 0">
+                                <div class="panel-heading" ng-if="!loading && list.length > 0">
                                     查询结果
                                 </div>
-                                <div class="panel-heading" ng-if="list.length < 1">
+                                <div class="panel-heading" ng-if="!loading && list.length < 1">
                                     暂无数据！
                                 </div>
                                 <div class="wrapper">
@@ -247,7 +270,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="table-responsive" ng-if="list.length > 0">
+                                <div class="table-responsive" ng-if="!loading && list.length > 0">
                                     <table class="table table-hover b-t b-light">
                                         <thead>
                                             <tr>

@@ -7,7 +7,6 @@
             "$http",
             function($rootScope,$stateParams,$scope,$http){
                 $scope.gradeText=['普通用户','粉丝']
-                $scope.customerInfo = {};
                 var id = $stateParams.id;
 
 
@@ -29,24 +28,6 @@
                     num_page: 1,
                     total_page: 1
                 };
-
-                //获取用户信息
-                $scope.getcustomerInfo = function () {
-                    $http.get("/rest/customers/search/getById?id="+id+"&projection=customerProjection")
-                        .success(function (resResult) {
-                            console.log(resResult);
-                            $scope.customerInfo = {
-                                headimgurl:resResult.headimgurl,
-                                nickname:resResult.nickname,
-                                phone:resResult.phone,
-                                grade:$scope.gradeText[resResult.grade],
-                                stateCode:resResult.state.label
-                            }
-                        }).error(function(){
-                        $rootScope.toasterWarning("状态读取不正确！")
-                    });
-                };
-                $scope.getcustomerInfo();
 
 
                 //承保列表
@@ -86,25 +67,6 @@
 
 </script>
 <div ng-controller="customerInfoCtrl">
-    <div style="background:url(img/c4.jpg) center center; background-size:cover">
-        <div class="wrapper-lg bg-white-opacity">
-            <div class="row m-t">
-                <div class="col-sm-7">
-                    <a href="" class="thumb-lg pull-left m-r">
-                        <img ng-src="{{customerInfo.headimgurl?customerInfo.headimgurl:'img/userHead.png'}}" class="img-circle">
-                    </a>
-                    <div class="clear m-b">
-                        <div class="m-b m-t-sm">
-                            <span class="h3 text-black">{{customerInfo.nickname}}</span>
-                            <small class="m-l">{{customerInfo.phone}}</small>
-                            <small class="m-l">{{customerInfo.grade}}</small>
-                            <small class="m-l">{{customerInfo.stateCode}}</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="wrapper">
         <div class="panel panel-default">
             <div class="panel-heading" ng-if="list.length < 1">

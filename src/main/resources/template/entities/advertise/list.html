@@ -81,6 +81,7 @@
 	            $scope.list = [];
 
 	            $scope.getList = function (page) {
+	                $scope.loading = true;
 	            	$scope.searchInfo={type:1};
 	            	$scope.link='/dafeng/advertise/advertiseSearch?size=15&page='+page;
                     if($scope.byState==='ALL' || $scope.byState === 'all'){
@@ -100,6 +101,7 @@
                     }
                     console.log($scope.searchInfo);
                     $http({method: "POST", url: $scope.link,data:$scope.searchInfo}).success(function (resResult) {
+                        $scope.loading = false;
                     	//排序
 	                	var orderArray=resResult.data.content;
 	                	if($scope.byState==='state'&&$scope.state_code=='PUBLISHED'){
@@ -371,11 +373,9 @@
 									<p class="card-text">创建时间：{{changeTime(item.createdAt)}}</p>
 									<p class="card-text">更新时间：{{changeTime(item.lastModifiedAt)}}</p>
 									<p class="card-text" ng-if="state_code==='PUBLISHED'&&byState==='state'">发布时间：{{changeTime(item.publishTime)}}</p>
-									<p class="card-text" ng-if="byState==='all'">状态：{{item.state.label}}</p>
+									<p class="card-text" ng-if="byState==='all'">状态：{{item.state.label ? item.state.label : "暂无"}}</p>
 								</div>
 							</div>
-
-
 						</div>
 					</div>
 				</div>

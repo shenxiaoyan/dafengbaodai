@@ -1,0 +1,40 @@
+<script>
+    app.controller("roleProfileCtrl",
+        [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$resource",
+            "$stateParams",
+            "$state",
+            "$filter",
+            function ($rootScope, $scope, $http, $resource, $stateParams, $state,$filter) {
+
+                $scope.profile = {};
+
+            }
+        ]
+    );
+
+</script>
+
+<div class="vbox bg-white" ng-controller="roleProfileCtrl">
+    <!--<div class="wrapper-md b-b b-light clearfix" style="padding: 22.5px 20px">-->
+        <!--<div class="font-thin inline h4">团队详情</div>-->
+        <!--<div class="pull-right inline">-->
+            <!--<button class="btn btn-danger"-->
+                    <!--data-target="add_modal_member"-->
+                    <!--data-toggle="modal">-->
+                <!--添加成员-->
+            <!--</button>-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="row-row">
+        <div class="cell scrollable">
+            <div class="cell-inner">
+                <div ui-view></div>
+
+            </div>
+        </div>
+    </div>
+</div>

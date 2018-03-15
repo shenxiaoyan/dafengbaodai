@@ -1,4 +1,21 @@
 <div class="vbox" ng-controller="workflowEntityListController">
+    <div  ng-if="loading">
+        <div id="loading">
+            <div id="loading-center">
+                <div id="loading-center-absolute">
+                    <div class="object" id="object_one"></div>
+                    <div class="object" id="object_two"></div>
+                    <div class="object" id="object_three"></div>
+                    <div class="object" id="object_four"></div>
+                    <div class="object" id="object_five"></div>
+                    <div class="object" id="object_six"></div>
+                    <div class="object" id="object_seven"></div>
+                    <div class="object" id="object_eight"></div>
+                </div>
+                <!--<div class="text-center m-t">加载中请稍后</div>-->
+            </div>
+        </div>
+    </div>
     <div class="wrapper-md b-b">
         <div class="font-thin h4">
             {{entity_key + "s"}}

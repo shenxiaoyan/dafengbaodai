@@ -59,7 +59,7 @@
 
                 $scope.getList = function (page) {
 
-                    console.log($scope.searchInfo)
+                    $scope.loading = true;
 
                     $scope.searchIf = false;
 
@@ -69,6 +69,8 @@
                         url : "/dafeng/log/search?size=15&page=" + page,
                         params: $scope.searchInfo
                     }).success(function(resResult){
+
+                        $scope.loading  = false;
 
                         $scope.list = resResult.data.content;
 

@@ -46,6 +46,8 @@
                 //当前列表
                 $scope.getList = function (page) {
 
+                    $scope.loading = true;
+
                     if($scope.state_code === "all") {
                         $scope.state_code = "";
                     }
@@ -62,6 +64,9 @@
                             stateCode : $scope.state_code
                         }
                     }).success(function(resResult){
+
+                        $scope.loading = false;
+
                         $scope.list = resResult.data.salesmen;
                         console.log($scope.list);
                         $scope.pageList = {
@@ -245,6 +250,23 @@
     <!-- column -->
     <div class="col w-md lter b-l">
         <div class="vbox">
+            <div  ng-if="loading">
+                <div id="loading">
+                    <div id="loading-center">
+                        <div id="loading-center-absolute">
+                            <div class="object" id="object_one"></div>
+                            <div class="object" id="object_two"></div>
+                            <div class="object" id="object_three"></div>
+                            <div class="object" id="object_four"></div>
+                            <div class="object" id="object_five"></div>
+                            <div class="object" id="object_six"></div>
+                            <div class="object" id="object_seven"></div>
+                            <div class="object" id="object_eight"></div>
+                        </div>
+                        <!--<div class="text-center m-t">加载中请稍后</div>-->
+                    </div>
+                </div>
+            </div>
             <div class="wrapper b-b b-light clearfix">
                 <div class="inline pull-left">
                     <!--<span translate="createEnquiries.self.label"></span>-->

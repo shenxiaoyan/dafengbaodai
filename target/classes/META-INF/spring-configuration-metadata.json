@@ -1,0 +1,30 @@
+{
+  "groups": [{
+    "name": "spring.wechat",
+    "type": "com.liyang.util.WechatProperties",
+    "sourceType": "com.liyang.util.WechatProperties"
+  }],
+  "properties": [
+    {
+      "name": "spring.wechat.appid",
+      "type": "java.lang.String",
+      "sourceType": "com.liyang.util.WechatProperties"
+    },
+    {
+      "name": "spring.wechat.redirect-uri",
+      "type": "java.lang.String",
+      "sourceType": "com.liyang.util.WechatProperties"
+    },
+    {
+      "name": "spring.wechat.scope",
+      "type": "java.lang.String",
+      "sourceType": "com.liyang.util.WechatProperties"
+    },
+    {
+      "name": "spring.wechat.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.liyang.util.WechatProperties"
+    }
+  ],
+  "hints": []
+}

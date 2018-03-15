@@ -8,8 +8,9 @@
             "$stateParams",
             "$state",
             function ($rootScope, $scope, $http, $resource, $stateParams, $state) {
+
                 $scope.id = $stateParams.id;
-                console.log($scope.id);
+                console.log($stateParams.phone);
 
             }
         ]
@@ -22,9 +23,10 @@
                 <div class="pull-right">
                     <ul class="nav nav-tabs" style="margin-bottom: -1px;">
                         <li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.info">邀请列表</a></li>
-                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.page({entity_key:'customer',view_type:'xunjia'})">询价列表</a></li>
-                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.page({entity_key:'customer',view_type:'hebao'})">核保列表</a></li>
-                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.page({entity_key:'customer',view_type:'chengbao'})">承保列表</a></li>
+                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.page({entity_key:'customer',view_type:'account'})">个人账户</a></li>
+                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.page({entity_key:'customer',view_type:'xunjia'})">询价列表</a></li>
+                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.page({entity_key:'customer',view_type:'hebao'})">核保列表</a></li>
+                        <li ui-sref-active="active"><a ui-sref="workflowEntity.home.profile.page({entity_key:'customer',view_type:'chengbao'})">承保列表</a></li>
                     </ul>
                 </div>
                 <h4 class="pull-left m-t-none">{{module_entity_type}}</h4>

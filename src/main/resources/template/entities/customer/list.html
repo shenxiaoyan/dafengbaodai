@@ -58,6 +58,7 @@ app.controller("customerListCtrl",
 	            $scope.list = [];
 
 	            $scope.getList = function (page) {
+	                $scope.loading = true;
 	               	if($scope.byState==='state'){
 	               		$scope.link="/dafeng/user/searchCustomer?size=15&page="+page+ "&sort=lastModifiedAt,desc";
 	               		$scope.searchInfo.stateCode=$scope.state_code;
@@ -66,7 +67,7 @@ app.controller("customerListCtrl",
 	               		$scope.link='/dafeng/user/searchCustomer?size=15&page=' + page+ "&sort=lastModifiedAt,desc";
 	               	}
 	                $http({method: "POST", url: $scope.link,data:$scope.searchInfo}).success(function (resResult) {
-	                	console.log(resResult);
+						$scope.loading = false;
 	                    $scope.list = resResult.customers;
 	                    $scope.pageList = {
 	                        size: resResult.page.size,
@@ -138,6 +139,23 @@ app.controller("customerListCtrl",
 <div class="hbox hbox-auto-xs bg-light" ng-controller="customerListCtrl">
 	
 	<div class="wrapper b-b b-light clearfix">
+		<div  ng-if="loading">
+			<div id="loading">
+				<div id="loading-center">
+					<div id="loading-center-absolute">
+						<div class="object" id="object_one"></div>
+						<div class="object" id="object_two"></div>
+						<div class="object" id="object_three"></div>
+						<div class="object" id="object_four"></div>
+						<div class="object" id="object_five"></div>
+						<div class="object" id="object_six"></div>
+						<div class="object" id="object_seven"></div>
+						<div class="object" id="object_eight"></div>
+					</div>
+					<!--<div class="text-center m-t">加载中请稍后</div>-->
+				</div>
+			</div>
+		</div>
         <div class="inline pull-left">
             <!--<span translate="createEnquiries.self.label"></span>-->
             状态：
@@ -164,7 +182,7 @@ app.controller("customerListCtrl",
 					            <div>
 					                <form class="clearfix">
 					                 	<div class="pull-left m-r inline">
-					                 		<label class="form-label" style="padding:6px 0px;">用户等级：</label>
+					                 		<!--<label class="form-label" style="padding:6px 0px;">用户等级：</label>-->
 					                 	</div>
 					                    <!--<div class="pull-left m-r inline">-->
 											<!--<select type="text"-->
@@ -209,7 +227,7 @@ app.controller("customerListCtrl",
 							<th class="v-middle">昵称</th>
 							<th class="v-middle">手机号</th>
 							<th class="v-middle">状态</th>
-							<th class="v-middle">等级</th>
+							<!--<th class="v-middle">等级</th>-->
 							<th class="v-middle">创建时间</th>
 							<th class="v-middle">更新时间</th>
 							<th class="v-middle">操作</th>
@@ -230,7 +248,7 @@ app.controller("customerListCtrl",
 										<td class="v-middle">{{item.nickname}}</td>
 										<td class="v-middle">{{item.phone}}</td>
 										<td class="v-middle">{{item.state.label}}</td>
-										<td class="v-middle">{{gradeText[item.grade-1]}}</td>
+										<!--<td class="v-middle">{{gradeText[item.grade-1]}}</td>-->
 										<td class="v-middle">{{item.createdAt | date:"yyyy-MM-dd HH:mm:ss" }}</td>
 										<td class="v-middle">{{item.lastModifiedAt| date:"yyyy-MM-dd HH:mm:ss"}}</td>
 										<td class="v-middle">

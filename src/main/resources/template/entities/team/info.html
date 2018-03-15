@@ -41,6 +41,7 @@
                         $scope.team = resResult.data.team;
 
                         $scope.members = resResult.data.members;
+                        console.log(resResult,'$scope.members')
 
                         $scope.currentObjective = resResult.data.currentObjective;
 
@@ -238,6 +239,7 @@
                             <div class="text-black" style="margin: 10px 0 0 20px;">
                                 <small class="m-l">队长名称：{{team.contactName}}</small>
                                 <small class="m-l">队长联系方式：{{team.contactPhone}}</small>
+                                <small class="m-l">团队收益总额：{{team.totalIncome ?(team.totalIncome | number:2):"0"}}（元）</small>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,225 @@
+package com.liyang.domain.team;
+
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.liyang.annotation.Info;
+import com.liyang.domain.base.AbstractAuditorEntity;
+import com.liyang.domain.base.LogRepository;
+import com.liyang.domain.customer.Customer;
+import com.liyang.domain.teamobjective.TeamObjective;
+import com.liyang.service.AbstractAuditorService;
+
+/**
+ *  团队
+ * @author Adam
+ */
+@Entity
+@Table(name = "team")
+public class Team extends AbstractAuditorEntity<TeamState, TeamAct, TeamLog> {
+
+	private static final long serialVersionUID = 1L;
+
+	@SuppressWarnings("rawtypes")
+	@Transient
+	private static LogRepository logRepository;
+
+	@SuppressWarnings("rawtypes")
+	@Transient
+	private static AbstractAuditorService service;
+
+	@NotBlank(message = "团队名称不能为空")
+	@Length(min = 1, max = 10, message = "团队名称需为1~10个汉字")
+	@Pattern(regexp = "[\\u4e00-\\u9fa5]*", message = "团队名称只能包含中文汉字")
+	@Column(length = 10)
+	@Info(label = "团队名称")
+	private String label;
+
+	@Info(label = "团队邀请码")
+	private String teamInviteCode;
+
+	@Info(label = "团队图标Url")
+	private String logoImgUrl;
+
+	@Info(label = "团队联系人")
+	private String contactName;
+
+	@Info(label = "团队联系电话")
+	private String contactPhone;
+
+	@JoinColumn(name = "customer_id_caption")
+	@OneToOne(cascade = CascadeType.ALL)
+	@Info(label = "团队长")
+	@NotNull(message = "团队长不能为空")
+	private Customer captain;
+	
+	@OneToMany(cascade = CascadeType.PERSIST, targetEntity = Customer.class, mappedBy = "team")
+	private Set<Customer> members;
+
+	@Info(label = "审核不通过原因备注")
+	private String rejectReason;
+
+	@Column(name = "city_code")
+	@Info(label = "团队负责区域cityCode")
+	@NotBlank(message = "cityCode不能为空")
+	private String cityCode;
+	
+	@OneToMany(cascade = CascadeType.PERSIST, targetEntity = TeamObjective.class, mappedBy = "team")
+	private Set<TeamObjective> teamObjectives;
+	
+	@Column(name = "revenue_ratio",columnDefinition = "decimal(5,2)")
+	@Info(label = "收益比例")
+	private Double revenueRatio;
+	
+	@Column(name = "total_income",columnDefinition = "decimal(10,2)")
+	@Info(label = "团队收益总额")
+    private Double totalIncome;
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getTeamInviteCode() {
+		return teamInviteCode;
+	}
+
+	public void setTeamInviteCode(String teamInviteCode) {
+		this.teamInviteCode = teamInviteCode;
+	}
+
+	public String getLogoImgUrl() {
+		return logoImgUrl;
+	}
+
+	public void setLogoImgUrl(String logoImgUrl) {
+		this.logoImgUrl = logoImgUrl;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getContactPhone() {
+		return contactPhone;
+	}
+
+	public void setContactPhone(String contactPhone) {
+		this.contactPhone = contactPhone;
+	}
+
+	public Customer getCaptain() {
+		return captain;
+	}
+
+	public void setCaptain(Customer captain) {
+		this.captain = captain;
+	}
+	
+	public Set<Customer> getMembers() {
+		return members;
+	}
+
+	public void setMembers(Set<Customer> members) {
+		this.members = members;
+	}
+
+	public String getRejectReason() {
+		return rejectReason;
+	}
+
+	public void setRejectReason(String rejectReason) {
+		this.rejectReason = rejectReason;
+	}
+
+	public String getCityCode() {
+		return cityCode;
+	}
+
+	public void setCityCode(String cityCode) {
+		this.cityCode = cityCode;
+	}
+	
+	public Set<TeamObjective> getTeamObjectives() {
+		return teamObjectives;
+	}
+
+	public void setTeamObjectives(Set<TeamObjective> teamObjectives) {
+		this.teamObjectives = teamObjectives;
+	}
+
+
+	public Double getRevenueRatio() {
+		return revenueRatio;
+	}
+
+	public void setRevenueRatio(Double revenueRatio) {
+		this.revenueRatio = revenueRatio;
+	}
+	
+
+	public Double getTotalIncome() {
+		return totalIncome;
+	}
+
+	public void setTotalIncome(Double totalIncome) {
+		this.totalIncome = totalIncome;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transient
+	@JsonIgnore
+	public AbstractAuditorService<?, TeamState, TeamAct, TeamLog> getService() {
+		return service;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void setService(AbstractAuditorService service) {
+		Team.service = service;
+	}
+
+	@Override
+	@Transient
+	@JsonIgnore
+	public TeamLog getLogInstance() {
+		return new TeamLog();
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	@Transient
+	@JsonIgnore
+	public LogRepository getLogRepository() {
+		return logRepository;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void setLogRepository(LogRepository logRepository) {
+		Team.logRepository = logRepository;
+	}
+
+}

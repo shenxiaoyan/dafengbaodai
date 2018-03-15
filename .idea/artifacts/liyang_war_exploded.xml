@@ -151,9 +151,10 @@
           <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:1.04" />
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.38" />
           <element id="library" level="project" name="Maven: javax.transaction:jta:1.0.1B" />
-          <element id="library" level="project" name="Maven: com.baidu.aip:java-sdk:4.1.1" />
           <element id="library" level="project" name="Maven: org.json:json:20140107" />
+          <element id="library" level="project" name="Maven: com.baidu.aip:java-sdk:4.1.1" />
           <element id="library" level="project" name="Maven: log4j:log4j:1.2.17" />
+          <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
         </element>
       </element>
       <element id="directory" name="META-INF">
